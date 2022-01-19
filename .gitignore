@@ -4,3 +4,4 @@ test/
 out/
 electron-builder.yml
 dist/
+note.txt
