@@ -1,0 +1,57 @@
+body {
+    margin: 0px;
+    background-color: #121212;
+    color: #dfe6e9;
+    overflow-x: hidden;
+}
+
+#container {
+    margin-left: 30px;
+}
+
+textarea {
+    width: 80vw;
+    height: 40vh;
+    border: none;
+    resize: none;
+    background-color: #ffffff10;
+    color: wheat;
+}
+
+.br {
+    margin-bottom: 20px;
+}
+
+#ex {
+    color: steelblue;
+    cursor: pointer;
+}
+
+.btn {
+    border: transparent;
+    background-color: #ffffff10;
+    color: #dfe6e9;
+    height: 30px;
+    margin-top: 5px;
+    width: 100vw;
+}
+
+.btn2 {
+    border: transparent;
+    background-color: #ffffff10;
+    color: #dfe6e9;
+    height: 30px;
+    width: 25vw;
+    margin-right: 5px;
+}
+
+#apply {
+    margin-top: 30px;
+}
+
+.invisible{
+    visibility: hidden;
+    position: absolute;
+    height: 0px;
+    width: 0px;
+}
