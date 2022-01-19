@@ -50,7 +50,7 @@ const returnVal = (key, temppp) => {
     const fkey = Keys[0]
     if(temppp === undefined){
         console.log(key)
-        return undefined
+        return ''
     }
     if(Keys.length==1){
         return temppp[fkey];
@@ -64,9 +64,7 @@ const returnVal = (key, temppp) => {
     }
 }
 
-exports.setObj = (key, val, temppp) => {
-    return addto(key, val, temppp)
-}
+exports.setObj = addto
 
 function obNullSafe(c){
     return (typeof c === 'object' && c !== undefined && c !== null)
