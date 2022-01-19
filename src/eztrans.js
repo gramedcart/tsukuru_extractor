@@ -53,8 +53,12 @@ class Translator{
     }
     async translate(text){
         if(this.type === 'eztrans'){
-            const t =  decodeURIp((await axios.get(`http://localhost:8000/?text=${encodeURIp(text)}`)).data)
-            return t
+            const t =  ((await axios.get(`http://localhost:8000/?text=${encodeURIp(text)}`))).data
+            if(typeof(t) !== 'string'){
+                console.log(t)
+                return `ERROR: RETURNED ${JSON.stringify(t)}`
+            }
+            return decodeURIp(t)
         }
         if(this.type === 'google'){
             const translated = (await translatte(text, {to: 'ko'}))
