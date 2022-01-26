@@ -159,59 +159,14 @@ function _reload(){
         document.getElementById('ext').style.backgroundColor = '#ffffff10'
         document.getElementById('apply').style.backgroundColor = '#ffffff10'
     }
-    if(config.ext_plugin){
-        document.getElementById('ext_plugin').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('ext_plugin').style.backgroundColor = '#ffffff10'
-    }
-    if(config.ext_note){
-        document.getElementById('ext_note').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('ext_note').style.backgroundColor = '#ffffff10'
-    }
-    if(config.ext_src){
-        document.getElementById('ext_src').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('ext_src').style.backgroundColor = '#ffffff10'
-    }
-    if(config.autoline){
-        document.getElementById('autoline').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('autoline').style.backgroundColor = '#ffffff10'
-    }
-    if(config.instantapply){
-        document.getElementById('instantapply').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('instantapply').style.backgroundColor = '#ffffff10'
-    }
-    if(config.instantapply){
-        document.getElementById('instantapply').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('instantapply').style.backgroundColor = '#ffffff10'
-    }
-    if(config.exJson){
-        document.getElementById('exJson').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('exJson').style.backgroundColor = '#ffffff10'
-    }
-    if(config.decryptImg){
-        document.getElementById('decryptImg').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('decryptImg').style.backgroundColor = '#ffffff10'
-    }
-    if(config.decryptAudio){
-        document.getElementById('decryptAudio').style.backgroundColor = '#3700b390'
-    }
-    else{
-        document.getElementById('decryptAudio').style.backgroundColor = '#ffffff10'
+    const DomList = ['ext_plugin','ext_note','ext_src','autoline','instantapply','exJson','decryptImg','decryptAudio']
+    for(const i in DomList){
+        if(config[DomList[i]]){
+            document.getElementById(DomList[i]).style.backgroundColor = '#3700b390'
+        }
+        else{
+            document.getElementById(DomList[i]).style.backgroundColor = '#ffffff10'
+        }
     }
 }
 
@@ -230,58 +185,36 @@ if(true){
         menu_open = true
     }
     
-    document.getElementById('ext_plugin').addEventListener('mouseenter', ()=>{
-        info.innerText = "추출 시 플러그인을\n추출합니다"
-    })
-    document.getElementById('decryptImg').addEventListener('mouseenter', ()=>{
-        info.innerText = "추출 시 이미지의\n암호화를 해제하고\n추출합니다"
-    })
-    document.getElementById('decryptAudio').addEventListener('mouseenter', ()=>{
-        info.innerText = "추출 시 오디오의\n암호화를 해제하고\n추출합니다"
-    })
-    document.getElementById('ext_src').addEventListener('mouseenter', ()=>{
-        info.innerText = "추출 시 스크립트를\n추출합니다"
-    })
-    document.getElementById('ext').addEventListener('mouseenter', ()=>{
-        info.innerText = "추출 모드로\n전환합니다"
-    })
-    document.getElementById('apply').addEventListener('mouseenter', ()=>{
-        info.innerText = "적용 모드로\n전환합니다"
-    })
-    document.getElementById('changeAll').addEventListener('mouseenter', ()=>{
-        info.innerText = "문자열을 일괄\n변경합니다"
-    })
-    document.getElementById('addons_btn').addEventListener('mouseenter', ()=>{
-        info.innerText = "추가 기능을\n펼칩니다"
-    })
-    document.getElementById('eztrans').addEventListener('mouseenter', ()=>{
-        info.innerText = "Extract 폴더 내\n파일을 이지트랜스로\n번역합니다"
-    })
-    document.getElementById('ext_note').addEventListener('mouseenter', ()=>{
-        info.innerText = "노트/메모를\n추출합니다"
-    })
-    document.getElementById('exJson').addEventListener('mouseenter', ()=>{
-        info.innerText = "RpgMaker MV에\n기본적으로는\n존재하지 않는 JSON\n을 추출합니다"
-    })
-    document.getElementById('autoline').addEventListener('mouseenter', ()=>{
-        info.innerText = "적용 시 자동\n줄바꿈을 합니다"
-    })
-    document.getElementById('instantapply').addEventListener('mouseenter', ()=>{
-        info.innerText = "적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다"
-    })
-    document.getElementById('settings').addEventListener('mouseenter', ()=>{
-        info.innerText = "설정"
+    const InfoList = {
+        'ext_plugin': '추출 시 플러그인을\n추출합니다',
+        'decryptImg': '추출 시 이미지의\n암호화를 해제하고\n추출합니다',
+        'decryptAudio': '추출 시 오디오의\n암호화를 해제하고\n추출합니다',
+        'ext_src': '추출 시 스크립트를\n추출합니다',
+        'ext': '추출 모드로\n전환합니다',
+        'apply': '적용 모드로\n전환합니다',
+        'changeAll': '문자열을 일괄\n변경합니다',
+        'addons_btn': '추가 기능을\n펼칩니다',
+        'eztrans': 'Extract 폴더 내\n파일을 이지트랜스로\n번역합니다',
+        'ext_note': '노트/메모를\n추출합니다',
+        'exJson': 'RpgMaker MV에\n기본적으로는\n존재하지 않는 JSON\n을 추출합니다',
+        'autoline': '적용 시 자동\n줄바꿈을 합니다',
+        'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
+        'settings': '설정'
+    }
+    for(const i in InfoList){
+        document.getElementById(i).addEventListener('mouseenter', ()=>{
+            info.innerText = InfoList[i]
+        })
+    }
+    document.getElementById('run').addEventListener('mouseenter', ()=>{
+        if(_mode == 0){
+            info.innerText = "추출을 시작합니다"
+        }
+        else{
+            info.innerText = "적용을 시작합니다"
+        }
     })
 }
-
-document.getElementById('run').addEventListener('mouseenter', ()=>{
-    if(_mode == 0){
-        info.innerText = "추출을 시작합니다"
-    }
-    else{
-        info.innerText = "적용을 시작합니다"
-    }
-})
 document.getElementById('ext_plugin').onclick = () => {
     if(!config.ext_plugin){
         Swal.fire({
