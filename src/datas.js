@@ -77,5 +77,5 @@ exports.translateable = [
 ]
 
 exports.note2able = [
-    '選択肢ヘルプ'
+    '選択肢ヘルプ',
 ]

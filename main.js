@@ -4,7 +4,8 @@ const {
   app,
   BrowserWindow,
   ipcMain,
-  dialog
+  dialog,
+  globalShortcut
 } = require('electron');
 const fs = require('fs');
 const open = require('open');
@@ -96,6 +97,12 @@ function createWindow() {
     }
     v(app.getVersion())
     getMainWindow().webContents.send('getGlobalSettings', globalThis.settings);
+    if(!isPackaged){
+      globalShortcut.register('Control+Shift+I', () => {
+        mainWindow.webContents.openDevTools()
+        return false;
+      });
+    }
   });
   mainid = mainWindow.id;
   globalThis.mwindow = mainWindow
@@ -376,7 +383,7 @@ function oPath(){
 
 
 ipcMain.on('extend', async (ev, arg) => {
-  getMainWindow().setSize(800, defaultHeight+90, true)
+  getMainWindow().setSize(800, defaultHeight+170, true)
 })
 
 ipcMain.on('eztrans', eztrans.trans)

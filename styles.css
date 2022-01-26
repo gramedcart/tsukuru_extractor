@@ -103,6 +103,8 @@ body{
 #addons-block{
     position: relative;
     top: 190px;
+    margin-top: 10px;
+    height: 52.5px;
 }
 
 ::-webkit-scrollbar {

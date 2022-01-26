@@ -1,7 +1,7 @@
 {
   "name": "mv-extractor-pp",
-  "version": "1.3.3",
-  "description": "A MV Extractor App",
+  "version": "1.4.0",
+  "description": "MV Extractor++",
   "main": "main.js",
   "scripts": {
     "codepage": "chcp 65001",

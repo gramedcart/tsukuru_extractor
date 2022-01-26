@@ -225,8 +225,8 @@ _reload()
 
 if(true){
     document.getElementById('addons_btn').onclick = () => {
-        document.getElementById("addons").style.height = "90px";
-        ipcRenderer.send('extend', 450)
+        document.getElementById("addons").style.height = "165px";
+        ipcRenderer.send('extend', 460)
         menu_open = true
     }
     
