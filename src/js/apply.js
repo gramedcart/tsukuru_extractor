@@ -42,7 +42,12 @@ exports.apply = async (ev, arg) => {
         }
       }
       const jsdir = ((dir.substring(0,dir.length-5) + '/js').replaceAll('//','/'))
-      const ext_data = edTool.read(dir)
+      let ext_data = edTool.read(dir)
+      if(ext_data.main === undefined){
+        while(ext_data.main === undefined){
+          ext_data = ext_data.dat
+        }
+      }
       const ext_dat = ext_data.main
       const max_files = Object.keys(ext_dat).length
       let worked_files = 0
@@ -86,7 +91,12 @@ exports.apply = async (ev, arg) => {
                 output += '\n'
               }
             }
-            OutputData[originFile] = ExtTool.setObj(ext_dat[i].data[q].val, output, OutputData[originFile])
+            try {
+              OutputData[originFile] = ExtTool.setObj(ext_dat[i].data[q].val, output, OutputData[originFile]) 
+            } catch (error) {
+              console.log(ext_dat[i].data[q].val)
+              console.log(error)
+            }
           }
         }
         globalThis.mwindow.webContents.send('loading', worked_files/max_files*100);

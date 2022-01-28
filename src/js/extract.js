@@ -29,6 +29,9 @@ function addtodic(pa, obj, usePath='', conf = undefined){
 const addto = (key, val,temppp) => { 
     Keys = key.split('.');
     const fkey = Keys[0]
+    if(temppp === undefined){
+        temppp = {}
+    }
     if(Keys.length==1){
         temppp[fkey] = val;
     }
