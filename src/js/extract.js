@@ -116,8 +116,11 @@ exports.parse_externMsg = (dir) => {
     return new Promise((resolve, reject) => {
         let a = {}
         csv.parseFile(dir, {encoding: "binary"})
-        .on('data', row => {
+        .on('data', (row) => {
             function Convert(txt){
+                if(txt === undefined || txt === null){
+                    return ''
+                }
                 const bf = Buffer.from(txt, "binary")
                 const Utf8Array = new Uint8Array(encoding.convert(bf, 'UTF8', 'AUTO'));
                 return new TextDecoder().decode(Utf8Array)
