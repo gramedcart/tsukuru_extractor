@@ -1,7 +1,19 @@
 const { ipcRenderer } = require('electron');
-const { set } = require('lodash');
 
 let settings = {}
+const CheckboxValues = [
+  'extractJs',
+  'code122',
+  'safeTrans',
+  'smartTrans',
+  'ExtractAddLine',
+  'onefile_src',
+  'onefile_note',
+  'JsonChangeLine',
+  'extractSomeScript',
+  'oneMapFile',
+  'loadingText'
+]
 
 ipcRenderer.on("settings", (evt, arg) => {
   settings = arg
@@ -14,18 +26,9 @@ ipcRenderer.on("settings", (evt, arg) => {
   }
 
   document.getElementById('extractSomeScript2').value += ess2.join('\n')
-  document.getElementById('extractJs').checked = settings.extractJs
-  document.getElementById('code122').checked = settings.code122
-  document.getElementById('safeTrans').checked = settings.safeTrans
-  document.getElementById('smartTrans').checked = settings.smartTrans
-  document.getElementById('ExtractAddLine').checked = settings.ExtractAddLine
-  document.getElementById('onefile_src').checked = settings.onefile_src
-  document.getElementById('onefile_note').checked = settings.onefile_note
-  document.getElementById('JsonChangeLine').checked = settings.JsonChangeLine
-  document.getElementById('extractSomeScript').checked = settings.extractSomeScript
-  document.getElementById('oneMapFile').checked = settings.oneMapFile
-  document.getElementById('loadingText').checked = settings.loadingText
-  document.getElementById('oneMapFile').checked = settings.oneMapFile
+  CheckboxValues.forEach((val) => {
+    document.getElementById(val).checked = settings[val]
+  })
   document.getElementById('update').innerText = `업데이트 확인 (현재: ${settings.version})`
   document.getElementById('update').onclick = () => {ipcRenderer.send('updates')}
   document.getElementById('license').onclick = () => {ipcRenderer.send('license')}
@@ -58,17 +61,9 @@ document.getElementById('apply').onclick = () => {
     }
   }
   settings.userdict = userdict
-  settings.extractJs = document.getElementById('extractJs').checked
-  settings.code122 = document.getElementById('code122').checked
-  settings.ExtractAddLine = document.getElementById('ExtractAddLine').checked
-  settings.onefile_src = document.getElementById('onefile_src').checked
-  settings.onefile_note = document.getElementById('onefile_note').checked
-  settings.loadingText = document.getElementById('loadingText').checked
-  settings.safeTrans = document.getElementById('safeTrans').checked
-  settings.smartTrans = document.getElementById('smartTrans').checked
-  settings.extractSomeScript = document.getElementById('extractSomeScript').checked
-  settings.JsonChangeLine = document.getElementById('JsonChangeLine').checked
-  settings.oneMapFile = document.getElementById('oneMapFile').checked
+  CheckboxValues.forEach((val) => {
+    settings[val] = document.getElementById(val).checked
+  })
   settings.extractSomeScript2 = document.getElementById('extractSomeScript2').value.split('\n')
   ipcRenderer.send('applysettings', settings);
 }

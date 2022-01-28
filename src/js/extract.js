@@ -2,11 +2,8 @@ const {_} = require('lodash');
 const path = require('path')
 const fs = require('fs')
 const rpgencrypt = require("./rpgencrypt");
-
-function isVar(){
-    
-}
-
+const csv = require('@fast-csv/parse');
+const encoding = require('encoding-japanese')
 
 function addtodic(pa, obj, usePath='', conf = undefined){
     const Path = pa
@@ -115,6 +112,25 @@ function Extreturnit(dat_obj, Path='', nas={'nothing':'nothing'}){
 }
 
 
+exports.parse_externMsg = (dir) => {
+    return new Promise((resolve, reject) => {
+        let a = {}
+        csv.parseFile(dir, {encoding: "binary"})
+        .on('data', row => {
+            function Convert(txt){
+                const bf = Buffer.from(txt, "binary")
+                const Utf8Array = new Uint8Array(encoding.convert(bf, 'UTF8', 'AUTO'));
+                return new TextDecoder().decode(Utf8Array)
+            }
+            a[`\\M[${Convert(row[0])}]`] = Convert(row[1])
+        })
+        .on('end', () => {
+            resolve(a)
+        })
+    })
+}
+
+
 exports.extract = async (filedata, conf, ftype) => {
     const extended = conf.extended
     const fileName = conf.fileName
@@ -161,6 +177,17 @@ exports.extract = async (filedata, conf, ftype) => {
         if(obNullSafe(data.events)){
             for(const i of _.range(data.events.length)){
                 if(obNullSafe(data.events[i]) && obNullSafe(data.events[i].pages)){
+                    if(conf.note){
+                        console.log(data.events[i].note)
+                        if(globalThis.settings.extractSomeScript){
+                            if(isIncludeAble(data.events[i].note)){
+                                dat_obj = addtodic(`events.${i}.note`, dat_obj, 'note')
+                            }
+                        }
+                        else{
+                            dat_obj = addtodic(`events.${i}.note`, dat_obj, 'note')
+                        }
+                    }
                     for(const a of _.range(data.events[i].pages.length)){
                         if(obNullSafe(data.events[i].pages[a]) && obNullSafe(data.events[i].pages[a].list)){
                             dat_obj = forEvent(data.events[i].pages[a], dat_obj, conf, `events.${i}.pages.${a}`)
@@ -423,6 +450,11 @@ exports.format_extracted = async(dats, typ = 0) => {
             }
             else if(globalThis.settings.oneMapFile && jpathIsMap(jpath)){
                 jpath = 'Maps.json'
+            }
+            if(globalThis.useExternMsg){
+                if(globalThis.externMsgKeys.includes(datobj[d].var)){
+                    datobj[d].var = globalThis.externMsg[datobj[d].var]
+                }
             }
             const cid = (globalThis.gb[jpath].outputText.split('\n').length - 1)
             globalThis.gb[jpath].data[cid] = {}

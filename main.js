@@ -12,19 +12,19 @@ const open = require('open');
 const isPackaged = require('electron-is-packaged').isPackaged;
 const Store = require('electron-store');
 const storage = new Store();
-const ExtTool = require('./src/extract.js')
+const ExtTool = require('./src/js/extract.js')
 const path = require('path')
 const zlib= require('zlib')
-const LZString = require('./src/lz-string.min.js');
-const edTool = require('./src/edtool.js')
+const LZString = require('./src/js/lz-string.min.js');
+const edTool = require('./src/js/edtool.js')
 let mainid = 0
 const defaultHeight = 350
 const isDev = true
 const axios = require('axios')
-const dataBaseO = require('./src/datas.js')
-const applyjs = require("./src/apply.js")
-const eztrans = require("./src/eztrans.js")
-const {checkIsMapFile, sleep} = require('./src/globalutils.js')
+const dataBaseO = require('./src/js/datas.js')
+const applyjs = require("./src/js/apply.js")
+const eztrans = require("./src/js/eztrans.js")
+const {checkIsMapFile, sleep} = require('./src/js/globalutils.js')
 
 function ErrorAlert(msg){
   getMainWindow().webContents.send('alert', msg)
@@ -75,7 +75,7 @@ function createWindow() {
   
   mainWindow.setMenu(null)
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('./src/html/main/index.html')
   mainWindow.webContents.on('did-finish-load', function () {
     mainWindow.show();
     getMainWindow().webContents.send('is_version', app.getVersion());
@@ -115,6 +115,14 @@ const getMainWindow = () => {
   return BrowserWindow.fromId(ID)
 }
 
+function sendAlert(txt){
+  getMainWindow().webContents.send('alert', txt);
+}
+
+function sendError(txt){
+  getMainWindow().webContents.send('alert', {icon: 'error',  message: txt});
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -137,7 +145,7 @@ ipcMain.on('license', () => {
     icon: path.join(__dirname, 'libs/icon.png')
   })
   licenseWindow.setMenu(null)
-  licenseWindow.loadFile('libs/license.html')
+  licenseWindow.loadFile('src/html/license.html')
   licenseWindow.show()
 })
 
@@ -156,7 +164,7 @@ ipcMain.on('settings', () => {
     icon: path.join(__dirname, 'libs/icon.png'),
   })
   globalThis.settingsWindow.setMenu(null)
-  globalThis.settingsWindow.loadFile('src/config/settings.html')
+  globalThis.settingsWindow.loadFile('src/html/config/settings.html')
   globalThis.settingsWindow.webContents.on('did-finish-load', function () {
     globalThis.settingsWindow.show();
     globalThis.settingsWindow.webContents.send('settings', getSettings());
@@ -166,6 +174,38 @@ ipcMain.on('settings', () => {
   });
   globalThis.settingsWindow.show()
 })
+
+ipcMain.on('gamePatcher', (ev, dir) => {
+  if(!edTool.exists(dir)){
+    sendError('추출된 파일이 없습니다')
+    worked()
+    return
+  }
+  globalThis.settingsWindow = new BrowserWindow({
+    width: 800,
+    height: 400,
+    resizable: false,
+    show: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
+    },
+    icon: path.join(__dirname, 'libs/icon.png'),
+  })
+  globalThis.settingsWindow.setMenu(null)
+  globalThis.settingsWindow.loadFile('src/html/patcher/index.html')
+  globalThis.settingsWindow.webContents.on('did-finish-load', function () {
+    globalThis.settingsWindow.show();
+    globalThis.settingsWindow.webContents.send('settings', getSettings());
+  });
+  globalThis.settingsWindow.on('close', function() { //   <---- Catch close event
+    worked()
+  });
+  globalThis.settingsWindow.show()
+})
+
 
 ipcMain.on('updatePage', () => {
   open('https://github.com/gramedcart/mvextractor/releases/latest')
@@ -278,6 +318,17 @@ async function extractor(arg){
       }
     }
     const fileList = fs.readdirSync(dir)
+    globalThis.externMsg = {}
+    globalThis.useExternMsg = false
+    if(fs.existsSync(dir + '/ExternMessage.csv')){
+      console.log('extern Exists')
+      const Emsg = await ExtTool.parse_externMsg(dir + '/ExternMessage.csv')
+      globalThis.externMsg = Emsg
+      globalThis.useExternMsg = true
+      globalThis.externMsgKeys = Object.keys(Emsg)
+    }
+
+
     if (! fs.existsSync(dir + '/Extract')){
       fs.mkdirSync(dir + '/Extract')
     }

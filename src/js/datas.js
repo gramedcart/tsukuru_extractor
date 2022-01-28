@@ -73,7 +73,11 @@ exports.translateable = [
     '<SG説明',
     '<SG説明2:',
     "<namePop:",
-    "<SGカテゴリ:"
+    "<SGカテゴリ:",
+]
+
+exports.translateableOne = [
+    "<namePop:"
 ]
 
 exports.note2able = [

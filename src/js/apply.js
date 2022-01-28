@@ -20,7 +20,7 @@ exports.apply = async (ev, arg) => {
         globalThis.mwindow.webContents.send('worked', 0);
         return
       }
-      if (! fs.existsSync(dir + '/.extracteddata')){
+      if (!edTool.exists(dir)){
         globalThis.mwindow.webContents.send('alert', {icon: 'error', message: '.extracteddata 파일이 존재하지 않습니다'}); 
         globalThis.mwindow.webContents.send('worked', 0);
         return

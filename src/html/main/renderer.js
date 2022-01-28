@@ -5,9 +5,12 @@
 // selectively enable features needed in the rendering
 // process.
 
-const { ipcRenderer } = require('electron');
+const { ipcRenderer} = require('electron');
 const {_} = require('lodash');
 const info = document.getElementById('info')
+require = () => {
+    
+}
 let running = false
 let loadingTag = ''
 let menu_open = false
@@ -55,6 +58,8 @@ ipcRenderer.on('updateFound', (evn, tt) => {
         }
     })
 });
+
+
 
 ipcRenderer.on('getGlobalSettings', (evn, tt) => {
     globalSettings = tt
@@ -199,7 +204,9 @@ if(true){
         'exJson': 'RpgMaker MV에\n기본적으로는\n존재하지 않는 JSON\n을 추출합니다',
         'autoline': '적용 시 자동\n줄바꿈을 합니다',
         'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
-        'settings': '설정'
+        'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
+        'versionUp': '버전 업 툴을\n엽니다',
+        'settings': '설정',
     }
     for(const i in InfoList){
         document.getElementById(i).addEventListener('mouseenter', ()=>{
@@ -215,6 +222,7 @@ if(true){
         }
     })
 }
+
 document.getElementById('ext_plugin').onclick = () => {
     if(!config.ext_plugin){
         Swal.fire({
@@ -365,9 +373,13 @@ document.getElementById('eztrans').onclick = () => {
         })
         return
     }
+    let txt = '플러그인/스크립트 활성화 상태로 기계 번역을 돌리면 게임 내에서 오류가 날 수 있습니다. 정말로 번역하시겠습니까?'
+    if(globalSettings.smartTrans){
+        txt = '플러그인/스크립트/노트/메모는 스마트 번역으로 오류 없이 번역됩니다. 번역하시겠습니까?'
+    }
     Swal.fire({
         icon: 'warning',
-        text: '플러그인/스크립트 활성화 상태로 기계 번역을 돌리면 게임 내에서 오류가 날 수 있습니다. 정말로 번역하시겠습니까?',
+        text: txt,
         confirmButtonText: '예',
         showDenyButton: true,
         denyButtonText: `아니오`,

@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
         <link href="./styles.css" rel="stylesheet">
         <title>설정</title>
     </head>
@@ -42,7 +43,7 @@
             </label>
             <textarea id="extractSomeScript2" class="invisible" spellcheck="false" placeholder="showtext&#10;maintext&#10;.."></textarea><br><br>
             <label>자동번역 사용자 사전</label><br><br>
-            <textarea id="userdict" spellcheck="false" placeholder="アル=아루&#10;日本=일본&#10;.."></textarea><br><br>
+            <textarea id="userdict" spellcheck="false" placeholder="Hina=히나&#10;橋本=하시모토&#10;ひかり=히카리&#10;.."></textarea><br><br>
             <button id="update" class="btn2">업데이트 확인</button><button id="license" class="btn2">오픈소스 라이센스</button>
         </div>
         <button id="apply" class="btn">적용</button>

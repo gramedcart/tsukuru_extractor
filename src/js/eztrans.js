@@ -5,7 +5,7 @@ const spawn = require('child_process').spawn;
 const dataBaseO = require('./datas.js')
 const {checkIsMapFile, sleep} = require('./globalutils.js')
 const axios = require('axios')
-const {translateable, note2able} = require('./datas.js')
+const {translateable, note2able, translateableOne} = require('./datas.js')
 const translatte = require('translatte');
 
 function oPath(){
@@ -168,6 +168,7 @@ exports.trans = async (ev, arg) => {
             const read = applyUserDict(fs.readFileSync(iPath, 'utf-8')).split('\n')
             let output = ''
             let transIt = false
+            let folkt = false
             for (const v in read) {
                 try {
                     globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / read.length / max_files)) * 100);
@@ -203,6 +204,8 @@ exports.trans = async (ev, arg) => {
                                     if (readLine.startsWith(translateable[vv])){
                                         startAble = true
                                         fi = translateable[vv]
+                                        folkt = translateableOne.includes(fi)
+                                        console.log(`${fi} | ${folkt}`)
                                         break
                                     }
                                 }
@@ -216,15 +219,23 @@ exports.trans = async (ev, arg) => {
                                 }
                             }
                             if(transIt){
-                                if(rl.includes('>')){
+                                if(rl.includes('>') || (folkt && rl.includes(' '))){
                                     transIt = false
-                                    rl = rl.substring(0, rl.indexOf('>'))
+                                    let keyString = '>'
+                                    if((folkt && rl.includes(' '))){
+                                        keyString = ' '
+                                    }
+                                    let vax = '>\n'
+                                    vax = rl.substring(rl.indexOf(keyString)) + '\n'
+
+                                    
+                                    rl = rl.substring(0, rl.indexOf(keyString))
                                     const ouput = await translator.translate((rl))
                                     try{
-                                        output += fi + encodeSp(ouput, true) + '>\n'
+                                        output += fi + encodeSp(ouput, true) + vax
                                     }
                                     catch{
-                                        output += fi + rl + '>\n'
+                                        output += fi + rl + vax
                                         if (await translator.isCrash()){
                                             return
                                         }
