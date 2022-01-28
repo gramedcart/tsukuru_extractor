@@ -7,7 +7,8 @@
     "codepage": "chcp 65001",
     "start2": "electron . start",
     "start": "npm-run-all --parallel codepage start2",
-    "build": "electron-builder --windows nsis:x64"
+    "build": "electron-builder --windows nsis:x64",
+    "build2": "electron-builder --windows portable"
   },
   "repository": {
     "type": "git",
