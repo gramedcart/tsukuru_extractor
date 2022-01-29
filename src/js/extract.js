@@ -4,6 +4,7 @@ const fs = require('fs')
 const rpgencrypt = require("./rpgencrypt");
 const csv = require('@fast-csv/parse');
 const encoding = require('encoding-japanese')
+const { writeToPath } = require('@fast-csv/format');
 
 function addtodic(pa, obj, usePath='', conf = undefined){
     const Path = pa
@@ -92,11 +93,7 @@ exports.init_extract = (arg) => {
     }
 }
 
-function Extreturnit(dat_obj, Path='', nas={'nothing':'nothing'}){
-    if(nas === {'nothing':'nothing'}){
-        nas = dat_obj.edited
-        console.log('isnull')
-    }
+function Extreturnit(dat_obj, Path='', nas=null){
     if(typeof(nas) === 'object' && nas !== null){
         const keys = Object.keys(nas)
         for(let i=0;i<keys.length;i++){
@@ -110,12 +107,12 @@ function Extreturnit(dat_obj, Path='', nas={'nothing':'nothing'}){
         return dat_obj
     }
     else{
-        return addtodic(Path, dat_obj)
+        return addtodic(Path, dat_obj, 'ext')
     }
 }
 
 
-exports.parse_externMsg = (dir) => {
+exports.parse_externMsg = (dir, useI) => {
     return new Promise((resolve, reject) => {
         let a = {}
         csv.parseFile(dir, {encoding: "binary"})
@@ -128,7 +125,12 @@ exports.parse_externMsg = (dir) => {
                 const Utf8Array = new Uint8Array(encoding.convert(bf, 'UTF8', 'AUTO'));
                 return new TextDecoder().decode(Utf8Array)
             }
-            a[`\\M[${Convert(row[0])}]`] = Convert(row[1])
+            if(useI){
+                a[`\\M[${Convert(row[0])}]`] = Convert(row[1])
+            }
+            else{
+                a[Convert(row[0])] = Convert(row[1])
+            }
         })
         .on('end', () => {
             resolve(a)
@@ -136,6 +138,17 @@ exports.parse_externMsg = (dir) => {
     })
 }
 
+exports.pack_externMsg = (dir, data) => {
+    return new Promise((resolve, reject) => {
+        rows = []
+        for(const i in data){
+            rows.push([i, data[i]])
+        }
+        writeToPath(dir, rows)
+        .on('error', err => console.error(err))
+        .on('finish', () => resolve());
+    })
+}
 
 exports.extract = async (filedata, conf, ftype) => {
     const extended = conf.extended
@@ -255,7 +268,7 @@ exports.extract = async (filedata, conf, ftype) => {
         }
     }
     else if(ftype == 'ex'){
-        dat_obj = Extreturnit(dat_obj)
+        dat_obj = Extreturnit(dat_obj, '', dat_obj.edited)
     }
     else if(ftype == 'ene2'){
         for(let i=0;i<data.length;i++){
@@ -470,6 +483,10 @@ exports.format_extracted = async(dats, typ = 0) => {
             globalThis.gb[jpath].data[cid].conf = datobj[d].conf
             globalThis.gb[jpath].outputText += datobj[d].var + '\n'
             globalThis.gb[jpath].data[cid].m = (globalThis.gb[jpath].outputText.split('\n').length - 1)
+        }
+        if(Keys.length == 0){
+            console.log(dats.dat_obj)
+            console.log(fileName)
         }
     }
 } // 

@@ -114,6 +114,9 @@ exports.apply = async (ev, arg) => {
             fs.writeFileSync(dir + '/Completed/js/plugins.js', vaq,'utf8')
           }
         }
+        else if(i == 'ExternMsgcsv.json'){
+          await ExtTool.pack_externMsg(dir + '/Completed/data/ExternMessage.csv', data)
+        }
         else{
           const dataJson = JSON.stringify(data, null, 4*globalThis.JsonChangeLine)
           if(arg.instantapply){

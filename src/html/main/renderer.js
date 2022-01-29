@@ -201,7 +201,7 @@ if(true){
         'addons_btn': '추가 기능을\n펼칩니다',
         'eztrans': 'Extract 폴더 내\n파일을 이지트랜스로\n번역합니다',
         'ext_note': '노트/메모를\n추출합니다',
-        'exJson': 'RpgMaker MV에\n기본적으로는\n존재하지 않는 JSON\n을 추출합니다',
+        'exJson': 'Rpg Maker에\n기본적으로는\n존재하지 않는\nJSON 또는 CSV를\n추출합니다',
         'autoline': '적용 시 자동\n줄바꿈을 합니다',
         'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
         'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
@@ -255,7 +255,7 @@ document.getElementById('exJson').onclick = () => {
     if(!config.exJson){
         Swal.fire({
             icon: 'warning',
-            text: '비표준 JSON을 추출하여 번역할 시\n게임 내에서 오류가 날 수 있습니다\n정말로 활성화하시겠습니까?',
+            text: '비표준 JSON / CSV를 추출하여 번역할 시\n게임 내에서 오류가 날 수 있습니다\n정말로 활성화하시겠습니까?',
             confirmButtonText: '예',
             showDenyButton: true,
             denyButtonText: `아니오`,

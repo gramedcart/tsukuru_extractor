@@ -1,199 +1,227 @@
-body{
-    margin: 0px;
-    background-color: #121212;
-    color: #dfe6e9;
-    overflow-x: hidden;
-    overflow-y: hidden;
+body {
+  margin: 0px;
+  background-color: #121212;
+  color: #dfe6e9;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
-.center{
-    display: flex;
-    justify-content: space-around;
-    align-items: stretch;
+.center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
 }
 
-.n{
-    margin-top: 10px;
-    height: 52.5px;
+.n {
+  margin-top: 10px;
+  height: 52.5px;
 }
 
-.n2{
-    justify-content: center;
-    align-items: stretch;
+.n2 {
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
 }
 
-.info{
-    text-align: center;
+.info {
+  text-align: center;
 }
 
-#folder_input{
-    width: 70vw;
+#folder_input {
+  width: 70vw;
 }
 
-#sel{
-    width: 10vw;
-    text-align: center;
+#sel {
+  width: 10vw;
+  text-align: center;
 }
 
-.highlight{
-    border-radius: 10px;
-    border: transparent;
-    background-color: #ffffff10;
-    color: #dfe6e9;   
+.highlight {
+  border-radius: 10px;
+  border: transparent;
+  background-color: #ffffff10;
+  color: #dfe6e9;
 }
 
-.side_main{
-    width: 20vw;
-    height: 245px;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
+.side_main {
+  width: 20vw;
+  height: 245px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
-.center_main{
-    width: 55vw;
-    height: 245px;
+.center_main {
+  width: 55vw;
+  height: 245px;
 }
 
-.btn{
-    border: transparent;
-    background-color: #ffffff10;
-    color: #dfe6e9;  
-    height: 70px;
+.btn {
+  border: transparent;
+  background-color: #ffffff10;
+  color: #dfe6e9;
+  height: 70px;
 }
 
-.mode-select{
-    border-radius: 0px;
-    margin-bottom: 5px;
-    height: 20%;
-}
-.mode-run{
-    border-radius: 0px;
-    height: 50%;
+.mode-select {
+  border-radius: 0px;
+  margin-bottom: 5px;
+  height: 20%;
 }
 
-.right_main{
-    text-align: center;
+.mode-run {
+  border-radius: 0px;
+  height: 50%;
+}
+
+.right_main {
+  text-align: center;
 }
 
 .container {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+  grid-gap: 5px;
 }
 
 .container2 {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-gap: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: 5px;
 }
 
 #addons {
-    position: relative;
-    width: 90vw;
-    height: 0px;
-    transition: 0.2s;
+  position: relative;
+  width: 90vw;
+  height: 0px;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
 }
 
-#addons-block{
-    position: relative;
-    top: 190px;
-    margin-top: 10px;
-    height: 52.5px;
+#addons-block {
+  position: relative;
+  top: 190px;
+  margin-top: 10px;
+  height: 52.5px;
 }
 
 ::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
-#loading_bar{
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-app-region: drag;
-    width: 100vw;
-    height: 20px;
-    background-color: #ffffff10;
+#loading_bar {
+  -moz-user-select: none;
+   -ms-user-select: none;
+       user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  width: 100vw;
+  height: 20px;
+  background-color: #ffffff10;
 }
 
-#icon1{
-    position: absolute;
-    left: 96vw;
-    top: 0px;
+#icon1 {
+  position: absolute;
+  left: 96vw;
+  top: 0px;
 }
 
-#icon2{
-    position: absolute;
-    left: 90vw;
-    top: 0px;
+#icon2 {
+  position: absolute;
+  left: 90vw;
+  top: 0px;
 }
 
-#loading-text{
-    position: absolute;
-    left: 10px;
-    top: 0px;
-    font-size: 12px;
-    visibility: hidden;
+#loading-text {
+  position: absolute;
+  left: 10px;
+  top: 0px;
+  font-size: 12px;
+  visibility: hidden;
 }
 
-
-.icon{
-    -webkit-app-region: no-drag;
-    height: 20px;
-    cursor: pointer;
-    z-index: 1;
+.icon {
+  -webkit-app-region: no-drag;
+  height: 20px;
+  cursor: pointer;
+  z-index: 1;
 }
 
-#border_r{
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-app-region: drag;
-    height: 20px;
-    top: 0px;
-    left: 0px;
-    width: 0vw;
-    position: absolute;
-    background-color: #00968850;
+#border_r {
+  -moz-user-select: none;
+   -ms-user-select: none;
+       user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  height: 20px;
+  top: 0px;
+  left: 0px;
+  width: 0vw;
+  position: absolute;
+  background-color: #00968850;
 }
 
-#debug{
-    visibility: hidden;
+#debug {
+  visibility: hidden;
 }
 
-.hiddenc{
-    visibility: hidden;
-    position: absolute;
+.hiddenc {
+  visibility: hidden;
+  position: absolute;
 }
 
-.hiddenc button{
-    visibility: hidden;
-    position: absolute;
+.hiddenc button {
+  visibility: hidden;
+  position: absolute;
 }
 
-.right_main2{
-    height: 200px;
+.right_main2 {
+  height: 200px;
 }
 
-#addons_btn{
-    border: transparent;
-    background-color: #ffffff19;
-    color: #dfe6e9;  
-    height: 40px;
-    position: absolute;
-    border-radius: 10px;
-    right: 7px;
-    top: 300px;
-    width: 20vw;
+#addons_btn {
+  border: transparent;
+  background-color: #ffffff10;
+  color: #dfe6e9;
+  height: 40px;
+  position: absolute;
+  border-radius: 10px;
+  right: 7px;
+  top: 300px;
+  width: 20vw;
 }
 
-.cfolder{
-    text-overflow: ellipsis !important;
-    padding: 20px;
-    border: solid 2px #dfe6e9;
-    margin-bottom: 10px;
-    white-space: nowrap;
+.cfolder {
+  text-overflow: ellipsis !important;
+  padding: 20px;
+  border: solid 2px #dfe6e9;
+  margin-bottom: 10px;
+  white-space: nowrap;
 }
+/*# sourceMappingURL=styles.css.map */

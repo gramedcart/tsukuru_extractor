@@ -317,17 +317,22 @@ async function extractor(arg){
         fs.writeFileSync(dir + '/ext_plugins.json', JSON.stringify(JSON.parse(hail)), 'utf-8')
       }
     }
-    const fileList = fs.readdirSync(dir)
     globalThis.externMsg = {}
     globalThis.useExternMsg = false
-    if(fs.existsSync(dir + '/ExternMessage.csv')){
+    if(fs.existsSync(dir + '/ExternMessage.csv') && arg.exJson && globalThis.settings.ExternMsgJson){
       console.log('extern Exists')
-      const Emsg = await ExtTool.parse_externMsg(dir + '/ExternMessage.csv')
+      const Emsg = await ExtTool.parse_externMsg(dir + '/ExternMessage.csv', !globalThis.settings.ExternMsgJson)
       globalThis.externMsg = Emsg
-      globalThis.useExternMsg = true
-      globalThis.externMsgKeys = Object.keys(Emsg)
+      if(globalThis.settings.ExternMsgJson){
+        fs.writeFileSync(dir + '/ExternMsgcsv.json', JSON.stringify(Emsg, null, 4), 'utf-8')
+      }
+      else{
+        globalThis.useExternMsg = true
+        globalThis.externMsgKeys = Object.keys(Emsg)
+      }
     }
 
+    const fileList = fs.readdirSync(dir)
 
     if (! fs.existsSync(dir + '/Extract')){
       fs.mkdirSync(dir + '/Extract')
@@ -394,6 +399,9 @@ async function extractor(arg){
     edTool.write(dir, ext_data)
     if (fs.existsSync(dir + '/ext_plugins.json')){
       fs.rmSync(dir + '/ext_plugins.json')
+    }
+    if (fs.existsSync(dir + '/ExternMsgcsv.json')){
+      fs.rmSync(dir + '/ExternMsgcsv.json')
     }
     getMainWindow().webContents.send('loading', 0);
     ['img','audio'].forEach((type) => {

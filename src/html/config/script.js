@@ -12,7 +12,8 @@ const CheckboxValues = [
   'JsonChangeLine',
   'extractSomeScript',
   'oneMapFile',
-  'loadingText'
+  'loadingText',
+  'ExternMsgJson'
 ]
 
 ipcRenderer.on("settings", (evt, arg) => {

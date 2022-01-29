@@ -14,7 +14,8 @@ exports.settings = {
     loadingText: true,
     JsonChangeLine: false,
     ExtractAddLine: false,
-    oneMapFile: false
+    oneMapFile: false,
+    ExternMsgJson: true
 }
 
 exports.onebyone = {
@@ -30,7 +31,7 @@ exports.onebyone = {
     'Items.json': 'item',
     'Troops.json': 'ene',
     'ext_plugins.json': 'plugin',
-    'Troops.json': 'ene2'
+    'Troops.json': 'ene2',
 }
 
 exports.default = [
