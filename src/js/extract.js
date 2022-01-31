@@ -331,7 +331,7 @@ exports.extract = async (filedata, conf, ftype) => {
                             if(obNullSafe(targ)){
                                 console.log('obj')
                             }
-                            dat_obj = addtodic(Path + '.parameters.' + v[i2], dat_obj)
+                            dat_obj = addtodic(Path + '.parameters.' + v[i2], dat_obj, d.name)
                         }
                     }
                 }

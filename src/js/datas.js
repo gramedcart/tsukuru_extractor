@@ -15,7 +15,8 @@ exports.settings = {
     JsonChangeLine: false,
     ExtractAddLine: false,
     oneMapFile: false,
-    ExternMsgJson: true
+    ExternMsgJson: true,
+    DoNotTransHangul: true
 }
 
 exports.onebyone = {
@@ -75,6 +76,7 @@ exports.translateable = [
     '<SG説明2:',
     "<namePop:",
     "<SGカテゴリ:",
+    '<shop_mes:',
 ]
 
 exports.translateableOne = [
@@ -84,3 +86,5 @@ exports.translateableOne = [
 exports.note2able = [
     '選択肢ヘルプ',
 ]
+
+exports.hanguls = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;

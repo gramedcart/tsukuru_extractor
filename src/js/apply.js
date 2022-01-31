@@ -43,11 +43,6 @@ exports.apply = async (ev, arg) => {
       }
       const jsdir = ((dir.substring(0,dir.length-5) + '/js').replaceAll('//','/'))
       let ext_data = edTool.read(dir)
-      if(ext_data.main === undefined){
-        while(ext_data.main === undefined){
-          ext_data = ext_data.dat
-        }
-      }
       const ext_dat = ext_data.main
       const max_files = Object.keys(ext_dat).length
       let worked_files = 0
@@ -115,10 +110,15 @@ exports.apply = async (ev, arg) => {
           }
         }
         else if(i == 'ExternMsgcsv.json'){
-          await ExtTool.pack_externMsg(dir + '/Completed/data/ExternMessage.csv', data)
+          if(arg.instantapply){
+            await ExtTool.pack_externMsg(dir + '/ExternMessage.csv', data)
+          }
+          else{
+            await ExtTool.pack_externMsg(dir + '/Completed/data/ExternMessage.csv', data)
+          }
         }
         else{
-          const dataJson = JSON.stringify(data, null, 4*globalThis.JsonChangeLine)
+          const dataJson = JSON.stringify(data, null, 4*globalThis.settings.JsonChangeLine)
           if(arg.instantapply){
             fs.writeFileSync(dir + '/' + i, dataJson,'utf8')
           }

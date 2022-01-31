@@ -5,3 +5,4 @@ out/
 electron-builder.yml
 dist/
 note.txt
+package-lock.json

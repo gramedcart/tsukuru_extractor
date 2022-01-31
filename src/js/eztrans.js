@@ -5,8 +5,9 @@ const spawn = require('child_process').spawn;
 const dataBaseO = require('./datas.js')
 const {checkIsMapFile, sleep} = require('./globalutils.js')
 const axios = require('axios')
-const {translateable, note2able, translateableOne} = require('./datas.js')
+const {translateable, note2able, translateableOne, hanguls} = require('./datas.js')
 const translatte = require('translatte');
+const edTool = require('./edtool')
 
 function oPath(){
     return globalThis.oPath
@@ -26,6 +27,7 @@ function encodeURIp(p) {
     p = p.replaceAll('■', '■0')
     p = p.replaceAll('%', '■1')
     p = p.replaceAll('％', '■2')
+    p = p.replaceAll('|', '■3')
     return encodeURIComponent(p)
 }
 
@@ -34,6 +36,7 @@ function decodeURIp(p, encodeSp=false) {
     p = p.replaceAll('■1', '%')
     p = p.replaceAll('■0', '■')
     p = p.replaceAll('■2', '％')
+    p = p.replaceAll('■3', '|')
     if(encodeSp){
         p = p.replaceAll(' ', ' ')
     }
@@ -52,6 +55,12 @@ class Translator{
         this.type = type
     }
     async translate(text){
+        if(globalThis.settings.DoNotTransHangul){
+            if(hanguls.test(text)){
+                return text
+            }
+        }
+        text = applyUserDict(text)
         if(this.type === 'eztrans'){
             const t =  ((await axios.get(`http://localhost:8000/?text=${encodeURIp(text)}`))).data
             if(typeof(t) !== 'string'){
@@ -130,6 +139,9 @@ exports.trans = async (ev, arg) => {
         const fileList = fs.readdirSync(edir)
         const max_files = fileList.length
         let worked_files = 0
+        const edDat = edTool.read(dir)
+        let eed = {}
+        console.log(Object.keys(edDat.main))
         for (const i in fileList) {
             let typeOfFile = ''
             if (globalThis.settings.safeTrans || globalThis.settings.smartTrans) {
@@ -143,15 +155,22 @@ exports.trans = async (ev, arg) => {
                     }
                 } else if (name.includes('ext_note.txt')) {
                     typeOfFile = 'note'
-                    console.log('skiping')
                     if(!globalThis.settings.smartTrans){
+                        console.log('skiping note')
                         continue
                     }
                 } else if (name.includes('ext_note2.txt')) {
                     typeOfFile = 'note2'
-                    console.log('skiping')
                     if(!globalThis.settings.smartTrans){
+                        console.log('skiping note2')
                         continue
+                    }
+                    else{
+                        let eed2 = edDat.main['ext_note2.json'].data
+                        for(const i2 in eed2){
+                            const cdat = eed2[i2]
+                            eed[cdat.m] = cdat.conf.code
+                        }
                     }
                 } else if ((!(dataBaseO.default.includes(name))) && (!checkIsMapFile(name))) {
                     console.log('skiping')
@@ -165,10 +184,12 @@ exports.trans = async (ev, arg) => {
                 }
             }
             const iPath = path.join(edir, fileList[i])
-            const read = applyUserDict(fs.readFileSync(iPath, 'utf-8')).split('\n')
+            const read = (fs.readFileSync(iPath, 'utf-8')).split('\n')
             let output = ''
             let transIt = false
             let folkt = false
+            let typeofit = ''
+
             for (const v in read) {
                 try {
                     globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / read.length / max_files)) * 100);
@@ -201,7 +222,7 @@ exports.trans = async (ev, arg) => {
                             if(!transIt){
                                 let startAble = false
                                 for(const vv in translateable){
-                                    if (readLine.startsWith(translateable[vv])){
+                                    if (readLine.replaceAll(' ','').startsWith(translateable[vv])){
                                         startAble = true
                                         fi = translateable[vv]
                                         folkt = translateableOne.includes(fi)
@@ -260,7 +281,7 @@ exports.trans = async (ev, arg) => {
                             break
                         case 'note2':
                             if(transIt){
-                                if(readLine.startsWith('\\>')){
+                                if(eed[v.toString()] == 108){
                                     const ouput = await translator.translate((readLine))
                                     try{
                                         output += encodeSp(ouput, true) + '\n'
@@ -279,6 +300,7 @@ exports.trans = async (ev, arg) => {
                             if(!transIt){
                                 if(note2able.includes(readLine)){
                                     transIt = true
+                                    typeofit = 'default'
                                 }
                                 output += readLine + '\n'
                             }

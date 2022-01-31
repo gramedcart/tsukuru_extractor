@@ -8,9 +8,14 @@ const lz_string_min_js_1 = __importDefault(require("./lz-string.min.js"));
 const fs_1 = __importDefault(require("fs"));
 function read(dir) {
     try {
-        const data = JSON.parse(lz_string_min_js_1.default.decompressFromUint8Array(fs_1.default.readFileSync(dir + '/.extracteddata')));
+        let data = JSON.parse(lz_string_min_js_1.default.decompressFromUint8Array(fs_1.default.readFileSync(dir + '/.extracteddata')));
         write(dir, data);
-        return data.dat;
+        if (data.main === undefined) {
+            while (data.main === undefined) {
+                data = data.dat;
+            }
+        }
+        return data;
     }
     catch (error) {
         console.log('trying in base64');

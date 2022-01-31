@@ -1,5 +1,5 @@
 깃 복붙용
 
 git add .
-git commit -m "1.5.0 --pre1"
+git commit -m "1.5.0 --pre2"
 git push -u origin --all

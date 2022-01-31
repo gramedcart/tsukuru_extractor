@@ -15,7 +15,7 @@
     "url": "https://github.com/gramedcart/mvextractor.git"
   },
   "author": "Sziya",
-  "license": "CC BY-NC 4.0",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^16.0.4",
     "electron-builder": "^22.14.5",

@@ -3,9 +3,14 @@ import fs from 'fs';
 
 export function read(dir: string){
     try {
-        const data = JSON.parse(LZString.decompressFromUint8Array(fs.readFileSync(dir + '/.extracteddata')))
+        let data = JSON.parse(LZString.decompressFromUint8Array(fs.readFileSync(dir + '/.extracteddata')))
         write(dir, data)
-        return data.dat
+        if(data.main === undefined){
+            while(data.main === undefined){
+                data = data.dat
+            }
+        }
+        return data
     } catch (error) {
         console.log('trying in base64')
         const data = JSON.parse(LZString.decompressFromBase64(fs.readFileSync(dir + '/.extracteddata', 'utf8')))

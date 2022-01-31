@@ -13,7 +13,8 @@ const CheckboxValues = [
   'extractSomeScript',
   'oneMapFile',
   'loadingText',
-  'ExternMsgJson'
+  'ExternMsgJson',
+  'DoNotTransHangul'
 ]
 
 ipcRenderer.on("settings", (evt, arg) => {
