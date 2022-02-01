@@ -281,7 +281,7 @@ exports.trans = async (ev, arg) => {
                             break
                         case 'note2':
                             if(transIt){
-                                if(eed[v.toString()] == 108){
+                                if(readLine.startsWith('\\>')){
                                     const ouput = await translator.translate((readLine))
                                     try{
                                         output += encodeSp(ouput, true) + '\n'
