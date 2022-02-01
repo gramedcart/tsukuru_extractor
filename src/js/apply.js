@@ -2,6 +2,7 @@ const fs = require('fs');
 const ExtTool = require('./extract.js')
 const path = require('path')
 const edTool = require('./edtool.js')
+const isPackaged = require('electron-is-packaged').isPackaged;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

@@ -456,6 +456,8 @@ exports.format_extracted = async(dats, typ = 0) => {
     const dir = conf.dir
     if(typ == 0){
         const Keys = Object.keys(datobj)
+        let LenMemory = {}
+        let LenKeys = []
         globalThis.gb[fileName].outputText = ''
         for(const d of Keys){
             let jpath = fileName
@@ -476,14 +478,21 @@ exports.format_extracted = async(dats, typ = 0) => {
                     datobj[d].var = globalThis.externMsg[datobj[d].var]
                 }
             }
-            const cid = (globalThis.gb[jpath].outputText.split('\n').length - 1)
+            if(!LenKeys.includes(jpath)){
+                LenMemory[jpath] = (globalThis.gb[jpath].outputText.split('\n').length - 1)
+                LenKeys.push(jpath)
+            }
+            const cid = LenMemory[jpath]
             globalThis.gb[jpath].data[cid] = {}
             globalThis.gb[jpath].data[cid].origin = fileName
             globalThis.gb[jpath].data[cid].type = 'None'
             globalThis.gb[jpath].data[cid].val = d
             globalThis.gb[jpath].data[cid].conf = datobj[d].conf
-            globalThis.gb[jpath].outputText += datobj[d].var + '\n'
-            globalThis.gb[jpath].data[cid].m = (globalThis.gb[jpath].outputText.split('\n').length - 1)
+
+            const toadd = datobj[d].var + '\n'
+            globalThis.gb[jpath].outputText += toadd
+            LenMemory[jpath] += (toadd.split('\n').length - 1)
+            globalThis.gb[jpath].data[cid].m = LenMemory[jpath]
         }
     }
 } // 
