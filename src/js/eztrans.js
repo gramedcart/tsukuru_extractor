@@ -144,7 +144,7 @@ exports.trans = async (ev, arg) => {
                     icon: 'error',
                     message: 'dotnet 6.0 이 설치되지 않은 것 같습니다. 5초 내에 다운로드 창을 띄웁니다.'
                 });
-                setTimeout(() => {open(`https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.1-windows-x64-installer`)}, 2000)
+                setTimeout(() => {open(`https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.1-windows-x86-installer`)}, 2000)
                 try {
                     ls.kill()
                 } catch (error) {   }

@@ -27,7 +27,7 @@ const eztrans = require("./src/js/eztrans.js")
 const {checkIsMapFile, sleep} = require('./src/js/globalutils.js')
 
 function ErrorAlert(msg){
-  getMainWindow().webContents.send('alert', msg)
+  sendError(msg)
 }
 
 function worked(){
@@ -551,3 +551,36 @@ ipcMain.on('updateVersion', async (ev, arg) => {
 })
 
 ipcMain.on('log', async(ev, arg) => console.log(arg))
+
+ipcMain.on('selFont', async (ev, dir) => {
+  if(!fs.existsSync(dir)){
+    getMainWindow().webContents.send('alert', {icon: 'error', message: '지정된 디렉토리가 없습니다'}); 
+    worked()
+    return
+  }
+  if(path.parse(dir).name !== 'data' && (!arg.force)){
+    getMainWindow().webContents.send('alert', {icon: 'error', message: 'data 폴더가 아닙니다'}); 
+    worked()
+    return
+  }
+  const f = await dialog.showOpenDialog({
+    "title": '폰트 선택',
+    "properties": ["openFile"],
+    "filters":[{
+      "name": "폰트",
+      "extensions": ["ttf", "otf"]
+    }],
+  })
+  if(f.canceled){
+    ErrorAlert('취소되었습니다')
+    worked()
+    return
+  }
+  const fPath = f.filePaths[0]
+  const MfontPath = path.join(path.dirname(dir), 'fonts', 'mplus-1m-regular.ttf')
+  if(fPath === MfontPath){
+    ErrorAlert('이미 사용 중인 폰트입니다')
+    worked()
+    return
+  }
+})

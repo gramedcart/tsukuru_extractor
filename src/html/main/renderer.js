@@ -446,6 +446,7 @@ document.getElementById('changeAll').onclick = async () => {
     }
 }
 
+
 document.getElementById('versionUp').onclick = async () => {
     if(running){
         Swal.fire({
@@ -510,3 +511,28 @@ document.getElementById('versionUp').onclick = async () => {
         }
     }
 }
+
+// document.getElementById('fontConfig').onclick = async () => {
+//     if(running){
+//         Swal.fire({
+//             icon: 'error',
+//             text: '이미 작업이 시행중입니다!',
+//         })
+//         return
+//     }
+//     let result = await Swal.fire({
+//         title: '무엇을 하시겠습니까?',
+//         icon: 'info',
+//         showDenyButton: true,
+//         showCancelButton: true,
+//         confirmButtonText: '폰트 변경',
+//         denyButtonText: `폰트 크기 변경`,
+//         cancelButtonText: '취소'
+//     })
+//     if (result.isConfirmed) {
+//         running = true
+//         ipcRenderer.send('selFont', document.getElementById('folder_input').value)
+//     } else if (result.isDenied) {
+//         Swal.fire('Changes are not saved', '', 'info')
+//     }
+// }
