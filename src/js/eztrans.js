@@ -9,6 +9,7 @@ const {translateable, note2able, translateableOne, hanguls} = require('./datas.j
 const translatte = require('translatte');
 const edTool = require('./edtool')
 const { performance } = require('perf_hooks');
+const open = require('open');
 
 function oPath(){
     return globalThis.oPath
@@ -136,9 +137,21 @@ exports.trans = async (ev, arg) => {
             ls = spawn(path.join(oPath(), 'exfiles', 'eztrans' ,'eztransServer.exe'));
 
             await sleep(1000)
-            await PU.waitUntilUsed(8000)
+            try {
+                await PU.waitUntilUsed(8000)
+            } catch (error) {
+                globalThis.mwindow.webContents.send('alert', {
+                    icon: 'error',
+                    message: 'dotnet 6.0 이 설치되지 않은 것 같습니다. 5초 내에 다운로드 창을 띄웁니다.'
+                });
+                setTimeout(() => {open(`https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.1-windows-x64-installer`)}, 2000)
+                try {
+                    ls.kill()
+                } catch (error) {   }
+                globalThis.mwindow.webContents.send('worked', 0);
+                return
+            }
             await sleep(1000)
-
         }
 
         const fileList = fs.readdirSync(edir)
