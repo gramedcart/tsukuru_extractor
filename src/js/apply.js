@@ -44,6 +44,14 @@ exports.apply = async (ev, arg) => {
       }
       const jsdir = ((dir.substring(0,dir.length-5) + '/js').replaceAll('//','/'))
       let ext_data = edTool.read(dir)
+      if(!isPackaged){
+        const JD = JSON.stringify(ext_data, null, 4)
+        fs.writeFileSync('./test/ed.json', JD, 'utf-8')
+        if(fs.existsSync('./test/ed2.json')){
+          const dats = fs.readFileSync('./test/ed2.json','utf-8')
+          console.log(`Match ${JD === dats}`)
+        }
+      }
       const ext_dat = ext_data.main
       const max_files = Object.keys(ext_dat).length
       let worked_files = 0

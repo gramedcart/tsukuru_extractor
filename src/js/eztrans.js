@@ -8,6 +8,7 @@ const axios = require('axios')
 const {translateable, note2able, translateableOne, hanguls} = require('./datas.js')
 const translatte = require('translatte');
 const edTool = require('./edtool')
+const { performance } = require('perf_hooks');
 
 function oPath(){
     return globalThis.oPath
@@ -62,12 +63,15 @@ class Translator{
         }
         text = applyUserDict(text)
         if(this.type === 'eztrans'){
-            const t =  ((await axios.get(`http://localhost:8000/?text=${encodeURIp(text)}`))).data
-            if(typeof(t) !== 'string'){
-                console.log(t)
+            const a =  await axios.post(
+                'http://localhost:8000/',
+                text
+            )
+            let t = a.data
+            if(typeof(t) !== 'string' && typeof(t) !== 'number'){
                 return `ERROR: RETURNED ${JSON.stringify(t)}`
             }
-            return decodeURIp(t)
+            return t
         }
         if(this.type === 'google'){
             const translated = (await translatte(text, {to: 'ko'}))
@@ -101,6 +105,8 @@ class Translator{
 exports.trans = async (ev, arg) => {
     const dm = true
     const translator = new Translator(arg.type)
+    let ls
+
     try {
         const dir = Buffer.from(arg.dir, "base64").toString('utf8');
         const edir = path.join(dir, 'Extract')
@@ -113,7 +119,6 @@ exports.trans = async (ev, arg) => {
             return
         }
         let isUsed
-        let ls
         console.log(translator.getType())
         if(translator.getType() == 'eztrans'){
             console.log('eztrans')
@@ -128,7 +133,7 @@ exports.trans = async (ev, arg) => {
                 globalThis.mwindow.webContents.send('worked', 0);
                 return
             }
-            ls = spawn(path.join(oPath(), 'exfiles', 'eztrans-server.exe'));
+            ls = spawn(path.join(oPath(), 'exfiles', 'eztrans' ,'eztransServer.exe'));
 
             await sleep(1000)
             await PU.waitUntilUsed(8000)
@@ -169,7 +174,7 @@ exports.trans = async (ev, arg) => {
                         let eed2 = edDat.main['ext_note2.json'].data
                         for(const i2 in eed2){
                             const cdat = eed2[i2]
-                            eed[cdat.m] = cdat.conf.code
+                            eed[i2] = cdat.conf.code
                         }
                     }
                 } else if ((!(dataBaseO.default.includes(name))) && (!checkIsMapFile(name))) {
@@ -184,135 +189,177 @@ exports.trans = async (ev, arg) => {
                 }
             }
             const iPath = path.join(edir, fileList[i])
-            const read = (fs.readFileSync(iPath, 'utf-8')).split('\n')
+            const fileRead = (fs.readFileSync(iPath, 'utf-8'))
             let output = ''
             let transIt = false
             let folkt = false
-            let typeofit = ''
+            let typeofit = 0
 
-            for (const v in read) {
-                try {
-                    globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / read.length / max_files)) * 100);
-                    const readLine = read[v];
-                    switch (typeOfFile){
-                        case '':
-                            const ouput = await translator.translate((readLine))
-                            output += encodeSp(ouput) + '\n'
-                            break
-                        case 'src':
-                            if(readLine.startsWith('D_TEXT ')){
-                                let rl = readLine.split(' ')
-                                if(rl.length > 3){
-                                    while(rl.length > 3){
+            if(typeOfFile == '' && translator.getType() === 'eztrans'){
+                let reads = fileRead.split('\n')
+                let a = ''
+                let l = 0
+                let chunks = []
+
+                while(reads.length > 0){
+                    const d = reads[0]
+                    l += d.length
+                    a += d + '\n'
+                    if(l > 4000){
+                        l = 0
+                        chunks.push(a)
+                        a = ''
+                    }
+                    reads.shift()
+                }
+                chunks.push(a)
+                for(const v in chunks){
+                    globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / chunks.length / max_files)) * 100);
+                    const ouput = await translator.translate(chunks[v])
+                    output += encodeSp(ouput)
+                }
+            }
+            else{
+                const read = fileRead.split('\n')
+                for (const v in read) {
+                    try {
+                        globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / read.length / max_files)) * 100);
+                        const readLine = read[v];
+                        switch (typeOfFile){
+                            case '':
+                                const ouput = await translator.translate((readLine))
+                                output += encodeSp(ouput) + '\n'
+                                break
+                            case 'src':
+                                if(readLine.startsWith('D_TEXT ')){
+                                    let rl = readLine.split(' ')
+                                    if(rl.length > 3){
+                                        while(rl.length > 3){
+                                            rl[1] = rl[1]+' '+rl[2]
+                                            rl.splice(2)
+                                        }
+                                    }
+                                    if(rl.length == 3 && isNaN(rl[2])){
+                                        console.log(rl.join(' '))
                                         rl[1] = rl[1]+' '+rl[2]
                                         rl.splice(2)
                                     }
+                                    const ouput = await translator.translate((rl[1]))
+                                    rl[1] = encodeSp(ouput, true)
+                                    output += rl.join(' ') + '\n'
                                 }
-                                const ouput = await translator.translate((rl[1]))
-                                rl[1] = encodeSp(ouput, true)
-                                output += rl.join(' ') + '\n'
-                            }
-                            else{
-                                output += readLine + '\n'
-                            }
-                            break
-                        case 'note':
-                            let fi = ''
-                            let rl = readLine
-                            if(!transIt){
-                                let startAble = false
-                                for(const vv in translateable){
-                                    if (readLine.replaceAll(' ','').startsWith(translateable[vv])){
-                                        startAble = true
-                                        fi = translateable[vv]
-                                        folkt = translateableOne.includes(fi)
-                                        console.log(`${fi} | ${folkt}`)
+                                else{
+                                    output += readLine + '\n'
+                                }
+                                break
+                            case 'note':
+                                let fi = ''
+                                let rl = readLine
+                                if(!transIt){
+                                    let startAble = false
+                                    for(const vv in translateable){
+                                        if (readLine.replaceAll(' ','').startsWith(translateable[vv])){
+                                            startAble = true
+                                            fi = translateable[vv]
+                                            folkt = translateableOne.includes(fi)
+                                            console.log(`${fi} | ${folkt}`)
+                                            break
+                                        }
+                                    }
+                                    if(startAble){
+                                        transIt = true
+                                        rl = rl.substring(fi.length, rl.length)
+                                    }
+                                    else{
+                                        output += rl + '\n'
                                         break
                                     }
                                 }
-                                if(startAble){
-                                    transIt = true
-                                    rl = rl.substring(fi.length, rl.length)
+                                if(transIt){
+                                    if(rl.includes('>') || (folkt && rl.includes(' '))){
+                                        transIt = false
+                                        let keyString = '>'
+                                        if((folkt && rl.includes(' '))){
+                                            keyString = ' '
+                                        }
+                                        let vax = '>\n'
+                                        vax = rl.substring(rl.indexOf(keyString)) + '\n'
+    
+                                        
+                                        rl = rl.substring(0, rl.indexOf(keyString))
+                                        const ouput = await translator.translate((rl))
+                                        try{
+                                            output += fi + encodeSp(ouput, true) + vax
+                                        }
+                                        catch{
+                                            output += fi + rl + vax
+                                            if (await translator.isCrash()){
+                                                return
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        const ouput = await translator.translate((rl))
+                                        try{
+                                            output += fi + encodeSp(ouput, true) + '\n'
+                                        }
+                                        catch{
+                                            output += fi + rl + '\n'
+                                            if (await translator.isCrash()){
+                                                return
+                                            }
+                                        }
+                                    }
                                 }
                                 else{
                                     output += rl + '\n'
-                                    break
                                 }
-                            }
-                            if(transIt){
-                                if(rl.includes('>') || (folkt && rl.includes(' '))){
-                                    transIt = false
-                                    let keyString = '>'
-                                    if((folkt && rl.includes(' '))){
-                                        keyString = ' '
-                                    }
-                                    let vax = '>\n'
-                                    vax = rl.substring(rl.indexOf(keyString)) + '\n'
-
-                                    
-                                    rl = rl.substring(0, rl.indexOf(keyString))
-                                    const ouput = await translator.translate((rl))
-                                    try{
-                                        output += fi + encodeSp(ouput, true) + vax
-                                    }
-                                    catch{
-                                        output += fi + rl + vax
-                                        if (await translator.isCrash()){
-                                            return
+                                break
+                            case 'note2':
+                                if(transIt){
+                                    if(eed[v] == 408){
+                                        let run = true
+                                        if(readLine.startsWith('\\>')){
+                                            typeofit = 1
+                                        }
+                                        else if(typeofit == 1){
+                                            run = false
+                                            transIt = false
+                                        }
+                                        if(run){
+                                            const ouput = await translator.translate((readLine))
+                                            try{
+                                                output += encodeSp(ouput, true) + '\n'
+                                            }
+                                            catch{
+                                                output += readLine + '\n'
+                                                if (await translator.isCrash()){
+                                                    return
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                                else{
-                                    const ouput = await translator.translate((rl))
-                                    try{
-                                        output += fi + encodeSp(ouput, true) + '\n'
-                                    }
-                                    catch{
-                                        output += fi + rl + '\n'
-                                        if (await translator.isCrash()){
-                                            return
-                                        }
+                                    else{
+                                        transIt = false
                                     }
                                 }
-                            }
-                            else{
-                                output += rl + '\n'
-                            }
-                            break
-                        case 'note2':
-                            if(transIt){
-                                if(readLine.startsWith('\\>')){
-                                    const ouput = await translator.translate((readLine))
-                                    try{
-                                        output += encodeSp(ouput, true) + '\n'
+                                if(!transIt){
+                                    if(note2able.includes(readLine) && eed[v] == 108){
+                                        transIt = true
+                                        typeofit = 0
                                     }
-                                    catch{
-                                        output += readLine + '\n'
-                                        if (await translator.isCrash()){
-                                            return
-                                        }
-                                    }
+                                    output += readLine + '\n'
                                 }
-                                else{
-                                    transIt = false
-                                }
-                            }
-                            if(!transIt){
-                                if(note2able.includes(readLine)){
-                                    transIt = true
-                                    typeofit = 'default'
-                                }
-                                output += readLine + '\n'
-                            }
-                            break
+                                break
+                        }
+                    } catch (error) {
+                        console.log(read[v])
+                        console.log('err')
+                        if (await translator.isCrash()) {
+                            return
+                        }
+                        output += read[v] + '\n'
                     }
-                } catch (error) {
-                    console.log(read[v])
-                    console.log('err')
-                    if (await translator.isCrash()) {
-                        return
-                    }
-                    output += read[v] + '\n'
                 }
             }
             worked_files += 1
@@ -328,6 +375,9 @@ exports.trans = async (ev, arg) => {
         globalThis.mwindow.webContents.send('alert', '완료되었습니다');
         globalThis.mwindow.webContents.send('loading', 0);
     } catch (err) {
+        try {
+            ls.kill()
+        } catch (error) {}
         globalThis.mwindow.webContents.send('alert', {
             icon: 'error',
             message: JSON.stringify(err, Object.getOwnPropertyNames(err))

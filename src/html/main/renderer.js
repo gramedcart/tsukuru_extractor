@@ -71,28 +71,30 @@ ipcRenderer.on('loadingTag', (evn, tt) => {
 
 ipcRenderer.on('loading', (evn, tt) => {
     document.getElementById('border_r').style.width = `${tt}vw`
+    let ds = Math.floor(new Date().getTime()/1000)
     if(tt > 0 && globalSettings.loadingText){
-        let ds = new Date().getSeconds()
         if(LastTime != ds){
             const toHHMMSS = function (num) {
-                let sec_num = parseInt(num, 10); // don't forget the second param
-                let hours   = Math.floor(sec_num / 3600);
-                let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-                let seconds = sec_num - (hours * 3600) - (minutes * 60);
+                const sec_num = parseInt(num, 10);
+                const hours   = Math.floor(sec_num / 3600);
+                const minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+                const seconds = sec_num - (hours * 3600) - (minutes * 60);
                 let timeString = ''
                 if(hours > 0){timeString += `${hours}시간 `}
                 if(minutes > 0){timeString += `${minutes}분 `}
                 timeString += `${seconds}초`
                 return timeString;
             }
+            const ChangedTime = ds - LastTime
             LastTime = ds
             let OldPercent = LastPercent
             LastPercent = parseFloat(tt)
+            const movedPercent = (LastPercent - OldPercent) / ChangedTime
             if(zinheng[1] == 0){
-                zinheng[0] = (LastPercent - OldPercent)
+                zinheng[0] = movedPercent
             }
             else{
-                zinheng[0] = ((zinheng[0]*zinheng[1]) + (LastPercent - OldPercent))/(zinheng[1]+1)
+                zinheng[0] = ((zinheng[0]*zinheng[1]) + movedPercent)/(zinheng[1]+1)
             }
             zinheng[1] += 1
             let TimeLeftSec = (100 - LastPercent)/zinheng[0]
@@ -104,7 +106,7 @@ ipcRenderer.on('loading', (evn, tt) => {
     else{
         zinheng = [0, 0]
         estimatedTime = ''
-        LastTime = -1
+        LastTime = ds
         LastPercent = -1.0
         document.getElementById('loading-text').style.visibility = 'hidden'
         loadingTag = ''

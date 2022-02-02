@@ -2,7 +2,7 @@
 
 exports.settings = {
     userdict: {},
-    extractJs: true,
+    extractJs: false,
     extractSomeScript: false,
     extractSomeScript2: [],
     code122: false,

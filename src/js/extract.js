@@ -396,9 +396,9 @@ function forEvent(d, dat_obj, conf, Path){
                 let acceptable = [401, 102, 405]
                 let ischeckable = false
                 if(conf.srce){
-                    acceptable = acceptable.concat([355])
+                    acceptable = acceptable.concat([356])
                     if(globalThis.settings.extractJs){
-                        acceptable = acceptable.concat([356])
+                        acceptable = acceptable.concat([355])
                     }
                 }
                 if(conf.note){
