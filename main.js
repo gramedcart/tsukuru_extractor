@@ -14,12 +14,9 @@ const Store = require('electron-store');
 const storage = new Store();
 const ExtTool = require('./src/js/extract.js')
 const path = require('path')
-const zlib= require('zlib')
-const LZString = require('./src/js/lz-string.min.js');
 const edTool = require('./src/js/edtool.js')
 let mainid = 0
 const defaultHeight = 350
-const isDev = true
 const axios = require('axios')
 const dataBaseO = require('./src/js/datas.js')
 const applyjs = require("./src/js/apply.js")
@@ -70,7 +67,7 @@ function createWindow() {
       contextIsolation: false,
       enableRemoteModule: true,
     },
-    icon: path.join(__dirname, 'libs/icon.png')
+    icon: path.join(__dirname, 'res/icon.png')
   })
   
   mainWindow.setMenu(null)
@@ -142,7 +139,7 @@ ipcMain.on('license', () => {
     height: 400,
     resizable: true,
     autoHideMenuBar: true,
-    icon: path.join(__dirname, 'libs/icon.png')
+    icon: path.join(__dirname, 'res/icon.png')
   })
   licenseWindow.setMenu(null)
   licenseWindow.loadFile('src/html/license.html')
@@ -161,7 +158,7 @@ ipcMain.on('settings', () => {
       contextIsolation: false,
       enableRemoteModule: true,
     },
-    icon: path.join(__dirname, 'libs/icon.png'),
+    icon: path.join(__dirname, 'res/icon.png'),
   })
   globalThis.settingsWindow.setMenu(null)
   globalThis.settingsWindow.loadFile('src/html/config/settings.html')
@@ -192,7 +189,7 @@ ipcMain.on('gamePatcher', (ev, dir) => {
       contextIsolation: false,
       enableRemoteModule: true,
     },
-    icon: path.join(__dirname, 'libs/icon.png'),
+    icon: path.join(__dirname, 'res/icon.png'),
   })
   globalThis.settingsWindow.setMenu(null)
   globalThis.settingsWindow.loadFile('src/html/patcher/index.html')
@@ -583,4 +580,7 @@ ipcMain.on('selFont', async (ev, dir) => {
     worked()
     return
   }
+  fs.copyFileSync(fPath, MfontPath)
+  sendAlert('완료되었습니다')
+  worked()
 })

@@ -1,6 +1,6 @@
 {
   "name": "mv-extractor-pp",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "MV Extractor++",
   "main": "main.js",
   "scripts": {
@@ -61,7 +61,7 @@
         "zip",
         "nsis"
       ],
-      "icon": "./libs/icon.ico"
+      "icon": "./res/icon.ico"
     },
     "nsis": {
       "oneClick": false,

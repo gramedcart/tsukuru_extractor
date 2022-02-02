@@ -30,11 +30,10 @@ function encodeURIp(p) {
     p = p.replaceAll('%', '■1')
     p = p.replaceAll('％', '■2')
     p = p.replaceAll('|', '■3')
-    return encodeURIComponent(p)
+    return p
 }
 
 function decodeURIp(p, encodeSp=false) {
-    p = decodeURIComponent(p)
     p = p.replaceAll('■1', '%')
     p = p.replaceAll('■0', '■')
     p = p.replaceAll('■2', '％')
@@ -72,7 +71,7 @@ class Translator{
             if(typeof(t) !== 'string' && typeof(t) !== 'number'){
                 return `ERROR: RETURNED ${JSON.stringify(t)}`
             }
-            return t
+            return (t)
         }
         if(this.type === 'google'){
             const translated = (await translatte(text, {to: 'ko'}))
@@ -213,23 +212,59 @@ exports.trans = async (ev, arg) => {
                 let a = ''
                 let l = 0
                 let chunks = []
-
+                let debuging = false
+                if(fileList[i] === 'Map004.txt'){
+                    debuging = true
+                }
                 while(reads.length > 0){
                     const d = reads[0]
                     l += d.length
                     a += d + '\n'
-                    if(l > 4000){
+                    if(l > 2000){
                         l = 0
-                        chunks.push(a)
+                        chunks.push(encodeURIp(a))
                         a = ''
                     }
                     reads.shift()
                 }
-                chunks.push(a)
+                chunks.push(encodeURIp(a))
                 for(const v in chunks){
                     globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / chunks.length / max_files)) * 100);
-                    const ouput = await translator.translate(chunks[v])
-                    output += encodeSp(ouput)
+                    let ouput = ''
+                    let temps = ''
+                    try {
+                        temps = await translator.translate(chunks[v])
+                    } catch (error) {
+                        console.log('err')
+                        if (await translator.isCrash()) {
+                            return
+                        }
+                        temps = chunks[v]
+                    }
+                    if(temps == chunks[v]){
+                        console.log('err')
+                        const r = chunks[v].split('\n')
+                        let r2 = []
+                        for (const a in r) {
+                            const readLine = r[a]
+                            try {
+                                const tr = await translator.translate((readLine))
+                                console.log(tr)
+                                r2.push(tr)
+                            } catch (error) {
+                                console.log(readLine)
+                                if (await translator.isCrash()) {
+                                    return
+                                }
+                                r2.push(readLine)
+                            }
+                        }
+                        ouput = r2.join('\n')
+                    }
+                    else{
+                        ouput = temps
+                    }
+                    output += encodeSp(decodeURIp(ouput))
                 }
             }
             else{
