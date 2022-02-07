@@ -512,27 +512,50 @@ document.getElementById('versionUp').onclick = async () => {
     }
 }
 
-// document.getElementById('fontConfig').onclick = async () => {
-//     if(running){
-//         Swal.fire({
-//             icon: 'error',
-//             text: '이미 작업이 시행중입니다!',
-//         })
-//         return
-//     }
-//     let result = await Swal.fire({
-//         title: '무엇을 하시겠습니까?',
-//         icon: 'info',
-//         showDenyButton: true,
-//         showCancelButton: true,
-//         confirmButtonText: '폰트 변경',
-//         denyButtonText: `폰트 크기 변경`,
-//         cancelButtonText: '취소'
-//     })
-//     if (result.isConfirmed) {
-//         running = true
-//         ipcRenderer.send('selFont', document.getElementById('folder_input').value)
-//     } else if (result.isDenied) {
-//         Swal.fire('Changes are not saved', '', 'info')
-//     }
-// }
+document.getElementById('fontConfig').onclick = async () => {
+    if(running){
+        Swal.fire({
+            icon: 'error',
+            text: '이미 작업이 시행중입니다!',
+        })
+        return
+    }
+    await Swal.fire({
+        title: '주의사항',
+        icon: 'warning',
+        text: '폰트 변경/크기 변경은 게임 내 폰트를 즉시 변경합니다.'
+    })
+    let result = await Swal.fire({
+        title: '무엇을 하시겠습니까?',
+        icon: 'info',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: '폰트 변경',
+        denyButtonText: `폰트 크기 변경`,
+        cancelButtonText: '취소'
+    })
+    if (result.isConfirmed) {
+        running = true
+        ipcRenderer.send('selFont', document.getElementById('folder_input').value)
+    } else if (result.isDenied) {
+        let { value: result2 } = await Swal.fire({
+            title: '폰트 크기 입력',
+            input: 'text',
+            inputValue: 24,
+            showCancelButton: true,
+            inputValidator: (value) => {
+              if (!value) {
+                return '무언가 입력해야 합니다!'
+              }
+              if (isNaN(value)) {
+                return '숫자가 아닙니다!'
+              }
+            }
+        })
+        if(result2){
+            running = true
+            ipcRenderer.send('changeFontSize', [document.getElementById('folder_input').value, parseInt(result2)])
+        }
+
+    }
+}

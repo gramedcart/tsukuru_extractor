@@ -1,11 +1,10 @@
 const {_} = require('lodash');
 const path = require('path')
-const fs = require('fs')
-const rpgencrypt = require("./rpgencrypt");
 const csv = require('@fast-csv/parse');
 const encoding = require('encoding-japanese')
 const { writeToPath } = require('@fast-csv/format');
 const { DecryptDir, EncryptDir } = require('./fileCrypto')
+const { beautifyCodes } = require("./datas")
 
 function addtodic(pa, obj, usePath='', conf = undefined){
     const Path = pa
@@ -481,6 +480,13 @@ exports.format_extracted = async(dats, typ = 0) => {
             if(!LenKeys.includes(jpath)){
                 LenMemory[jpath] = (globalThis.gb[jpath].outputText.split('\n').length - 1)
                 LenKeys.push(jpath)
+            }
+            if(globalThis.settings.formatNice && obNullSafe(datobj[d].conf)){
+                if(beautifyCodes.includes(datobj[d].conf.code)){
+                    const toadd = '==========\n'
+                    globalThis.gb[jpath].outputText += toadd
+                    LenMemory[jpath] += (toadd.split('\n').length - 1)
+                }
             }
             const cid = LenMemory[jpath]
             globalThis.gb[jpath].data[cid] = {}

@@ -10,9 +10,6 @@ function sleep(ms) {
 function getBinarySize(string) {
     return Buffer.byteLength(string, 'utf8');
 }
-const getMainWindow = () => {
-  return globalThis.mwindow
-}
 exports.apply = async (ev, arg) => {
     try {
       const dir = (Buffer.from(arg.dir, "base64").toString('utf8'));

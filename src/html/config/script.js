@@ -14,7 +14,8 @@ const CheckboxValues = [
   'oneMapFile',
   'loadingText',
   'ExternMsgJson',
-  'DoNotTransHangul'
+  'DoNotTransHangul',
+  'formatNice'
 ]
 
 ipcRenderer.on("settings", (evt, arg) => {

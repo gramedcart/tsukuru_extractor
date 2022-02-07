@@ -4,5 +4,5 @@ test/
 out/
 electron-builder.yml
 dist/
-note.txt
+*.txt
 package-lock.json

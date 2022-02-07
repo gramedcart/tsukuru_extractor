@@ -75,6 +75,7 @@ class Translator{
         }
         if(this.type === 'google'){
             const translated = (await translatte(text, {to: 'ko'}))
+            console.log(translated)
             if(translated.text === '찾으시는 주소가 없습니다'){
                 translated.text = text
             }

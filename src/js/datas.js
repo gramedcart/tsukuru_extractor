@@ -16,7 +16,8 @@ exports.settings = {
     ExtractAddLine: false,
     oneMapFile: false,
     ExternMsgJson: true,
-    DoNotTransHangul: true
+    DoNotTransHangul: true,
+    formatNice: true
 }
 
 exports.onebyone = {
@@ -88,3 +89,7 @@ exports.note2able = [
 ]
 
 exports.hanguls = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
+exports.beautifyCodes = [
+    108
+]
