@@ -1,6 +1,6 @@
 {
   "name": "mv-extractor-pp",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "MV Extractor++",
   "main": "main.js",
   "scripts": {
@@ -17,6 +17,7 @@
   "author": "Sziya",
   "license": "MIT",
   "devDependencies": {
+    "@types/aes-js": "^3.1.1",
     "electron": "^16.0.4",
     "electron-builder": "^22.14.5",
     "electron-packager": "^15.4.0",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@types/jsdom": "^16.2.14",
+    "aes-js": "^3.1.2",
     "axios": "^0.24.0",
     "bson": "^4.6.1",
     "electron-is-packaged": "^1.0.2",
@@ -31,10 +33,12 @@
     "electron-store": "^8.0.1",
     "encoding-japanese": "^1.0.30",
     "fast-csv": "^4.3.6",
+    "iconv-lite": "^0.6.3",
     "jsdom": "^19.0.0",
     "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
     "open": "^8.4.0",
+    "sha3": "^2.1.4",
     "tcp-port-used": "^1.0.2",
     "translatte": "^3.0.1"
   },

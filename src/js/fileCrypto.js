@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const rpgencrypt = require("./rpgencrypt");
+const rpgencrypt = require("./libs/rpgencrypt");
 
 exports.DecryptDir = (DataDir, type) => {
     globalThis.mwindow.webContents.send('loading', 0);

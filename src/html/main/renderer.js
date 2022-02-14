@@ -209,6 +209,7 @@ if(true){
         'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
         'versionUp': '버전 업 툴을\n엽니다',
         'settings': '설정',
+        'fontConfig': '게임 내 폰트를\n변경합니다',
     }
     for(const i in InfoList){
         document.getElementById(i).addEventListener('mouseenter', ()=>{
@@ -282,7 +283,7 @@ document.getElementById('settings').onclick = () => {
     if(running){
         Swal.fire({
             icon: 'error',
-            text: '이미 작업이 시행중입니다!',
+            text: '이미 다른 작업이 시행중입니다!',
         })
         return
     }
@@ -346,7 +347,7 @@ document.getElementById('run').onclick = () => {
     if(running){
         Swal.fire({
             icon: 'error',
-            text: '이미 작업이 시행중입니다!',
+            text: '이미 다른 작업이 시행중입니다!',
         })
         return
     }
@@ -371,7 +372,7 @@ document.getElementById('eztrans').onclick = () => {
     if(running){
         Swal.fire({
             icon: 'error',
-            text: '이미 작업이 시행중입니다!',
+            text: '이미 다른 작업이 시행중입니다!',
         })
         return
     }
@@ -413,7 +414,7 @@ document.getElementById('changeAll').onclick = async () => {
     if(running){
         Swal.fire({
             icon: 'error',
-            text: '이미 작업이 시행중입니다!',
+            text: '이미 다른 작업이 시행중입니다!',
         })
         return
     }
@@ -451,7 +452,7 @@ document.getElementById('versionUp').onclick = async () => {
     if(running){
         Swal.fire({
             icon: 'error',
-            text: '이미 작업이 시행중입니다!',
+            text: '이미 다른 작업이 시행중입니다!',
         })
         return
     }
@@ -516,7 +517,7 @@ document.getElementById('fontConfig').onclick = async () => {
     if(running){
         Swal.fire({
             icon: 'error',
-            text: '이미 작업이 시행중입니다!',
+            text: '이미 다른 작업이 시행중입니다!',
         })
         return
     }

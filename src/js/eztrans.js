@@ -208,7 +208,7 @@ exports.trans = async (ev, arg) => {
             let folkt = false
             let typeofit = 0
 
-            if(typeOfFile == '' && translator.getType() === 'eztrans'){
+            if(typeOfFile == '' && translator.getType() === 'eztrans' && globalThis.settings.fastEztrans){
                 let reads = fileRead.split('\n')
                 let a = ''
                 let l = 0
@@ -242,7 +242,7 @@ exports.trans = async (ev, arg) => {
                         }
                         temps = chunks[v]
                     }
-                    if(temps == chunks[v]){
+                    if(temps == chunks[v] || (chunks[v].split('\n').length !== temps.split('\n').length) ){
                         console.log('err')
                         const r = chunks[v].split('\n')
                         let r2 = []

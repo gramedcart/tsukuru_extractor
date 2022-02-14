@@ -4,9 +4,6 @@ import path from "path"
 const EncryptedExtensions:string[] = [".rpgmvo", ".rpgmvm", ".rpgmvw", ".rpgmvp", ".ogg_", ".m4a_", ".wav_", ".png_"]
 const DecryptedExtensions:string[] = [".ogg", ".m4a", ".wav", ".png", ".ogg", ".m4a", ".wav", ".png"]
 const HEADER_MV:string[] = ["52", "50", "47", "4D", "56", "00", "00", "00", "00", "03", "01", "00", "00", "00", "00", "00"]
-const HEADER_OGG:string[] = ["4F", "67", "67", "53", "00", "02", "00", "00", "00", "00", "00", "00", "00", "00"]
-const HEADER_M4A:string[] = ["00", "00", "00", "20", "66", "74", "79", "70", "4D", "34", "41", "20", "00", "00", "00", "00"]
-const HEADER_WAV:string[] = ["52", "49", "46", "46", "24", "3C", "00", "00", "57", "41", "56", "45", "66", "6D", "74", "20"]
 
 function splitString(str:string, p:number){
     let chunks = [];

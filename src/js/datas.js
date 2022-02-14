@@ -17,7 +17,8 @@ exports.settings = {
     oneMapFile: false,
     ExternMsgJson: true,
     DoNotTransHangul: true,
-    formatNice: true
+    formatNice: true,
+    fastEztrans: true
 }
 
 exports.onebyone = {

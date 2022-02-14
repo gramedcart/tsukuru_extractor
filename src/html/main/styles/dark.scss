@@ -41,7 +41,7 @@ body{
 .highlight{
     border-radius: 10px;
     border: transparent;
-    background-color: #ffffff10;
+    background-color: $HighlightBlack;
     color: $WhiteColor;   
 }
 
@@ -61,7 +61,7 @@ body{
 
 .btn{
     border: transparent;
-    background-color: #ffffff10;
+    background-color: $HighlightBlack;
     color: $WhiteColor;  
     height: 70px;
 }

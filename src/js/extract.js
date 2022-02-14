@@ -494,6 +494,7 @@ exports.format_extracted = async(dats, typ = 0) => {
             globalThis.gb[jpath].data[cid].type = 'None'
             globalThis.gb[jpath].data[cid].val = d
             globalThis.gb[jpath].data[cid].conf = datobj[d].conf
+            globalThis.gb[jpath].data[cid].originText = datobj[d].var
 
             const toadd = datobj[d].var + '\n'
             globalThis.gb[jpath].outputText += toadd
@@ -501,7 +502,7 @@ exports.format_extracted = async(dats, typ = 0) => {
             globalThis.gb[jpath].data[cid].m = LenMemory[jpath]
         }
     }
-} // 
+}
 
 exports.DecryptDir = DecryptDir
 
