@@ -105,6 +105,11 @@ class Translator{
 
 exports.trans = async (ev, arg) => {
     const dm = true
+    let compatibilityMode = false
+    if(arg.type == 'eztransh'){
+        compatibilityMode = true
+        arg.type = 'eztrans'
+    }
     const translator = new Translator(arg.type)
     let ls
 
@@ -165,6 +170,15 @@ exports.trans = async (ev, arg) => {
             if (globalThis.settings.safeTrans || globalThis.settings.smartTrans) {
                 const name = fileList[i]
                 console.log(name)
+                if(compatibilityMode){
+                    const NoneCompList = [
+                        'System.txt'
+                    ]
+                    if(NoneCompList.includes(name)){
+                        console.log('skipping by compatibilityMode')
+                        continue
+                    }
+                }
                 if (name.includes('ext_scripts.txt')) {
                     typeOfFile = 'src'
                     console.log('src')

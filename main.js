@@ -20,7 +20,7 @@ const defaultHeight = 350
 const axios = require('axios')
 const dataBaseO = require('./src/js/datas.js')
 const applyjs = require("./src/js/apply.js")
-const eztrans = require("./src/js/eztrans.js")
+const eztrans = require("./src/js/translator.js")
 const {checkIsMapFile, sleep} = require('./src/js/globalutils.js')
 require('./src/js/fonts')
 
@@ -546,6 +546,10 @@ ipcMain.on('updateVersion', async (ev, arg) => {
     getMainWindow().webContents.send('alert', {icon: 'error', message: JSON.stringify(err, Object.getOwnPropertyNames(err))}); 
     endThis()
   }
+})
+
+process.on('uncaughtException', function (err) {
+  console.log(err);
 })
 
 ipcMain.on('log', async(ev, arg) => console.log(arg))

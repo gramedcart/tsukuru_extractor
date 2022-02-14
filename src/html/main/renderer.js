@@ -368,7 +368,7 @@ document.getElementById('run').onclick = () => {
     }
 }
 
-document.getElementById('eztrans').onclick = () => {
+document.getElementById('eztrans').onclick = async () => {
     if(running){
         Swal.fire({
             icon: 'error',
@@ -380,34 +380,55 @@ document.getElementById('eztrans').onclick = () => {
     if(globalSettings.smartTrans){
         txt = '플러그인/스크립트/노트/메모는 스마트 번역으로 오류 없이 번역됩니다. 번역하시겠습니까?'
     }
-    Swal.fire({
+    const result = await Swal.fire({
         icon: 'warning',
         text: txt,
         confirmButtonText: '예',
         showDenyButton: true,
         denyButtonText: `아니오`,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                icon: 'info',
-                text: '어느 번역기를 사용하시겠습니까?',
-                confirmButtonText: 'Eztrans',
-                showDenyButton: true,
-                denyButtonText: `구글`,
-            }).then((result) => {
-                let transtype = 'google'
-                if(result.isConfirmed){
-                    transtype = 'eztrans'
+    })
+    let confirmit = 5
+    if (!result.isConfirmed) {
+        return
+    }
+    const v = await Swal.fire({
+        icon: 'info',
+        title: '번역기를 선택해주세요',
+        input: 'select',
+        inputOptions: {
+            'eztrans': 'eztrans',
+            'eztransh': 'eztrans(호환성 모드)',
+            'google': '구글 번역기'
+        },
+        confirmButtonText: '확인',
+        inputValidator: (value) => {
+            return new Promise((resolve) => {
+                if (value) {
+                    if(value === 'eztransh' && confirmit > 0){
+                        resolve(`호환성 모드는 일부분이 번역되지 않을 수 있습니다.<br>번역 후 게임 내에서 오류가 날 시 사용해 주세요<br>계속하려면 확인 버튼을 ${confirmit}번 더 눌려주세요`)
+                        confirmit -= 1
+                    }
+                    resolve()
                 }
-                const a = {
-                    dir: Buffer.from(document.getElementById('folder_input').value.replace('\\','/'), "utf8").toString('base64'),
-                    type: transtype
-                };
-                running = true
-                ipcRenderer.send('eztrans', a);
+                else {
+                    ipcRenderer.send('log', value)
+                    resolve('설정되지 않음')
+                }
             })
         }
     })
+    const transtype = v.value
+    if(!transtype){
+        return
+    }
+    ipcRenderer.send('log', v.value)
+    const a = {
+        dir: Buffer.from(document.getElementById('folder_input').value.replace('\\','/'), "utf8").toString('base64'),
+        type: transtype
+    };
+    running = true
+    ipcRenderer.send('eztrans', a);
+    return
 }
 
 document.getElementById('changeAll').onclick = async () => {
