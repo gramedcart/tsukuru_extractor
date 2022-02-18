@@ -2,6 +2,7 @@ import LZString from './libs/lz-string.min.js';
 import fs from 'fs';
 import zlib from 'zlib'
 import iconv from 'iconv-lite'
+import axios from 'axios';
 
 export function read(dir: string){
     try {

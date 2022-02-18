@@ -16,7 +16,6 @@ const CheckboxValues = [
   'ExternMsgJson',
   'DoNotTransHangul',
   'formatNice',
-  'fastEztrans'
 ]
 
 ipcRenderer.on("settings", (evt, arg) => {

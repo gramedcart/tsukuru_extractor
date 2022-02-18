@@ -54,6 +54,15 @@ function encodeSp(p, change=false){
 class Translator{
     constructor(type){
         this.type = type
+        this.ls = null
+    }
+    setLs(ls){
+        this.ls = ls
+    }
+    KillLs(ls){
+        try {
+            this.ls.kill()
+        } catch (error) {}
     }
     async translate(text){
         if(globalThis.settings.DoNotTransHangul){
@@ -63,11 +72,33 @@ class Translator{
         }
         text = applyUserDict(text)
         if(this.type === 'eztrans'){
-            const a =  await axios.post(
-                'http://localhost:8000/',
-                text
-            )
-            let t = a.data
+            let t
+            // console.log(text)
+            try {
+                const a =  await axios.get(
+                    'http://localhost:8000/',
+                    {
+                        params: {
+                            text: text
+                        },
+                        timeout: 10000
+                    }
+                )
+                t = a.data
+            } catch (error) {
+                try {
+                    try {
+                        this.KillLs()
+                    } catch (error) {}
+                    this.ls = spawn(path.join(oPath(), 'exfiles', 'eztrans' ,'eztransServer.exe'));
+                    console.log('spawned')
+                    await sleep(2000)
+                    await PU.waitUntilUsed(8000)
+                } catch (error) {
+                    console.log('spawn failed')
+                }
+                t = a
+            }
             if(typeof(t) !== 'string' && typeof(t) !== 'number'){
                 return `ERROR: RETURNED ${JSON.stringify(t)}`
             }
@@ -98,9 +129,13 @@ class Translator{
                 return true
             }
         }
-        
         return false
     }
+}
+
+function setProgressBar(now, max){
+    console.log(`${now} / ${max}`)
+    globalThis.mwindow.webContents.send('loading', (now/max) * 100);
 }
 
 exports.trans = async (ev, arg) => {
@@ -112,6 +147,8 @@ exports.trans = async (ev, arg) => {
     }
     const translator = new Translator(arg.type)
     let ls
+    globalThis.settings.fastEztrans = true;
+
 
     try {
         const dir = Buffer.from(arg.dir, "base64").toString('utf8');
@@ -125,7 +162,16 @@ exports.trans = async (ev, arg) => {
             return
         }
         let isUsed
+        const fileList = fs.readdirSync(edir)
+        const max_files = fileList.length
+        let fullFileLength = 0
+        let workedFileLength = 0
         console.log(translator.getType())
+        for(const i in fileList){
+            const iPath = path.join(edir, fileList[i])
+            fullFileLength += fs.readFileSync(iPath, 'utf-8').length
+        }
+        console.log(fullFileLength)
         if(translator.getType() == 'eztrans'){
             console.log('eztrans')
             await PU.check(8000).then(function (inUse) {
@@ -140,7 +186,22 @@ exports.trans = async (ev, arg) => {
                 return
             }
             ls = spawn(path.join(oPath(), 'exfiles', 'eztrans' ,'eztransServer.exe'));
-
+            translator.setLs(ls)
+            // ls.stdout.on('data', function (data) {
+            //     console.log("eztrans");
+            //     console.log('data' + data);
+            // });
+            
+            ls.stderr.on('data', function (data) {
+                console.log("eztrans - Error");
+                console.log('test: ' + data);
+            });
+            
+            ls.on('close', function (code) {
+                console.log("eztrans");
+                console.log("close");
+            });
+            
             await sleep(1000)
             try {
                 await PU.waitUntilUsed(8000)
@@ -151,16 +212,13 @@ exports.trans = async (ev, arg) => {
                 });
                 setTimeout(() => {open(`https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.1-windows-x86-installer`)}, 2000)
                 try {
-                    ls.kill()
+                    translator.KillLs()
                 } catch (error) {   }
                 globalThis.mwindow.webContents.send('worked', 0);
                 return
             }
             await sleep(1000)
         }
-
-        const fileList = fs.readdirSync(edir)
-        const max_files = fileList.length
         let worked_files = 0
         const edDat = edTool.read(dir)
         let eed = {}
@@ -222,6 +280,7 @@ exports.trans = async (ev, arg) => {
             let folkt = false
             let typeofit = 0
 
+
             if(typeOfFile == '' && translator.getType() === 'eztrans' && globalThis.settings.fastEztrans){
                 let reads = fileRead.split('\n')
                 let a = ''
@@ -233,18 +292,19 @@ exports.trans = async (ev, arg) => {
                 }
                 while(reads.length > 0){
                     const d = reads[0]
-                    l += d.length
-                    a += d + '\n'
-                    if(l > 2000){
+                    if(l + d.length > 2000){
                         l = 0
                         chunks.push(encodeURIp(a))
                         a = ''
                     }
+                    l += d.length
+                    a += d + '\n'
                     reads.shift()
                 }
+                
+
                 chunks.push(encodeURIp(a))
                 for(const v in chunks){
-                    globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / chunks.length / max_files)) * 100);
                     let ouput = ''
                     let temps = ''
                     try {
@@ -256,7 +316,8 @@ exports.trans = async (ev, arg) => {
                         }
                         temps = chunks[v]
                     }
-                    if(temps == chunks[v] || (chunks[v].split('\n').length !== temps.split('\n').length) ){
+                    const isLine = (chunks[v].split('\n').length !== temps.split('\n').length)
+                    if(temps == chunks[v] || isLine){
                         console.log('err')
                         const r = chunks[v].split('\n')
                         let r2 = []
@@ -264,7 +325,6 @@ exports.trans = async (ev, arg) => {
                             const readLine = r[a]
                             try {
                                 const tr = await translator.translate((readLine))
-                                console.log(tr)
                                 r2.push(tr)
                             } catch (error) {
                                 console.log(readLine)
@@ -280,18 +340,20 @@ exports.trans = async (ev, arg) => {
                         ouput = temps
                     }
                     output += encodeSp(decodeURIp(ouput))
+                    setProgressBar(workedFileLength + output.length, fullFileLength)
                 }
             }
             else{
                 const read = fileRead.split('\n')
                 for (const v in read) {
                     try {
-                        globalThis.mwindow.webContents.send('loading', ((worked_files / max_files) + (v / read.length / max_files)) * 100);
+                        setProgressBar(workedFileLength + output.length, fullFileLength)
                         const readLine = read[v];
                         switch (typeOfFile){
                             case '':
                                 const ouput = await translator.translate((readLine))
-                                output += encodeSp(ouput) + '\n'
+                                const d = encodeSp(ouput) + '\n'
+                                output += d
                                 break
                             case 'src':
                                 if(readLine.startsWith('D_TEXT ')){
@@ -426,21 +488,18 @@ exports.trans = async (ev, arg) => {
                 }
             }
             worked_files += 1
+            workedFileLength += output.length
             fs.writeFileSync(iPath, output, 'utf-8')
-            globalThis.mwindow.webContents.send('loading', worked_files / max_files * 100);
+            // globalThis.mwindow.webContents.send('loading', worked_files / max_files * 100);
             await sleep(0)
         }
         if(translator.getType('eztrans')){
-            try {
-                ls.kill()
-            } catch (error) {}
+            translator.KillLs()
         }
         globalThis.mwindow.webContents.send('alert', '완료되었습니다');
         globalThis.mwindow.webContents.send('loading', 0);
     } catch (err) {
-        try {
-            ls.kill()
-        } catch (error) {}
+        translator.KillLs()
         globalThis.mwindow.webContents.send('alert', {
             icon: 'error',
             message: JSON.stringify(err, Object.getOwnPropertyNames(err))
