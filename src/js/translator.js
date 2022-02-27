@@ -52,8 +52,9 @@ function encodeSp(p, change=false){
 }
 
 class Translator{
-    constructor(type){
+    constructor(type, type2=''){
         this.type = type
+        this.type2 = type2
         this.ls = null
     }
     setLs(ls){
@@ -104,7 +105,57 @@ class Translator{
             }
             return (t)
         }
-        if(this.type === 'google'){
+        else if(this.type === 'transEngine'){
+            let t
+            // console.log(text)
+            try {
+                console.log('\starting transengine\n')
+                if(text.length < 1){
+                    console.log("one d")
+                    t = text
+                }
+                else{
+                    console.log('\rrequesting\n')
+                    const a =  await axios.get(
+                        'http://localhost:8000/',
+                        {
+                            params: {
+                                text: text,
+                                platform: this.type2,
+                                source: 'ja',
+                                target: 'ko'
+                            },
+                            timeout: 10000
+                        }
+                    )
+                    console.log(a.data)
+                    console.log('\rrequesting end\n')
+                    try {
+                        t = a.data.data.translatedContent
+                    } catch (error) {
+                        t = text
+                    }
+                }
+            } catch (error) {
+                try {
+                    try {
+                        this.KillLs()
+                    } catch (error) {}
+                    this.ls = spawn(path.join(oPath(), 'exfiles', 'transEngine' ,'translate_engine.exe'));
+                    console.log('spawned')
+                    await sleep(2000)
+                    await PU.waitUntilUsed(8000)
+                } catch (error) {
+                    console.log('spawn failed')
+                }
+                t = a
+            }
+            if(typeof(t) !== 'string' && typeof(t) !== 'number'){
+                return `ERROR: RETURNED ${JSON.stringify(t)}`
+            }
+            return (t)
+        }
+        else if(this.type === 'googleOld'){
             const translated = (await translatte(text, {to: 'ko'}))
             console.log(translated)
             if(translated.text === '찾으시는 주소가 없습니다'){
@@ -141,11 +192,20 @@ function setProgressBar(now, max){
 exports.trans = async (ev, arg) => {
     const dm = true
     let compatibilityMode = false
+    let type2 = ''
     if(arg.type == 'eztransh'){
         compatibilityMode = true
         arg.type = 'eztrans'
     }
-    const translator = new Translator(arg.type)
+    if(arg.type == 'papago'){
+        arg.type = 'transEngine'
+        type2 = 'papago'
+    }
+    if(arg.type == 'google'){
+        arg.type = 'transEngine'
+        type2 = 'google'
+    }
+    const translator = new Translator(arg.type, type2)
     let ls
     globalThis.settings.fastEztrans = true;
 
@@ -172,6 +232,38 @@ exports.trans = async (ev, arg) => {
             fullFileLength += fs.readFileSync(iPath, 'utf-8').length
         }
         console.log(fullFileLength)
+        if(translator.getType() == 'transEngine'){
+            console.log('transEngine')
+            await PU.check(8000).then(function (inUse) {
+                isUsed = inUse
+            })
+            if (isUsed) {
+                globalThis.mwindow.webContents.send('alert', {
+                    icon: 'error',
+                    message: '포트 8000이 사용중입니다.'
+                });
+                globalThis.mwindow.webContents.send('worked', 0);
+                return
+            }
+            ls = spawn(path.join(oPath(), 'exfiles', 'transEngine' ,'translate_engine.exe'));
+            translator.setLs(ls)
+
+            await sleep(1000)
+            try {
+                await PU.waitUntilUsed(8000)
+            } catch (error) {
+                globalThis.mwindow.webContents.send('alert', {
+                    icon: 'error',
+                    message: '구동 도중 오류가 발생하였습니다'
+                });
+                try {
+                    translator.KillLs()
+                } catch (error) {   }
+                globalThis.mwindow.webContents.send('worked', 0);
+                return
+            }
+            await sleep(1000)
+        }
         if(translator.getType() == 'eztrans'){
             console.log('eztrans')
             await PU.check(8000).then(function (inUse) {
@@ -493,9 +585,7 @@ exports.trans = async (ev, arg) => {
             // globalThis.mwindow.webContents.send('loading', worked_files / max_files * 100);
             await sleep(0)
         }
-        if(translator.getType('eztrans')){
-            translator.KillLs()
-        }
+        translator.KillLs()
         globalThis.mwindow.webContents.send('alert', '완료되었습니다');
         globalThis.mwindow.webContents.send('loading', 0);
     } catch (err) {

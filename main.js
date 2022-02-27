@@ -415,7 +415,7 @@ async function extractor(arg){
       ExtTool.DecryptDir(dir, "audio")
     }
     if(!arg.silent){
-      getMainWindow().webContents.send('alert', '완료되었습니다'); 
+      getMainWindow().webContents.send('alert2'); 
     }
   } catch (err) {
     getMainWindow().webContents.send('alert', {icon: 'error', message: JSON.stringify(err, Object.getOwnPropertyNames(err))}); 
@@ -459,6 +459,14 @@ ipcMain.on('app_version', (event) => {
 
 ipcMain.on('updates', ()=> {
   open("https://github.com/gramedcart/mvextractor/releases/")
+})
+
+ipcMain.on('updates', ()=> {
+  open("https://github.com/gramedcart/mvextractor/releases/")
+})
+
+ipcMain.on('openFolder', (ev, arg) => {
+  open(arg)
 })
 
 ipcMain.on('changeAllString', async (ev, arg) => {

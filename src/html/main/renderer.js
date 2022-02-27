@@ -34,6 +34,7 @@ let _mode = -1
 
 document.getElementById('icon1').onclick = () => {ipcRenderer.send('close')}
 document.getElementById('icon2').onclick = () => {ipcRenderer.send('minimize')}
+document.getElementById('fold').onclick = () => {ipcRenderer.send("openFolder", document.getElementById('folder_input').value)}
 document.querySelector('#sel').addEventListener('click', () => {
     ipcRenderer.send('select_folder', 'folder_input');
 });
@@ -144,6 +145,21 @@ ipcRenderer.on('alert', (evn, tt) => {
         })
     }
 });
+
+ipcRenderer.on('alert2', async (evn, tt) => {
+    const {isDenied} = await Swal.fire({
+        icon: 'success',
+        showDenyButton: true,
+        denyButtonText: "폴더 열기",
+        
+        title: '완료되었습니다',
+    })
+    if(isDenied){
+        ipcRenderer.send("openFolder", document.getElementById('folder_input').value)
+    }
+});
+
+
 
 function _reload(){
     if(_mode == 0){
@@ -398,7 +414,8 @@ document.getElementById('eztrans').onclick = async () => {
         inputOptions: {
             'eztrans': 'eztrans',
             'eztransh': 'eztrans(호환성 모드)',
-            'google': '구글 번역기'
+            'google': '구글 번역기',
+            'papago': '파파고 (베타)'
         },
         confirmButtonText: '확인',
         inputValidator: (value) => {
