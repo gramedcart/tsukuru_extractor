@@ -580,7 +580,7 @@ exports.trans = async (ev, arg) => {
                 }
             }
             worked_files += 1
-            workedFileLength += output.length
+            workedFileLength += output.length * 0.7
             fs.writeFileSync(iPath, output, 'utf-8')
             // globalThis.mwindow.webContents.send('loading', worked_files / max_files * 100);
             await sleep(0)
