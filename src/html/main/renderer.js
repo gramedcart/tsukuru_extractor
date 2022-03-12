@@ -414,7 +414,7 @@ document.getElementById('eztrans').onclick = async () => {
         inputOptions: {
             'eztrans': 'eztrans',
             'eztransh': 'eztrans(호환성 모드)',
-            'google': '구글 번역기',
+            'google': '구글 번역기 (베타)',
             'papago': '파파고 (베타)'
         },
         confirmButtonText: '확인',
