@@ -6,7 +6,6 @@ const dataBaseO = require('./datas.js')
 const {checkIsMapFile, sleep} = require('./globalutils.js')
 const axios = require('axios')
 const {translateable, note2able, translateableOne, hanguls} = require('./datas.js')
-const translatte = require('translatte');
 const edTool = require('./edtool')
 const { performance } = require('perf_hooks');
 const open = require('open');
@@ -154,15 +153,6 @@ class Translator{
                 return `ERROR: RETURNED ${JSON.stringify(t)}`
             }
             return (t)
-        }
-        else if(this.type === 'googleOld'){
-            const translated = (await translatte(text, {to: 'ko'}))
-            console.log(translated)
-            if(translated.text === '찾으시는 주소가 없습니다'){
-                translated.text = text
-            }
-            console.log(translated.text)
-            return translated.text
         }
     }
     getType(){

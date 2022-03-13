@@ -4,7 +4,8 @@ const csv = require('@fast-csv/parse');
 const encoding = require('encoding-japanese')
 const { writeToPath } = require('@fast-csv/format');
 const { DecryptDir, EncryptDir } = require('./fileCrypto')
-const { beautifyCodes } = require("./datas")
+const { beautifyCodes, beautifyCodes2 } = require("./datas")
+let eventID = 0
 
 function addtodic(pa, obj, usePath='', conf = undefined){
     const Path = pa
@@ -13,7 +14,7 @@ function addtodic(pa, obj, usePath='', conf = undefined){
         usePath = ''
     }
     if(usePath == ''){
-        if(conf !== undefined && conf.type == 'event' && [356,355].includes(conf.code)){
+        if(conf !== undefined && conf.type == 'event' && [356,355,357].includes(conf.code)){
             usePath = 'script'
         }
         if(conf !== undefined && conf.type == 'event' && [108,408].includes(conf.code)){
@@ -357,6 +358,9 @@ exports.extract = async (filedata, conf, ftype) => {
 }
 
 function isIncludeAble(sc){
+    console.log('includeable')
+    console.log(sc)
+
     const ess = globalThis.settings.extractSomeScript2
     let able = false
     if(sc === null || sc === undefined){
@@ -393,10 +397,14 @@ function forEvent(d, dat_obj, conf, Path){
             for(let i=0;i<d.list.length;i++){
                 let acceptable = [401, 102, 405]
                 let ischeckable = false
+                let reportDebug = false
                 if(conf.srce){
-                    acceptable = acceptable.concat([356])
+                    acceptable = acceptable.concat([356,357])
                     if(globalThis.settings.extractJs){
                         acceptable = acceptable.concat([355])
+                    }
+                    if(d.list[i].code === 357){
+                        reportDebug = true
                     }
                 }
                 if(conf.note){
@@ -405,31 +413,22 @@ function forEvent(d, dat_obj, conf, Path){
                 if(globalThis.settings.code122){
                     acceptable = acceptable.concat([122])
                 }
-                if([356,355,108,408].includes(d.list[i].code) && globalThis.settings.extractSomeScript){
+                if([356,355,108,408,357].includes(d.list[i].code) && globalThis.settings.extractSomeScript){
                     ischeckable = true
                 }
+                eventID += 1
                 if (acceptable.includes(d.list[i].code) && d.list[i].parameters !== undefined && d.list[i].parameters !== null){
                     for(let i2=0;i2<d.list[i].parameters.length;i2++){
                         if(typeof d.list[i].parameters[i2] === 'object'){
-                            for(let i3=0;i3<d.list[i].parameters[i2].length;i3++){
-                                if(ischeckable){
-                                    if(isIncludeAble(d.list[i].parameters[i2][i3])){
-                                        dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}.${i3}`, dat_obj, '', {type: "event",code:d.list[i].code})
-                                    }
-                                }
-                                else{
-                                    dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}.${i3}`, dat_obj, '', {type: "event",code:d.list[i].code})
+                            for(let i3 in d.list[i].parameters[i2]){
+                                if(!ischeckable || isIncludeAble(d.list[i].parameters[i2][i3])){
+                                    dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}.${i3}`, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID})
                                 }
                             }
                         }
                         else{
-                            if(ischeckable){
-                                if(isIncludeAble(d.list[i].parameters[i2])){
-                                    dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}`, dat_obj, '', {type: "event",code:d.list[i].code})
-                                }
-                            }
-                            else{
-                                dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}`, dat_obj, '', {type: "event",code:d.list[i].code})
+                            if(!ischeckable || isIncludeAble(d.list[i].parameters[i2])){
+                                dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}`, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID})
                             }
                         }
                     }
@@ -456,6 +455,7 @@ exports.format_extracted = async(dats, typ = 0) => {
         const Keys = Object.keys(datobj)
         let LenMemory = {}
         let LenKeys = []
+        let usedEid = []
         globalThis.gb[fileName].outputText = ''
         for(const d of Keys){
             let jpath = fileName
@@ -485,6 +485,15 @@ exports.format_extracted = async(dats, typ = 0) => {
                     const toadd = '==========\n'
                     globalThis.gb[jpath].outputText += toadd
                     LenMemory[jpath] += (toadd.split('\n').length - 1)
+                }
+                const eid = datobj[d].conf.eid
+                if(eid !== undefined && eid !== null){
+                    if(!usedEid.includes(eid) && beautifyCodes2.includes(datobj[d].conf.code)){
+                        const toadd = '==========\n'
+                        globalThis.gb[jpath].outputText += toadd
+                        LenMemory[jpath] += (toadd.split('\n').length - 1)
+                        usedEid.push(eid)
+                    }
                 }
             }
             const cid = LenMemory[jpath]

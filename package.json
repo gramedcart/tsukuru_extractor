@@ -1,6 +1,6 @@
 {
   "name": "mv-extractor-pp",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "MV Extractor++",
   "main": "main.js",
   "scripts": {
@@ -38,8 +38,7 @@
     "lz-string": "^1.4.4",
     "open": "^8.4.0",
     "sha3": "^2.1.4",
-    "tcp-port-used": "^1.0.2",
-    "translatte": "^3.0.1"
+    "tcp-port-used": "^1.0.2"
   },
   "build": {
     "productName": "MVExtractor++",
@@ -49,7 +48,9 @@
       "**/*",
       "!test/*",
       "!dist/*",
-      "!addon/*"
+      "!addon/*",
+      "!**/*.ts",
+      "!**/*.d.ts"
     ],
     "extraResources": [
       "./exfiles/**"
@@ -65,7 +66,16 @@
         "zip",
         "nsis"
       ],
-      "icon": "./res/icon.ico"
+      "icon": "./res/icon.ico",
+      "files": [
+        "!gruntfile.js",
+        "!README.md",
+        "!notarize.js",
+        "!.env",
+        "!minify.js",
+        "!.git/*",
+        "!resources/mac/*"
+      ]
     },
     "nsis": {
       "oneClick": false,

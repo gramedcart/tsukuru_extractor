@@ -94,3 +94,7 @@ exports.hanguls = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
 exports.beautifyCodes = [
     108
 ]
+
+exports.beautifyCodes2 = [
+    355,356,357
+]
