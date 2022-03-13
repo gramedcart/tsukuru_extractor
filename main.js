@@ -230,11 +230,11 @@ ipcMain.on('closesettings', async (ev, arg) => {
 })
 
 ipcMain.on('select_folder', async (ev, typeo) => {
-  let path = await dialog.showOpenDialog({
+  let Path = await dialog.showOpenDialog({
     properties: ['openDirectory']
   });
-  if(!path.canceled){
-    const qs = path.filePaths[0]
+  if(!Path.canceled){
+    const qs = Path.filePaths[0]
     let qv
     if(qs.includes('\\')){
       qv = qs.split('\\')[qs.split('\\').length-1]
@@ -247,14 +247,11 @@ ipcMain.on('select_folder', async (ev, typeo) => {
       getMainWindow().webContents.send('set_path', {type:typeo, dir:dir});
     }
     else{
-      if(qv === 'www'){
-        dir = qs + '\\data'
+      if(fs.existsSync(path.join(qs, 'www', 'data'))){
+        getMainWindow().webContents.send('set_path', {type:typeo, dir:path.join(qs, 'www', 'data')});
       }
-      else{
-        dir = qs + '\\www\\data'
-      }
-      if(fs.existsSync(dir)){
-        getMainWindow().webContents.send('set_path', {type:typeo, dir:dir});
+      else if(fs.existsSync(path.join(qs, 'data'))){
+        getMainWindow().webContents.send('set_path', {type:typeo, dir:path.join(qs, 'data')});
       }
       else{
         getMainWindow().webContents.send('alert', {icon: 'error',  message:'폴더가 올바르지 않습니다'});
@@ -300,13 +297,18 @@ async function extractor(arg){
         }
       }
     }
+    console.log(arg.ext_plugin)
     if(arg.ext_plugin){
-      if(!arg.silent){
-        const jsdir = ((dir.substring(0,dir.length-5) + '/js').replaceAll('//','/'))
+      if(true){
+        let jsdir = ((dir.substring(0,dir.length-5) + '/js').replaceAll('//','/'))
         if(!fs.existsSync(jsdir + '/plugins.js')){
-          getMainWindow().webContents.send('alert', {icon: 'error', message: 'plugin.js가 존재하지 않습니다'}); 
-          worked()
-          return
+          jsdir = path.join(path.dirname(path.dirname(path.dirname(jsdir))), 'js')
+          console.log(jsdir)
+          if(!fs.existsSync(jsdir + '/plugins.js')){
+            getMainWindow().webContents.send('alert', {icon: 'error', message: 'plugin.js가 존재하지 않습니다'}); 
+            worked()
+            return
+          }
         }
         let hail = fs.readFileSync(jsdir + '/plugins.js', 'utf-8')
         hail = hail.split('$plugins =')
@@ -510,12 +512,15 @@ ipcMain.on('updateVersion', async (ev, arg) => {
       worked()
       return
     }
+    
+    console.log(arg.dir1)
     await extractor({
       ...arg.dir1,
       dir: Buffer.from(path.join(arg.dir1_base, 'Backup'), "utf8").toString('base64'),
       force: true,
       silent: true
     })
+    console.log(arg.dir2)
     await extractor({
       ...arg.dir2,
       dir: Buffer.from(path.join(arg.dir2_base), "utf8").toString('base64'),

@@ -384,7 +384,7 @@ exports.trans = async (ev, arg) => {
                 }
                 while(reads.length > 0){
                     const d = reads[0]
-                    if(l + d.length > 2000){
+                    if(l + d.length > 1000){
                         l = 0
                         chunks.push(encodeURIp(a))
                         a = ''

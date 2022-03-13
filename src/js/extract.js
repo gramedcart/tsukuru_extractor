@@ -155,7 +155,6 @@ exports.extract = async (filedata, conf, ftype) => {
     const fileName = conf.fileName
     const dir = conf.dir
     const dirf = dir + fileName + '\\'
-    console.log(fileName)
     globalThis.gb[fileName] = {data: {}}
     if (filedata.charCodeAt(0) === 0xFEFF) {
         filedata = filedata.substr(1);
