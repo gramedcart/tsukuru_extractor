@@ -1,6 +1,6 @@
 {
   "name": "mv-extractor-pp",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "description": "MV Extractor++",
   "main": "main.js",
   "scripts": {
