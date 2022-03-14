@@ -6,6 +6,7 @@ import axios from 'axios';
 
 export function read(dir: string){
     try {
+        
         const readF = fs.readFileSync(dir + '/.extracteddata')
         let data:any
         try {

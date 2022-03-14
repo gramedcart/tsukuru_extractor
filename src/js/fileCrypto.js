@@ -1,11 +1,22 @@
+"use strict";
+
 const path = require('path')
 const fs = require('fs')
 const rpgencrypt = require("./libs/rpgencrypt");
 
+function reader(dir){
+    let data = fs.readFileSync(dir, "utf-8")
+    if (data.charCodeAt(0) === 0xFEFF) {
+        data = data.substring(1);
+    }
+    return JSON.parse(data)
+}
+
+
 exports.DecryptDir = (DataDir, type) => {
     globalThis.mwindow.webContents.send('loading', 0);
     globalThis.mwindow.webContents.send('loadingTag', `${type} 복호화 중`);
-    const SysFile = JSON.parse(fs.readFileSync(path.join(DataDir, "System.json"), "utf-8"))
+    const SysFile = reader(path.join(DataDir, "System.json"))
     const Key = SysFile.encryptionKey
     const ExtractImgDir = path.join(DataDir, `Extract_${type}`)
     if(fs.existsSync(ExtractImgDir)){
@@ -44,7 +55,7 @@ exports.DecryptDir = (DataDir, type) => {
 
 
 exports.EncryptDir = (DataDir, type, instantapply) => {
-    const SysFile = JSON.parse(fs.readFileSync(path.join(DataDir, "System.json"), "utf-8"))
+    const SysFile = reader(path.join(DataDir, "System.json"))
     const Key = SysFile.encryptionKey
     const ExtractImgDir = path.join(DataDir, `Extract_${type}`)
     const CompleteDir = (()=>{

@@ -403,9 +403,6 @@ function forEvent(d, dat_obj, conf, Path){
                     if(globalThis.settings.extractJs){
                         acceptable = acceptable.concat([355])
                     }
-                    if(d.list[i].code === 357){
-                        reportDebug = true
-                    }
                 }
                 if(conf.note){
                     acceptable = acceptable.concat([408, 108])
@@ -417,20 +414,23 @@ function forEvent(d, dat_obj, conf, Path){
                     ischeckable = true
                 }
                 eventID += 1
+                function checker(dat_obj, da, ca){
+                    if(typeof da === 'object'){
+                        for(let i3 in da){
+                            dat_obj = checker(dat_obj, da[i3], ca + `.${i3}`)
+                        }
+                    }
+                    else if(!ischeckable || isIncludeAble(da)){
+                        console.log(ca)
+                        dat_obj = addtodic(ca, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID})
+                    }
+                    return dat_obj
+                }
+                
+
                 if (acceptable.includes(d.list[i].code) && d.list[i].parameters !== undefined && d.list[i].parameters !== null){
                     for(let i2=0;i2<d.list[i].parameters.length;i2++){
-                        if(typeof d.list[i].parameters[i2] === 'object'){
-                            for(let i3 in d.list[i].parameters[i2]){
-                                if(!ischeckable || isIncludeAble(d.list[i].parameters[i2][i3])){
-                                    dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}.${i3}`, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID})
-                                }
-                            }
-                        }
-                        else{
-                            if(!ischeckable || isIncludeAble(d.list[i].parameters[i2])){
-                                dat_obj = addtodic(Path + `.list.${i}.parameters.${i2}`, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID})
-                            }
-                        }
+                        dat_obj = checker(dat_obj, d.list[i].parameters[i2], Path + `.list.${i}.parameters.${i2}`)
                     }
                 }
             }

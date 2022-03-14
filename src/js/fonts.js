@@ -80,4 +80,5 @@ ipcMain.on('changeFontSize', async (ev, arg) => {
     fs.writeFileSync(windowJSpath, f ,'utf-8')
     sendAlert('완료되었습니다')
     worked()
+    
 });
