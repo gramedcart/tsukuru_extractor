@@ -22,6 +22,14 @@ textarea {
     margin-bottom: 20px;
 }
 
+.unrec{
+    color: #f50057;
+}
+
+.rec{
+    color: #8bc34a;
+}
+
 #ex {
     color: steelblue;
     cursor: pointer;

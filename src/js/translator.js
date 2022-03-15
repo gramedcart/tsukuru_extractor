@@ -181,9 +181,14 @@ function setProgressBar(now, max){
 
 exports.trans = async (ev, arg) => {
     const dm = true
+    globalThis.settings.safeTrans = true
+    globalThis.settings.smartTrans = true;
+    globalThis.settings.fastEztrans = true;
+
     let compatibilityMode = false
     let type2 = ''
     if(arg.type == 'eztransh'){
+        globalThis.settings.smartTrans = false;
         compatibilityMode = true
         arg.type = 'eztrans'
     }
@@ -197,7 +202,6 @@ exports.trans = async (ev, arg) => {
     }
     const translator = new Translator(arg.type, type2)
     let ls
-    globalThis.settings.fastEztrans = true;
 
 
     try {
@@ -322,18 +326,18 @@ exports.trans = async (ev, arg) => {
                 if (name.includes('ext_scripts.txt')) {
                     typeOfFile = 'src'
                     console.log('src')
-                    if(!globalThis.settings.smartTrans){
+                    if(!globalThis.settings.smartTrans ||compatibilityMode){
                         continue
                     }
                 } else if (name.includes('ext_note.txt')) {
                     typeOfFile = 'note'
-                    if(!globalThis.settings.smartTrans){
+                    if(!globalThis.settings.smartTrans || compatibilityMode){
                         console.log('skiping note')
                         continue
                     }
                 } else if (name.includes('ext_note2.txt')) {
                     typeOfFile = 'note2'
-                    if(!globalThis.settings.smartTrans){
+                    if(!globalThis.settings.smartTrans || compatibilityMode){
                         console.log('skiping note2')
                         continue
                     }
@@ -349,8 +353,8 @@ exports.trans = async (ev, arg) => {
                     continue
                 }
                 else if(name == 'ext_plugins.txt'){
-                    if(!globalThis.settings.safeTrans){
-                        console.log('skiping')
+                    if(globalThis.settings.safeTrans || compatibilityMode){
+                        console.log('skiping ' + name)
                         continue
                     }
                 }

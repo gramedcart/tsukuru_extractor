@@ -8,20 +8,14 @@
     </head>
     <body>
         <div id="container">
-            <label class="boxc">스크립트 추출 시 코드 122 추출
-                <input type="checkbox" id="code122">
-            </label><br><br>
-            <label class="boxc">별도의 파일로 스크립트 추출
+            <label class="boxc">별도의 파일로 스크립트 추출 <label class="rec">(권장)</label>
                 <input type="checkbox" id="onefile_src">
             </label><br><br>
-            <label class="boxc">별도의 파일로 노트 추출
+            <label class="boxc">별도의 파일로 노트 추출 <label class="rec">(권장)</label>
                 <input type="checkbox" id="onefile_note">
             </label><br><br>
-            <label class="boxc">자동번역 세이프 모드
-                <input type="checkbox" id="safeTrans">
-            </label><br><br>
-            <label class="boxc">자동번역 스마트 모드
-                <input type="checkbox" id="smartTrans">
+            <label class="boxc">ExternMessage.csv 다른 파일로 추출 <label class="rec">(권장)</label>
+                <input type="checkbox" id="ExternMsgJson">
             </label><br><br>
             <label class="boxc">진행도 퍼센트 표시
                 <input type="checkbox" id="loadingText">
@@ -29,22 +23,22 @@
             <label class="boxc">적용 JSON에서 줄바꿈 사용
                 <input type="checkbox" id="JsonChangeLine">
             </label><br><br>
-            <label class="boxc">내용 없는 문자열 추출
-                <input type="checkbox" id="ExtractAddLine">
-            </label><br><br>
-            <label class="boxc">Map 파일 하나로 만들기
-                <input type="checkbox" id="oneMapFile">
-            </label><br><br>
-            <label class="boxc">ExternMessage.csv 다른 파일로 추출
-                <input type="checkbox" id="ExternMsgJson">
-            </label><br><br>
             <label class="boxc">기계번역 시 한글을 포함한 문자열 번역하지 않기
                 <input type="checkbox" id="DoNotTransHangul">
             </label><br><br>
             <label class="boxc">추출 시 구분을 편하게 만들기
                 <input type="checkbox" id="formatNice">
             </label><br><br>
-            <label class="boxc">특정 문자열을 가진 스크립트/노트만 추출
+            <label class="boxc">내용 없는 문자열 추출
+                <input type="checkbox" id="ExtractAddLine">
+            </label><br><br>
+            <label class="boxc">Map 파일 하나로 만들기 <label class="unrec">(비권장)</label>
+                <input type="checkbox" id="oneMapFile">
+            </label><br><br>
+            <label class="boxc">스크립트 추출 시 코드 122 추출 <label class="unrec">(비권장)</label>
+                <input type="checkbox" id="code122">
+            </label><br><br>
+            <label class="boxc">특정 문자열을 가진 스크립트/노트만 추출 <label class="unrec">(비권장)</label>
                 <input type="checkbox" id="extractSomeScript">
             </label>
             <textarea id="extractSomeScript2" class="invisible" spellcheck="false" placeholder="showtext&#10;maintext&#10;.."></textarea><br><br>

@@ -413,37 +413,45 @@ document.getElementById('eztrans').onclick = async () => {
         })
         return
     }
-    let txt = '플러그인/스크립트 활성화 상태로 기계 번역을 돌리면 게임 내에서 오류가 날 수 있습니다. 정말로 번역하시겠습니까?'
-    if(globalSettings.smartTrans){
-        txt = '플러그인/스크립트/노트/메모는 스마트 번역으로 오류 없이 번역됩니다. 번역하시겠습니까?'
-    }
     const result = await Swal.fire({
         icon: 'warning',
-        text: txt,
+        text: "정말로 번역기를 사용하시겠습니까?",
         confirmButtonText: '예',
         showDenyButton: true,
         denyButtonText: `아니오`,
     })
     let confirmit = 5
+    let lastvalue = -1
     if (!result.isConfirmed) {
         return
     }
+    const infos = {
+        'eztrans': '최대한 많이 번역하는 모드입니다.<br>번역된 게임에서 오류가 발생 할 수 있습니다.',
+        'eztransh': '오류가 나올 만한 부분을 번역하지 않는 모드입니다.<br>번역되지 않는 부분이 있을 수 있습니다.',
+        'google': '권장되지 않는 베타 번역기입니다.<br>중간에 번역이 되지 않을 수 있습니다.',
+        'papago': '권장되지 않는 베타 번역기입니다.<br>중간에 번역이 되지 않을 수 있습니다.'
+    }
+
     const v = await Swal.fire({
         icon: 'info',
         title: '번역기를 선택해주세요',
         input: 'select',
         inputOptions: {
-            'eztrans': 'eztrans',
-            'eztransh': 'eztrans(호환성 모드)',
+            'eztrans': 'eztrans (스마트 모드)',
+            'eztransh': 'eztrans (안전 모드)',
             'google': '구글 번역기 (베타)',
             'papago': '파파고 (베타)'
         },
         confirmButtonText: '확인',
         inputValidator: (value) => {
             return new Promise((resolve) => {
+                if(lastvalue !== value){
+                    lastvalue = value
+                    confirmit = 3
+                }
                 if (value) {
-                    if(value === 'eztransh' && confirmit > 0){
-                        resolve(`호환성 모드는 일부분이 번역되지 않을 수 있습니다.<br>번역 후 게임 내에서 오류가 날 시 사용해 주세요<br>계속하려면 확인 버튼을 ${confirmit}번 더 눌려주세요`)
+                    if(confirmit > 0){
+                        resolve(`${infos[value]}<br>계속하려면 확인 버튼을 ${confirmit}번 더 눌려주세요`)
                         confirmit -= 1
                     }
                     resolve()
