@@ -13,7 +13,7 @@ function getBinarySize(string) {
 exports.apply = async (ev, arg) => {
     try {
       const dir = (Buffer.from(arg.dir, "base64").toString('utf8'));
-      if (! await fs.existsSync(dir + '/Extract')){
+      if (! fs.existsSync(dir + '/Extract')){
         globalThis.mwindow.webContents.send('alert', {icon: 'error', message: 'Extract 폴더가 존재하지 않습니다'}); 
         globalThis.mwindow.webContents.send('worked', 0);
         return
@@ -24,18 +24,18 @@ exports.apply = async (ev, arg) => {
         return
       }
       if(!arg.instantapply){
-        if (await fs.existsSync(dir + '/.Completed')){
-          await fs.rmSync(dir + '/Completed', { recursive: true })
+        if (fs.existsSync(dir + '/.Completed')){
+          fs.rmSync(dir + '/Completed', { recursive: true })
         }
-        if (!await fs.existsSync(dir + '/.Completed')){
+        if (!fs.existsSync(dir + '/.Completed')){
           try {
-            await fs.mkdirSync(dir + '/Completed')
+            fs.mkdirSync(dir + '/Completed')
           } catch (error) {}
           try {
-            await fs.mkdirSync(dir + '/Completed/data')
+            fs.mkdirSync(dir + '/Completed/data')
           } catch (error) {}
           try {
-            await fs.mkdirSync(dir + '/Completed/js')
+            fs.mkdirSync(dir + '/Completed/js')
           } catch (error) {}
         }
       }
@@ -55,7 +55,7 @@ exports.apply = async (ev, arg) => {
       let OutputData = {}
       for(const i of Object.keys(ext_dat)){
         if(fs.existsSync(dir + '/Backup/' + i)){
-          let filedata = await fs.readFileSync(dir + '/Backup/' + i, 'utf8')
+          let filedata = fs.readFileSync(dir + '/Backup/' + i, 'utf8')
           if (filedata.charCodeAt(0) === 0xFEFF) {
             filedata = filedata.substring(1);
           }
@@ -67,7 +67,8 @@ exports.apply = async (ev, arg) => {
       for(const i of Object.keys(ext_dat)){
         worked_files += 1
         if(i.includes('.json')){
-          let Edata = (await fs.readFileSync(dir + '/Extract/' + path.parse(i).name + '.txt', 'utf8')).split('\n')
+          let fname = (fileName === 'ext_javascript.json') ? dir + '/Extract/ext_javascript.js' : '/Extract/' + path.parse(i).name + '.txt' 
+          let Edata = fs.readFileSync(fname, 'utf8').split('\n')
           for(const q of Object.keys(ext_dat[i].data)){
             let output = ''
             let autoline = false
