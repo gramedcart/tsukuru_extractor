@@ -14,8 +14,11 @@ function addtodic(pa, obj, usePath='', conf = undefined){
         usePath = ''
     }
     if(usePath == ''){
-        if(conf !== undefined && conf.type == 'event' && [356,355,357].includes(conf.code)){
+        if(conf !== undefined && conf.type == 'event' && [356,357].includes(conf.code)){
             usePath = 'script'
+        }
+        if(conf !== undefined && conf.type == 'event' && [355,655].includes(conf.code)){
+            usePath = 'javascript'
         }
         if(conf !== undefined && conf.type == 'event' && [108,408].includes(conf.code)){
             usePath = 'note2'
@@ -84,6 +87,9 @@ exports.init_extract = (arg) => {
     }
     if(globalThis.settings.onefile_src && arg.ext_src){
         c('ext_scripts.json')
+    }
+    if(globalThis.settings.onefile_src && arg.ext_javascript){
+        c('ext_javascript.json')
     }
     if(globalThis.settings.onefile_note && arg.ext_note){
         c('ext_note.json')
@@ -400,9 +406,9 @@ function forEvent(d, dat_obj, conf, Path){
                 let reportDebug = false
                 if(conf.srce){
                     acceptable = acceptable.concat([356,357])
-                    if(globalThis.settings.extractJs){
-                        acceptable = acceptable.concat([355])
-                    }
+                }
+                if(conf.arg.ext_javascript){
+                    acceptable = acceptable.concat([355,655])
                 }
                 if(conf.note){
                     acceptable = acceptable.concat([408, 108])
@@ -421,7 +427,6 @@ function forEvent(d, dat_obj, conf, Path){
                         }
                     }
                     else if(!ischeckable || isIncludeAble(da)){
-                        console.log(ca)
                         dat_obj = addtodic(ca, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID})
                     }
                     return dat_obj
@@ -468,6 +473,9 @@ exports.format_extracted = async(dats, typ = 0) => {
             else if(datobj[d].qpath === 'note2' && globalThis.settings.onefile_note){
                 jpath = 'ext_note2.json'
             }
+            else if(datobj[d].qpath === 'javascript' && globalThis.settings.onefile_src){
+                jpath = 'ext_javascript.json'
+            }
             else if(globalThis.settings.oneMapFile && jpathIsMap(jpath)){
                 jpath = 'Maps.json'
             }
@@ -477,6 +485,7 @@ exports.format_extracted = async(dats, typ = 0) => {
                 }
             }
             if(!LenKeys.includes(jpath)){
+                console.log(jpath)
                 LenMemory[jpath] = (globalThis.gb[jpath].outputText.split('\n').length - 1)
                 LenKeys.push(jpath)
             }
@@ -489,7 +498,7 @@ exports.format_extracted = async(dats, typ = 0) => {
                 const eid = datobj[d].conf.eid
                 if(eid !== undefined && eid !== null){
                     if(!usedEid.includes(eid) && beautifyCodes2.includes(datobj[d].conf.code)){
-                        const toadd = '==========\n'
+                        const toadd = '//==========//\n'
                         globalThis.gb[jpath].outputText += toadd
                         LenMemory[jpath] += (toadd.split('\n').length - 1)
                         usedEid.push(eid)

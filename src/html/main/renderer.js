@@ -21,7 +21,8 @@ let config = {
     ext_note: false,
     exJson: false,
     decryptImg: false,
-    decryptAudio: false
+    decryptAudio: false,
+    ext_javascript: false
 }
 let _mode = -1
 
@@ -175,7 +176,7 @@ function _reload(){
         document.getElementById('ext').style.backgroundColor = '#ffffff10'
         document.getElementById('apply').style.backgroundColor = '#ffffff10'
     }
-    const DomList = ['ext_plugin','ext_note','ext_src','autoline','instantapply','exJson','decryptImg','decryptAudio']
+    const DomList = ['ext_plugin','ext_note','ext_src','autoline','instantapply','exJson','decryptImg','decryptAudio', 'ext_javascript']
     for(const i in DomList){
         if(config[DomList[i]]){
             document.getElementById(DomList[i]).style.backgroundColor = '#3700b390'
@@ -219,6 +220,7 @@ if(true){
         'versionUp': '버전 업 툴을\n엽니다',
         'settings': '설정',
         'fontConfig': '게임 내 폰트를\n변경합니다',
+        'ext_javascript': '게임 내\n자바스크립트를\n추출합니다.'
     }
     for(const i in InfoList){
         document.getElementById(i).addEventListener('mouseenter', ()=>{
@@ -324,6 +326,32 @@ document.getElementById('ext_src').onclick = () => {
         _reload()
     }
 }
+
+document.getElementById('ext_javascript').onclick = () => {
+    if(!config.ext_javascript){
+        Swal.fire({
+            icon: 'warning',
+            text: '자바스크립트를 추출하여 번역할 시\n게임 내에서 오류가 날 수 있습니다\n정말로 활성화하시겠습니까?',
+            confirmButtonText: '예',
+            showDenyButton: true,
+            denyButtonText: `아니오`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    text: '활성화 되었습니다.\n잘못된 곳을 번역하지 않도록 주의하시고,\n추출 모드에서 RUN을 눌러 추출하세요',
+                })
+                config.ext_javascript = true
+                _reload()
+            }
+        })
+    }
+    else{
+        config.ext_javascript = false
+        _reload()
+    }
+}
+
 document.getElementById('ext_note').onclick = () => {
     if(!config.ext_note){
         Swal.fire({

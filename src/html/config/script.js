@@ -2,7 +2,6 @@ const { ipcRenderer } = require('electron');
 
 let settings = {}
 const CheckboxValues = [
-  'extractJs',
   'code122',
   'safeTrans',
   'smartTrans',

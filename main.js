@@ -357,7 +357,8 @@ async function extractor(arg){
         dir: dir,
         srce: arg.ext_src,
         autoline: arg.autoline,
-        note: arg.ext_note
+        note: arg.ext_note,
+        arg: arg
       }
       let runBackup = async () => {
         try {
@@ -387,6 +388,10 @@ async function extractor(arg){
       const fileName = gbKeys[i]
       if(globalThis.gb[fileName].outputText === ''){
         delete globalThis.gb[fileName]
+      }
+      else if(fileName === 'ext_javascript.json'){
+        fs.writeFileSync(dir + `/Extract/${path.parse(fileName).name}.js`, globalThis.gb[fileName].outputText,'utf-8')
+        delete globalThis.gb[fileName].outputText
       }
       else{
         fs.writeFileSync(dir + `/Extract/${path.parse(fileName).name}.txt`, globalThis.gb[fileName].outputText,'utf-8')
