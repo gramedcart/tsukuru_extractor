@@ -508,20 +508,15 @@ ipcMain.on('updateVersion', async (ev, arg) => {
   }
   try {
     if(!fs.existsSync(path.join(arg.dir1_base, 'Extract'))){
-      ErrorAlert('구버전의 Extract 폴더가 존재하지 않습니다')
-      worked()
-      return
-    }
-    if(!fs.existsSync(path.join(arg.dir1_base, 'Backup'))){
-      ErrorAlert('구버전의 Backup 폴더가 존재하지 않습니다')
+      ErrorAlert('구버전 번역본의 Extract 폴더가 존재하지 않습니다')
       worked()
       return
     }
     
-    console.log(arg.dir1)
+    console.log(arg.dir3)
     await extractor({
-      ...arg.dir1,
-      dir: Buffer.from(path.join(arg.dir1_base, 'Backup'), "utf8").toString('base64'),
+      ...arg.dir3,
+      dir: Buffer.from(path.join(arg.dir3_base), "utf8").toString('base64'),
       force: true,
       silent: true
     })
@@ -533,7 +528,7 @@ ipcMain.on('updateVersion', async (ev, arg) => {
       silent: true
     })
     const dir0ExtDir = path.join(arg.dir1_base, 'Extract')
-    const dir1ExtDir = path.join(arg.dir1_base, 'Backup', 'Extract')
+    const dir1ExtDir = path.join(arg.dir3_base, 'Extract')
     const dir2ExtDir = path.join(arg.dir2_base, 'Extract')
     const fileList1 = fs.readdirSync(dir1ExtDir)
     for(i in (fileList1)){
@@ -541,7 +536,7 @@ ipcMain.on('updateVersion', async (ev, arg) => {
       let TransDict = {}
       const dat1 = fs.readFileSync(path.join(dir1ExtDir, file), 'utf-8').split('\n')
       if(!((fs.existsSync(path.join(dir0ExtDir, file))))){
-        ErrorAlert('구버전의 Extract된 파일과 Backup 원본이 서로 통하지 않습니다. ')
+        ErrorAlert('구버전의 번역본 파일과 미번역본 파일이 서로 통하지 않습니다. ')
         endThis()
         return
       }

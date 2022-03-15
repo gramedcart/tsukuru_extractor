@@ -525,7 +525,7 @@ document.getElementById('versionUp').onclick = async () => {
     const { isConfirmed: isConfirmed} = await Swal.fire({
         title: '버전 업 툴 주의사항',
         icon: 'warning',
-        text: "버전 업 툴 사용 시 추출 모드의 설정 및 옵션이 그대로 적용됩니다. 만약 구버전을 추출하였을 때랑 다른 설정 및 옵션을 사용할 시, 예기치 못한 문제가 발생할 수 있습니다.",
+        text: "버전 업 툴 사용 시 추출 모드의 설정 및 옵션이 그대로 적용됩니다. 구버전 번역본의 추출된 데이터를 기반으로 이식되며, 추출된 데이터가 많을 수록 더 많은 데이터가 이식됩니다.만약 구버전 번역본을 추출하였을 때랑 다른 설정 및 옵션을 사용할 시, 예기치 못한 문제가 발생할 수 있습니다.",
         showDenyButton: true,
         denyButtonText: `취소`,
     })
@@ -535,9 +535,11 @@ document.getElementById('versionUp').onclick = async () => {
     const { value: formValues } = await Swal.fire({
         title: '버전 업 툴',
         html:
-          '<div id="swi1" class="cfolder" placeholder="구버전 data 폴더"'+
-          'onclick="ipcRenderer.send(\'select_folder\', \'swi1\')">구버전 폴더</div>' +
-          '<div id="swi2" class="cfolder" placeholder="신버전 data 폴더"'+
+          '<div id="swi1" class="cfolder" placeholder="구버전 번역 data 폴더"'+
+          'onclick="ipcRenderer.send(\'select_folder\', \'swi1\')">구버전 번역본 폴더</div>' +
+          '<div id="swi3" class="cfolder" placeholder="구버전 미번역 data 폴더"'+
+          'onclick="ipcRenderer.send(\'select_folder\', \'swi3\')">구버전 미번역 폴더</div>' +
+          '<div id="swi2" class="cfolder" placeholder="신버전 미번역 data 폴더"'+
           'onclick="ipcRenderer.send(\'select_folder\', \'swi2\')">신버전 폴더</div>',
         focusConfirm: false,
         showDenyButton: true,
@@ -545,24 +547,28 @@ document.getElementById('versionUp').onclick = async () => {
         preConfirm: () => {
           return [
             document.getElementById('swi1').innerText,
-            document.getElementById('swi2').innerText
+            document.getElementById('swi2').innerText,
+            document.getElementById('swi3').innerText
           ]
         }
     })
     
     if (formValues) {
-        if(!(formValues[0] === '' || formValues[1] === '' )){
-            if(formValues[0] === formValues[1]){
+        if(!(formValues[0] === '' || formValues[1] === '' || formValues[2] === '' )){
+            if(formValues[0] === formValues[1] || formValues[1] === formValues[2] || formValues[0] === formValues[2] ){
                 Swal.fire({icon: 'error',text: '같은 폴더입니다!'})
             }
             else{
                 const kas = formValues[0]
                 const kas2 = formValues[1]
+                const kas3 = formValues[2]
                 const a = {
                     dir1: _.merge({}, {dir: Buffer.from(kas.replace('\\','/'), "utf8").toString('base64')}, config),
                     dir2: _.merge({}, {dir: Buffer.from(kas2.replace('\\','/'), "utf8").toString('base64')}, config),
+                    dir3: _.merge({}, {dir: Buffer.from(kas3.replace('\\','/'), "utf8").toString('base64')}, config),
                     dir1_base: kas,
                     dir2_base: kas2,
+                    dir2_base: kas3,
                     config: config
                 };
                 running = true

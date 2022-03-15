@@ -67,7 +67,8 @@ exports.apply = async (ev, arg) => {
       for(const i of Object.keys(ext_dat)){
         worked_files += 1
         if(i.includes('.json')){
-          let fname = (fileName === 'ext_javascript.json') ? dir + '/Extract/ext_javascript.js' : '/Extract/' + path.parse(i).name + '.txt' 
+          let fname = (i === 'ext_javascript.json') ? dir + '/Extract/ext_javascript.js' : dir + '/Extract/' + path.parse(i).name + '.txt'
+          console.log(fname)
           let Edata = fs.readFileSync(fname, 'utf8').split('\n')
           for(const q of Object.keys(ext_dat[i].data)){
             let output = ''
