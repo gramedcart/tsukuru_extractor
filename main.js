@@ -532,7 +532,8 @@ ipcMain.on('updateVersion', async (ev, arg) => {
     const dir2ExtDir = path.join(arg.dir2_base, 'Extract')
     const fileList1 = fs.readdirSync(dir1ExtDir)
     for(i in (fileList1)){
-      const file = path.parse(fileList1[i]).name.concat('.txt')
+      const parsed = path.parse(fileList1[i])
+      const file = parsed.name.concat(parsed.ext)
       let TransDict = {}
       const dat1 = fs.readFileSync(path.join(dir1ExtDir, file), 'utf-8').split('\n')
       if(!((fs.existsSync(path.join(dir0ExtDir, file))))){
