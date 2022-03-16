@@ -576,7 +576,7 @@ document.getElementById('versionUp').onclick = async () => {
                     dir3: _.merge({}, {dir: Buffer.from(kas3.replace('\\','/'), "utf8").toString('base64')}, config),
                     dir1_base: kas,
                     dir2_base: kas2,
-                    dir2_base: kas3,
+                    dir3_base: kas3,
                     config: config
                 };
                 running = true
