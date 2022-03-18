@@ -498,7 +498,7 @@ exports.format_extracted = async(dats, typ = 0) => {
                 const eid = datobj[d].conf.eid
                 if(eid !== undefined && eid !== null){
                     if(!usedEid.includes(eid) && beautifyCodes2.includes(datobj[d].conf.code)){
-                        const toadd = '//==========//\n'
+                        const toadd = `//==========//\n`
                         globalThis.gb[jpath].outputText += toadd
                         LenMemory[jpath] += (toadd.split('\n').length - 1)
                         usedEid.push(eid)
@@ -513,9 +513,12 @@ exports.format_extracted = async(dats, typ = 0) => {
             globalThis.gb[jpath].data[cid].conf = datobj[d].conf
             globalThis.gb[jpath].data[cid].originText = datobj[d].var
 
-            const toadd = datobj[d].var + '\n'
+            // const toadd = datobj[d].var + ` -- ${fileName}` +'\n' //for testing
+            const toadd = datobj[d].var +'\n'
+
             globalThis.gb[jpath].outputText += toadd
             LenMemory[jpath] += (toadd.split('\n').length - 1)
+
             globalThis.gb[jpath].data[cid].m = LenMemory[jpath]
         }
     }

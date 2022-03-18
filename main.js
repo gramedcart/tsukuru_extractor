@@ -502,9 +502,6 @@ ipcMain.on('changeAllString', async (ev, arg) => {
 ipcMain.on('updateVersion', async (ev, arg) => {
   function endThis(){
     worked()
-    if(fs.existsSync(path.join(arg.dir1_base, 'Backup', 'Extract'))){
-      fs.rmdirSync(path.join(arg.dir1_base, 'Backup', 'Extract'), { recursive: true })
-    }
   }
   try {
     if(!fs.existsSync(path.join(arg.dir1_base, 'Extract'))){
@@ -527,22 +524,23 @@ ipcMain.on('updateVersion', async (ev, arg) => {
       force: true,
       silent: true
     })
-    const dir0ExtDir = path.join(arg.dir1_base, 'Extract')
-    const dir1ExtDir = path.join(arg.dir3_base, 'Extract')
-    const dir2ExtDir = path.join(arg.dir2_base, 'Extract')
-    const fileList1 = fs.readdirSync(dir1ExtDir)
+    const TranslatedDir = path.join(arg.dir1_base, 'Extract')
+    const OldDir = path.join(arg.dir3_base, 'Extract')
+    const NewDir = path.join(arg.dir2_base, 'Extract')
+    const fileList1 = fs.readdirSync(OldDir)
     for(i in (fileList1)){
       const parsed = path.parse(fileList1[i])
       const file = parsed.name.concat(parsed.ext)
       let TransDict = {}
-      const dat1 = fs.readFileSync(path.join(dir1ExtDir, file), 'utf-8').split('\n')
-      if(!((fs.existsSync(path.join(dir0ExtDir, file))))){
+      console.log(file)
+      const dat1 = fs.readFileSync(path.join(OldDir, file), 'utf-8').split('\n')
+      if(!((fs.existsSync(path.join(TranslatedDir, file))))){
         ErrorAlert('구버전의 번역본 파일과 미번역본 파일이 서로 통하지 않습니다. ')
         endThis()
         return
       }
-      const dat0 = fs.readFileSync(path.join(dir0ExtDir, file), 'utf-8').split('\n')
-      let dat2 = fs.readFileSync(path.join(dir2ExtDir, file), 'utf-8')
+      const dat0 = fs.readFileSync(path.join(TranslatedDir, file), 'utf-8').split('\n')
+      let dat2 = fs.readFileSync(path.join(NewDir, file), 'utf-8')
       for(i2 in (dat0)){
         TransDict[dat1[i2]] = dat0[i2]
         dat2 = dat2.replace(dat1[i2], dat0[i2])
@@ -550,7 +548,7 @@ ipcMain.on('updateVersion', async (ev, arg) => {
       for(i2 in TransDict){
         dat2 = dat2.replaceAll(i2, TransDict[i2])
       }
-      fs.writeFileSync(path.join(dir2ExtDir, file), dat2, 'utf-8')
+      fs.writeFileSync(path.join(NewDir, file), dat2, 'utf-8')
       getMainWindow().webContents.send('loading', i/fileList1.length*100);
       await sleep(0)
     }

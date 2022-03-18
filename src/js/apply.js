@@ -95,6 +95,19 @@ exports.apply = async (ev, arg) => {
               }
             }
             try {
+              if(!Object.keys(OutputData).includes(originFile)){
+                const fidir = path.join(dir, 'Backup', originFile)
+                if(fs.existsSync(fidir)){
+                  let filedata = fs.readFileSync(fidir, 'utf8')
+                  if (filedata.charCodeAt(0) === 0xFEFF) {
+                    filedata = filedata.substring(1);
+                  }
+                  try {
+                    OutputData[originFile] = JSON.parse(filedata)
+                    console.log(`restored${originFile}`)
+                  } catch (error) {}
+                }
+              }
               OutputData[originFile] = ExtTool.setObj(ext_dat[i].data[q].val, output, OutputData[originFile]) 
             } catch (error) {
               console.log(ext_dat[i].data[q].val)
