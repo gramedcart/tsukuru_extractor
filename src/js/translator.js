@@ -10,6 +10,7 @@ const edTool = require('./edtool')
 const { performance } = require('perf_hooks');
 const open = require('open');
 
+
 function oPath(){
     return globalThis.oPath
 }
@@ -51,10 +52,12 @@ function encodeSp(p, change=false){
 }
 
 class Translator{
-    constructor(type, type2=''){
+    constructor(type, type2='', langu='jp'){
         this.type = type
         this.type2 = type2
         this.ls = null
+        this.transMemory = {}
+        this.langu = langu
     }
     setLs(ls){
         this.ls = ls
@@ -108,30 +111,37 @@ class Translator{
             let t
             // console.log(text)
             try {
-                console.log('\starting transengine\n')
                 if(text.length < 1){
-                    console.log("one d")
+                    console.log("zero len")
                     t = text
                 }
+                else if(Object.keys(this.transMemory).includes(text)){
+                    console.log('from memory')
+                    t = this.transMemory[text]
+                }
                 else{
-                    console.log('\rrequesting\n')
+                    const tempTxt = text.replaceAll('◆','◇').replaceAll('\n','◆')
+                    console.log('requesting')
+                    console.log(tempTxt)
+                    console.log(this.langu)
                     const a =  await axios.get(
                         'http://localhost:8000/',
                         {
                             params: {
-                                text: text,
+                                text: tempTxt,
                                 platform: this.type2,
-                                source: 'ja',
+                                source: this.langu,
                                 target: 'ko'
                             },
                             timeout: 10000
                         }
                     )
-                    console.log(a.data)
-                    console.log('\rrequesting end\n')
                     try {
-                        t = a.data.data.translatedContent
+                        console.log(a.data.data.translatedContent)
+                        t = a.data.data.translatedContent.replaceAll('◆','\n')
+                        this.transMemory[text] = t
                     } catch (error) {
+                        console.log('err: notranslatedContent')
                         t = text
                     }
                 }
@@ -187,20 +197,23 @@ exports.trans = async (ev, arg) => {
 
     let compatibilityMode = false
     let type2 = ''
+    const langu = arg.langu
     if(arg.type == 'eztransh'){
         globalThis.settings.smartTrans = false;
         compatibilityMode = true
         arg.type = 'eztrans'
     }
     if(arg.type == 'papago'){
+        globalThis.settings.smartTrans = false;
         arg.type = 'transEngine'
         type2 = 'papago'
     }
     if(arg.type == 'google'){
+        globalThis.settings.smartTrans = false;
         arg.type = 'transEngine'
         type2 = 'google'
     }
-    const translator = new Translator(arg.type, type2)
+    const translator = new Translator(arg.type, type2, langu)
     let ls
 
 
@@ -367,7 +380,8 @@ exports.trans = async (ev, arg) => {
             let typeofit = 0
 
 
-            if(typeOfFile == '' && translator.getType() === 'eztrans' && globalThis.settings.fastEztrans){
+            if(typeOfFile == '' && globalThis.settings.fastEztrans){
+                const readLen = (translator.getType() === 'eztrans') ? 1000 : 200
                 let reads = fileRead.split('\n')
                 let a = ''
                 let l = 0
@@ -378,7 +392,7 @@ exports.trans = async (ev, arg) => {
                 }
                 while(reads.length > 0){
                     const d = reads[0]
-                    if(l + d.length > 1000){
+                    if(l + d.length > readLen){
                         l = 0
                         chunks.push(encodeURIp(a))
                         a = ''
@@ -396,15 +410,17 @@ exports.trans = async (ev, arg) => {
                     try {
                         temps = await translator.translate(chunks[v])
                     } catch (error) {
-                        console.log('err')
+                        console.log('err-crash')
                         if (await translator.isCrash()) {
                             return
                         }
                         temps = chunks[v]
                     }
-                    const isLine = (chunks[v].split('\n').length !== temps.split('\n').length)
+                    const chunkLen = chunks[v].split('\n').length
+                    const tempLen = temps.split('\n').length
+                    const isLine = (chunkLen !== tempLen)
                     if(temps == chunks[v] || isLine){
-                        console.log('err')
+                        console.log(`err-line ${chunkLen} | ${tempLen}`)
                         const r = chunks[v].split('\n')
                         let r2 = []
                         for (const a in r) {

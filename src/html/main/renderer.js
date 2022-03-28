@@ -426,10 +426,10 @@ document.getElementById('eztrans').onclick = async () => {
         return
     }
     const infos = {
-        'eztrans': '최대한 많이 번역하는 모드입니다.<br>번역된 게임에서 오류가 발생 할 수 있습니다.',
+        'eztrans': '최대한 많이 번역하는 모드입니다.<br>많은 스크립트를 안전하게 번역합니다.<br>적은 확률로 번역 한 게임에 오류가 발생할 수 있습니다.',
         'eztransh': '오류가 나올 만한 부분을 번역하지 않는 모드입니다.<br>번역되지 않는 부분이 있을 수 있습니다.',
-        'google': '권장되지 않는 베타 번역기입니다.<br>중간에 번역이 되지 않을 수 있습니다.',
-        'papago': '권장되지 않는 베타 번역기입니다.<br>중간에 번역이 되지 않을 수 있습니다.'
+        'google': '권장되지 않는 베타 번역기입니다.<br>속도가 굉장히 느리며, 중간에 번역이 되지 않을 수 있습니다.<br>여러가지 언어를 지원합니다.',
+        'papago': '권장되지 않는 베타 번역기입니다.<br>속도가 굉장히 느리며, 중간에 번역이 되지 않을 수 있습니다.<br>여러가지 언어를 지원합니다.'
     }
 
     const v = await Swal.fire({
@@ -467,10 +467,43 @@ document.getElementById('eztrans').onclick = async () => {
     if(!transtype){
         return
     }
+    let langu = 'jp'
+    if(!(transtype === 'eztrans'|| transtype === 'eztransh')){
+        const langu2 = await Swal.fire({
+            icon: 'info',
+            title: '시작 언어를 선택해주세요',
+            input: 'select',
+            inputOptions: {
+                'en': '영어 (english)',
+                'ja': '일본어 (日本語)',
+                'zh-CN': '대만어 (台灣語)',
+                'fr': '프랑스어 (Français)',
+                'es': '스페인어 (español)',
+                'ru': '러시아어 (Русский)'
+            },
+            confirmButtonText: '확인',
+            inputValidator: (value) => {
+                return new Promise((resolve) => {
+                    if (value) {
+                        resolve()
+                    }
+                    else {
+                        ipcRenderer.send('log', value)
+                        resolve('설정되지 않음')
+                    }
+                })
+            }
+        })
+        langu = langu2.value
+        if(!langu){
+            return
+        }
+    }
     ipcRenderer.send('log', v.value)
     const a = {
         dir: Buffer.from(document.getElementById('folder_input').value.replace('\\','/'), "utf8").toString('base64'),
-        type: transtype
+        type: transtype,
+        langu: langu
     };
     running = true
     ipcRenderer.send('eztrans', a);
