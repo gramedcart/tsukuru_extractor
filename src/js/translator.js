@@ -120,10 +120,9 @@ class Translator{
                     t = this.transMemory[text]
                 }
                 else{
-                    const tempTxt = text.replaceAll('◆','◇').replaceAll('\n','◆')
+                    const tempTxt = text.replaceAll('◆','◇')
                     console.log('requesting')
                     console.log(tempTxt)
-                    console.log(this.langu)
                     const a =  await axios.get(
                         'http://localhost:8000/',
                         {
@@ -138,7 +137,7 @@ class Translator{
                     )
                     try {
                         console.log(a.data.data.translatedContent)
-                        t = a.data.data.translatedContent.replaceAll('◆','\n')
+                        t = a.data.data.translatedContent
                         this.transMemory[text] = t
                     } catch (error) {
                         console.log('err: notranslatedContent')
