@@ -9,7 +9,7 @@ const {translateable, note2able, translateableOne, hanguls} = require('./datas.j
 const edTool = require('./edtool')
 const { performance } = require('perf_hooks');
 const open = require('open');
-
+const translatte = require("translatte")
 
 function oPath(){
     return globalThis.oPath
@@ -51,6 +51,9 @@ function encodeSp(p, change=false){
     return p
 }
 
+
+const fndi = /\\ *V *\[/g
+
 class Translator{
     constructor(type, type2='', langu='jp'){
         this.type = type
@@ -68,6 +71,19 @@ class Translator{
         } catch (error) {}
     }
     async translate(text){
+        let isEndPadding = 0
+        while(text.at(text.length - 1) === '\n'){
+            text = text.substring(0, text.length - 1)
+            isEndPadding += 1
+        }
+        text = await this.translate2(text)
+        while(isEndPadding > 0){
+            text += '\n'
+            isEndPadding -= 1
+        }
+        return text
+    }
+    async translate2(text){
         if(globalThis.settings.DoNotTransHangul){
             if(hanguls.test(text)){
                 return text
@@ -108,6 +124,21 @@ class Translator{
             return (t)
         }
         else if(this.type === 'transEngine'){
+            function encodeSafe(text, sup=false){
+                if(sup){
+                    console.log('encodeSafe')
+                    text.replaceAll('◆','◇').replaceAll('\n','◆')
+                }
+                return text
+            }
+            function decodeSafe(text, sup=false){
+                if(sup){
+                    console.log('decodeSafe')
+                    text.replaceAll('◆','\n')
+                }
+                text.replaceAll(fndi,'\\V[')
+                return text
+            }
             let t
             // console.log(text)
             try {
@@ -120,28 +151,36 @@ class Translator{
                     t = this.transMemory[text]
                 }
                 else{
-                    const tempTxt = text.replaceAll('◆','◇')
+                    const tempTxt = encodeSafe(text, this.type2 === 'papago')
                     console.log('requesting')
-                    console.log(tempTxt)
-                    const a =  await axios.get(
-                        'http://localhost:8000/',
-                        {
-                            params: {
-                                text: tempTxt,
-                                platform: this.type2,
-                                source: this.langu,
-                                target: 'ko'
-                            },
-                            timeout: 10000
+                    if(this.type2 === 'google'){
+                        const a = await translatte(tempTxt, {from: this.langu, to: 'ko'})
+                        await sleep(3000)
+                        return decodeSafe(a.text)
+                    }
+                    else{
+                        console.log(tempTxt)
+                        const a = (await axios.get(
+                            'http://localhost:8000/',
+                            {
+                                params: {
+                                    text: tempTxt,
+                                    platform: this.type2,
+                                    source: this.langu,
+                                    target: 'ko'
+                                },
+                                timeout: 10000
+                            }
+                        ))
+                        try {
+                            console.log(a.data.data.translatedContent)
+                            t = a.data.data.translatedContent
+                            t = decodeSafe(t, this.type2 === 'papago')
+                            this.transMemory[text] = t
+                        } catch (error) {
+                            console.log('err: notranslatedContent')
+                            t = text
                         }
-                    )
-                    try {
-                        console.log(a.data.data.translatedContent)
-                        t = a.data.data.translatedContent
-                        this.transMemory[text] = t
-                    } catch (error) {
-                        console.log('err: notranslatedContent')
-                        t = text
                     }
                 }
             } catch (error) {
@@ -185,7 +224,7 @@ class Translator{
 
 function setProgressBar(now, max){
     console.log(`${now} / ${max}`)
-    globalThis.mwindow.webContents.send('loading', (now/max) * 100);
+    globalThis.mwindow.webContents.send('loading', (now/max) * 70);
 }
 
 exports.trans = async (ev, arg) => {
@@ -380,7 +419,9 @@ exports.trans = async (ev, arg) => {
 
 
             if(typeOfFile == '' && globalThis.settings.fastEztrans){
-                const readLen = (translator.getType() === 'eztrans') ? 1000 : 200
+                const readLen = (translator.getType() === 'eztrans') ? 1000
+                                : (translator.type2 === 'google') ? 1000
+                                : 200
                 let reads = fileRead.split('\n')
                 let a = ''
                 let l = 0
@@ -589,7 +630,7 @@ exports.trans = async (ev, arg) => {
                 }
             }
             worked_files += 1
-            workedFileLength += output.length * 0.7
+            workedFileLength += output.length
             fs.writeFileSync(iPath, output, 'utf-8')
             // globalThis.mwindow.webContents.send('loading', worked_files / max_files * 100);
             await sleep(0)

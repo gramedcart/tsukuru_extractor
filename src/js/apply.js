@@ -152,7 +152,7 @@ exports.apply = async (ev, arg) => {
       ExtTool.EncryptDir(dir, 'img', arg.instantapply)
       ExtTool.EncryptDir(dir, 'audio', arg.instantapply)
 
-      globalThis.mwindow.webContents.send('alert', '완료되었습니다'); 
+      globalThis.mwindow.webContents.send('alert2'); 
       globalThis.mwindow.webContents.send('loading', 0);
     } catch (err) {
       globalThis.mwindow.webContents.send('alert', {icon: 'error', message: JSON.stringify(err, Object.getOwnPropertyNames(err))}); 

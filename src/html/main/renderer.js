@@ -428,8 +428,8 @@ document.getElementById('eztrans').onclick = async () => {
     const infos = {
         'eztrans': '최대한 많이 번역하는 모드입니다.<br>많은 스크립트를 안전하게 번역합니다.<br>적은 확률로 번역 한 게임에 오류가 발생할 수 있습니다.',
         'eztransh': '오류가 나올 만한 부분을 번역하지 않는 모드입니다.<br>번역되지 않는 부분이 있을 수 있습니다.',
-        'google': '권장되지 않는 베타 번역기입니다.<br>속도가 굉장히 느리며, 중간에 번역이 되지 않을 수 있습니다.<br>여러가지 언어를 지원합니다.',
-        'papago': '권장되지 않는 베타 번역기입니다.<br>속도가 굉장히 느리며, 중간에 번역이 되지 않을 수 있습니다.<br>여러가지 언어를 지원합니다.'
+        'google': '베타 번역기입니다.<br>중간에 번역이 멈출 수 있습니다.<br>여러가지 언어를 지원합니다.',
+        'papago': '권장되지 않는 베타 번역기입니다.<br>속도가 굉장히 느리며, 중간에 번역이 멈출 수 있습니다.<br>여러가지 언어를 지원합니다.'
     }
 
     const v = await Swal.fire({
@@ -440,7 +440,7 @@ document.getElementById('eztrans').onclick = async () => {
             'eztrans': 'eztrans (스마트 모드)',
             'eztransh': 'eztrans (안전 모드)',
             'google': '구글 번역기 (베타)',
-            'papago': '파파고 (베타)'
+            'papago': '파파고 (베타, 비권장)'
         },
         confirmButtonText: '확인',
         inputValidator: (value) => {
