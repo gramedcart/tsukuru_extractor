@@ -9,7 +9,7 @@ const {
 } = require('electron');
 const fs = require('fs');
 const open = require('open');
-const isPackaged = require('electron-is-packaged').isPackaged;
+const tools = require('./src/js/libs/projectTools').default;
 const Store = require('electron-store');
 const storage = new Store();
 const ExtTool = require('./src/js/extract.js')
@@ -22,6 +22,9 @@ const dataBaseO = require('./src/js/datas.js')
 const applyjs = require("./src/js/apply.js")
 const eztrans = require("./src/js/translator.js")
 const {checkIsMapFile, sleep} = require('./src/js/globalutils.js')
+const yaml = require('js-yaml');
+const prjc = require('./src/js/projectConvert')
+const Themes = require('./src/js/styles').default;
 require('./src/js/fonts')
 
 function ErrorAlert(msg){
@@ -53,7 +56,6 @@ async function loadSettings(){
 }
 
 function createWindow() {
-  // Create the browser window.
   loadSettings()
   oPath()
   const mainWindow = new BrowserWindow({
@@ -94,8 +96,9 @@ function createWindow() {
       }
     }
     v(app.getVersion())
+    globalThis.settings.themeData = Themes[globalThis.settings.theme]
     getMainWindow().webContents.send('getGlobalSettings', globalThis.settings);
-    if(!isPackaged){
+    if(!tools.packeds){
       globalShortcut.register('Control+Shift+I', () => {
         mainWindow.webContents.openDevTools()
         return false;
@@ -104,7 +107,7 @@ function createWindow() {
   });
   mainid = mainWindow.id;
   globalThis.mwindow = mainWindow
-
+  tools.init()
   // Open the DevTools.
 }
 
@@ -219,6 +222,7 @@ ipcMain.on('applysettings', async (ev, arg) => {
   globalThis.settings = {...globalThis.settings, ...arg}
   storage.set('settings', JSON.stringify(globalThis.settings))
   globalThis.settingsWindow.close()
+  globalThis.settings.themeData = Themes[globalThis.settings.theme]
   console.log(globalThis.settings)
   getMainWindow().webContents.send('getGlobalSettings', globalThis.settings);
   worked()
@@ -331,6 +335,19 @@ async function extractor(arg){
         globalThis.externMsgKeys = Object.keys(Emsg)
       }
     }
+    let tempjsons = []
+    const fileList2 = fs.readdirSync(dir)
+    for(const i in fileList2){
+      const f = path.join(dir, fileList2[i])
+      const pf = path.parse(f)
+      if(f.endsWith('.json.yaml')){
+        console.log(f)
+        const fname = path.join(pf.dir, pf.name)
+        const fd = JSON.stringify(yaml.load(fs.readFileSync(f, 'utf-8')))
+        fs.writeFileSync(fname, fd, 'utf-8')
+        tempjsons.push(fname)
+      }
+    }
 
     const fileList = fs.readdirSync(dir)
 
@@ -408,6 +425,9 @@ async function extractor(arg){
     if (fs.existsSync(dir + '/ExternMsgcsv.json')){
       fs.rmSync(dir + '/ExternMsgcsv.json')
     }
+    for(const i in tempjsons){
+      fs.rmSync(tempjsons[i])
+    }
     getMainWindow().webContents.send('loading', 0);
     ['img','audio'].forEach((type) => {
       const ExtractImgDir = path.join(dir, `Extract_${type}`)
@@ -437,7 +457,7 @@ ipcMain.on('extract', async (ev, arg) => {
 ipcMain.on('apply', applyjs.apply)
 
 function oPath(){
-  if(isPackaged){
+  if(tools.packed){
     globalThis.oPath = process.resourcesPath
   }
   else{
@@ -565,3 +585,4 @@ process.on('uncaughtException', function (err) {
 })
 
 ipcMain.on('log', async(ev, arg) => console.log(arg))
+ipcMain.on('projectConvert', async(ev, arg) => prjc.ConvertProject(arg))

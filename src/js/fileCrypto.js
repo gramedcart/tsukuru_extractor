@@ -3,8 +3,13 @@
 const path = require('path')
 const fs = require('fs')
 const rpgencrypt = require("./libs/rpgencrypt");
+const yaml = require('js-yaml');
 
 function reader(dir){
+    if(fs.existsSync(dir+'.yaml')){
+        let data = fs.readFileSync(dir+'.yaml', "utf-8")
+        return yaml.load(data)
+    }
     let data = fs.readFileSync(dir, "utf-8")
     if (data.charCodeAt(0) === 0xFEFF) {
         data = data.substring(1);

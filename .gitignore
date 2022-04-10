@@ -7,3 +7,5 @@ dist/
 *.txt
 package-lock.json
 src/html/main/editon.js
+*.js.map
+*.css.map

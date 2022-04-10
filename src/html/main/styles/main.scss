@@ -1,0 +1,237 @@
+
+:root{
+    --mainColor: #000000;
+    --Highlight3: #000000;
+    --Highlight2: #000000;
+    --Highlight1: #000000;
+    --Background: #000000;
+    --Selected: #000000;
+    --Gap: 0px;
+    --font: "NotoSansKR"
+}
+
+@font-face {
+    font-family: 'NotoSansKR';
+    src: url('./fonts/NotoSansKR.otf');
+}
+
+body{
+    margin: 0px;
+    background-color: var(--Background);
+    color: var(--mainColor);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-family: var(--font);
+}
+
+.center{
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+}
+
+.n{
+    margin-top: 10px;
+    height: 52.5px;
+}
+
+.n2{
+    justify-content: center;
+    align-items: stretch;
+}
+
+.info{
+    text-align: center;
+}
+
+#folder_input{
+    width: 70vw;
+}
+
+#sel{
+    width: 10vw;
+    text-align: center;
+}
+
+@mixin light($color) {
+    border-radius: 10px;
+    border: transparent;
+    background-color: #{$color};
+    color: var(--mainColor);  
+}
+
+
+.highlight{
+    @include light(var(--Highlight1));
+    font-family: var(--font);
+}
+
+.highlight2{
+    @include light(var(--Highlight3));
+    font-family: var(--font);
+}
+
+.btn2{
+    @include light(var(--Highlight2));
+    font-family: var(--font);
+}
+
+.side_main{
+    width: 20vw;
+    height: 245px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.center_main{
+    width: 55vw;
+    height: 245px;
+}
+
+.btn{
+    border: transparent;
+    background-color: var(--Highlight2);
+    font-family: var(--font);
+    color: var(--mainColor);  
+    height: 70px;
+}
+
+.mode-select{
+    border-radius: 0px;
+    margin-bottom: 5px;
+    height: 20%;
+}
+.mode-run{
+    border-radius: 0px;
+    height: 50%;
+}
+
+.right_main{
+    text-align: center;
+}
+
+.container {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: var(--Gap);
+}
+
+.container2 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: var(--Gap);
+}
+
+#addons {
+    position: relative;
+    width: 90vw;
+    height: 0px;
+    transition: 0.2s;
+}
+
+#addons-block{
+    position: relative;
+    top: 190px;
+    margin-top: 10px;
+    height: 52.5px;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+#loading_bar{
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    width: 100vw;
+    height: 20px;
+    background-color: var(--Highlight2);
+}
+
+#icon1{
+    position: absolute;
+    left: 96vw;
+    top: 0px;
+}
+
+#icon2{
+    position: absolute;
+    left: 90vw;
+    top: 0px;
+}
+
+#loading-text{
+    position: absolute;
+    left: 10px;
+    top: 0px;
+    font-size: 12px;
+    visibility: hidden;
+}
+
+
+.icon{
+    -webkit-app-region: no-drag;
+    height: 20px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+#border_r{
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    height: 20px;
+    top: 0px;
+    left: 0px;
+    width: 0vw;
+    position: absolute;
+    background-color: #00968850;
+}
+
+#debug{
+    visibility: hidden;
+}
+
+@mixin hiddencc {
+    visibility: hidden;
+    position: absolute;
+}
+
+.hiddenc{
+    @include hiddencc()
+}
+
+.hiddenc button{
+    @include hiddencc()
+}
+
+.right_main2{
+    height: 200px;
+}
+
+#addons_btn{
+    border: transparent;
+    background-color: var(--Highlight3);
+    color: var(--mainColor);  
+    height: 40px;
+    position: absolute;
+    border-radius: 10px;
+    right: 7px;
+    top: 300px;
+    width: 20vw;
+}
+
+.cfolder{
+    text-overflow: ellipsis !important;
+    padding: 20px;
+    border: solid 2px var(--mainColor);
+    margin-bottom: 10px;
+    white-space: nowrap;
+}

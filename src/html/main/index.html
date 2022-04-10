@@ -3,12 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'"> -->
-
-  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
   <link rel="stylesheet" href="./sweetalert2/css.css">
   <script src="./sweetalert2/main.js"></script>
-  <link href="./styles/light.css" rel="stylesheet">
+  <link href="./styles/main.css" rel="stylesheet">
   <title>MV Extractor++</title>
 </head>
 
@@ -21,15 +18,14 @@
   </div>
   <div class="center n">
     <p class="info" id="fold">Data 폴더:</p>
-    <input type="text" id="folder_input" class="highlight">
-    <button id="sel" class="highlight">선택</button>
-    <!-- You can also require other files to run in this process -->
+    <input type="text" id="folder_input" class="highlight2">
+    <button id="sel" class="highlight2">선택</button>
   </div>
   <div class="center n">
     <div class="highlight side_main left_main">
-      <button class="highlight mode-select" id="ext">추출모드</button>
-      <button class="highlight mode-select" id="apply">적용모드</button>
-      <button class="highlight mode-run" id="run">RUN</button>
+      <button class="btn2 mode-select" id="ext">추출모드</button>
+      <button class="btn2 mode-select" id="apply">적용모드</button>
+      <button class="btn2 mode-run" id="run">RUN</button>
     </div>
     <div class="highlight center_main">
       <div class="container hiddenc" id="c-ext">
@@ -55,7 +51,7 @@
         <button class="btn"></button>
       </div>
     </div>
-    <div class="highlight side_main right_main2">
+    <div class="highlight2 side_main right_main2">
       <h class="right_main" id="info"></h>
     </div>
     <button id="addons_btn">추가 기능</button>
@@ -68,7 +64,7 @@
         <button class="btn" id="changeAll">문자열 일괄 변경</button>
         <button class="btn" id="versionUp">버전 업 툴</button>
         <button class="btn" id="fontConfig">폰트 변경</button>
-        <button class="btn"></button>
+        <button class="btn" id="toProject">프로젝트로 변환</button>
         <button class="btn"></button>
         <button class="btn"></button>
         <button class="btn" id="settings">설정</button>

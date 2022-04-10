@@ -22,7 +22,8 @@ let config = {
     exJson: false,
     decryptImg: false,
     decryptAudio: false,
-    ext_javascript: false
+    ext_javascript: false,
+    useYaml: false
 }
 let _mode = -1
 
@@ -58,6 +59,11 @@ ipcRenderer.on('updateFound', (evn, tt) => {
 
 ipcRenderer.on('getGlobalSettings', (evn, tt) => {
     globalSettings = tt
+    const tData = (globalSettings.themeData)
+    let root = document.documentElement;
+    for(const i in tData){
+        root.style.setProperty(i,tData[i]);
+    }
 })
 
 ipcRenderer.on('loadingTag', (evn, tt) => {
@@ -157,32 +163,32 @@ ipcRenderer.on('alert2', async (evn, tt) => {
 
 function _reload(){
     if(_mode == 0){
-        document.getElementById('ext').style.backgroundColor = '#3700b390'
-        document.getElementById('apply').style.backgroundColor = '#ffffff10'
+        document.getElementById('ext').style.backgroundColor = 'var(--Selected)'
+        document.getElementById('apply').style.backgroundColor = 'var(--Highlight2)'
         if (document.getElementById('c-ext').classList.contains("hiddenc")) {
             document.getElementById('c-ext').classList.remove("hiddenc");}
         if (!document.getElementById('c-app').classList.contains("hiddenc")) {
             document.getElementById('c-app').classList.add("hiddenc");}
     }
     else if(_mode == 1){
-        document.getElementById('ext').style.backgroundColor = '#ffffff10'
-        document.getElementById('apply').style.backgroundColor = '#3700b390'
+        document.getElementById('ext').style.backgroundColor = 'var(--Highlight2)'
+        document.getElementById('apply').style.backgroundColor = 'var(--Selected)'
         if (document.getElementById('c-app').classList.contains("hiddenc")) {
             document.getElementById('c-app').classList.remove("hiddenc");}
         if (!document.getElementById('c-ext').classList.contains("hiddenc")) {
             document.getElementById('c-ext').classList.add("hiddenc");}
     }
     else{
-        document.getElementById('ext').style.backgroundColor = '#ffffff10'
-        document.getElementById('apply').style.backgroundColor = '#ffffff10'
+        document.getElementById('ext').style.backgroundColor = 'var(--Highlight2)'
+        document.getElementById('apply').style.backgroundColor = 'var(--Highlight2)'
     }
     const DomList = ['ext_plugin','ext_note','ext_src','autoline','instantapply','exJson','decryptImg','decryptAudio', 'ext_javascript']
     for(const i in DomList){
         if(config[DomList[i]]){
-            document.getElementById(DomList[i]).style.backgroundColor = '#3700b390'
+            document.getElementById(DomList[i]).style.backgroundColor = 'var(--Selected)'
         }
         else{
-            document.getElementById(DomList[i]).style.backgroundColor = '#ffffff10'
+            document.getElementById(DomList[i]).style.backgroundColor = 'var(--Highlight2)'
         }
     }
 }
@@ -220,7 +226,8 @@ if(true){
         'versionUp': '버전 업 툴을\n엽니다',
         'settings': '설정',
         'fontConfig': '게임 내 폰트를\n변경합니다',
-        'ext_javascript': '게임 내\n자바스크립트를\n추출합니다.'
+        'ext_javascript': '게임 내\n자바스크립트를\n추출합니다.',
+        'toProject': 'RPG MAKER 에디터에서 열 수 있는 파일로 변환합니다.'
     }
     for(const i in InfoList){
         document.getElementById(i).addEventListener('mouseenter', ()=>{
@@ -350,6 +357,32 @@ document.getElementById('ext_javascript').onclick = () => {
         config.ext_javascript = false
         _reload()
     }
+}
+
+document.getElementById('toProject').onclick = () => {
+    if(running){
+        Swal.fire({
+            icon: 'error',
+            text: '이미 다른 작업이 시행중입니다!',
+        })
+        return
+    }
+    Swal.fire({
+        icon: 'warning',
+        text: '변환기를 사용하시겠습니까?',
+        confirmButtonText: '예',
+        showDenyButton: true,
+        denyButtonText: `아니오`,
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            await Swal.fire({
+                icon: "info",
+                text: "프로젝트를 저장할 위치를 선택해주세요"
+            })
+            running = true
+            ipcRenderer.send('projectConvert', document.getElementById('folder_input').value)
+        }
+    })
 }
 
 document.getElementById('ext_note').onclick = () => {

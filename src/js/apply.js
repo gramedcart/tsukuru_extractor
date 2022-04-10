@@ -2,7 +2,8 @@ const fs = require('fs');
 const ExtTool = require('./extract.js')
 const path = require('path')
 const edTool = require('./edtool.js')
-const isPackaged = require('electron-is-packaged').isPackaged;
+const tools = require('./libs/projectTools').default;
+const yaml = require('js-yaml');
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -41,7 +42,7 @@ exports.apply = async (ev, arg) => {
       }
       const jsdir = ((dir.substring(0,dir.length-5) + '/js').replaceAll('//','/'))
       let ext_data = edTool.read(dir)
-      if(!isPackaged){
+      if(!tools.packed){
         const JD = JSON.stringify(ext_data, null, 4)
         fs.writeFileSync('./test/ed.json', JD, 'utf-8')
         if(fs.existsSync('./test/ed2.json')){
@@ -139,12 +140,16 @@ exports.apply = async (ev, arg) => {
           }
         }
         else{
-          const dataJson = JSON.stringify(data, null, 4*globalThis.settings.JsonChangeLine)
-          if(arg.instantapply){
-            fs.writeFileSync(dir + '/' + i, dataJson,'utf8')
+          const fdir = arg.instantapply ? path.join(dir, i) : path.join(dir,'Completed','data',i)
+          const fdir2 = arg.instantapply ? path.join(dir, `${i}.yaml`) : path.join(dir,'Completed','data', `${i}.yaml`)
+          const fd = arg.useYaml ? fdir2 : fdir
+          const dataJson = arg.useYaml ? yaml.dump(data) : JSON.stringify(data, null, 4*globalThis.settings.JsonChangeLine)
+          fs.writeFileSync(fd, dataJson,'utf8')
+          if(arg.useYaml && fs.existsSync(fdir)){
+            fs.rmSync(fdir)
           }
-          else{
-            fs.writeFileSync(dir + '/Completed/data/' + i, dataJson,'utf8')
+          else if((!arg.useYaml) && fs.existsSync(fdir2)){
+            fs.rmSync(fdir2)
           }
         }
       }

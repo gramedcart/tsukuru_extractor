@@ -29,6 +29,7 @@ ipcRenderer.on("settings", (evt, arg) => {
   CheckboxValues.forEach((val) => {
     document.getElementById(val).checked = settings[val]
   })
+  document.getElementById('theme').value = settings.theme
   document.getElementById('update').innerText = `업데이트 확인 (현재: ${settings.version})`
   document.getElementById('update').onclick = () => {ipcRenderer.send('updates')}
   document.getElementById('license').onclick = () => {ipcRenderer.send('license')}
@@ -64,6 +65,7 @@ document.getElementById('apply').onclick = () => {
   CheckboxValues.forEach((val) => {
     settings[val] = document.getElementById(val).checked
   })
+  settings.theme = document.getElementById('theme').value
   settings.extractSomeScript2 = document.getElementById('extractSomeScript2').value.split('\n')
   ipcRenderer.send('applysettings', settings);
 }

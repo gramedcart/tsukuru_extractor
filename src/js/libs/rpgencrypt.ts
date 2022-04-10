@@ -17,12 +17,7 @@ function hexToByte(hex:string){
     return Buffer.from(hex, "hex")[0]
 }
 
-
-function log(p:string){
-    console.log(p)
-}
-
-export function VerifyFakeHeader(filePath:string){
+function VerifyFakeHeader(filePath:string){
     if(!fs.existsSync(filePath)){
         throw "file dosen't exist"
     }

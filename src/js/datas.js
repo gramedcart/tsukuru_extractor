@@ -1,4 +1,4 @@
-
+const styles = require('./styles').default
 
 exports.settings = {
     userdict: {},
@@ -18,7 +18,10 @@ exports.settings = {
     ExternMsgJson: true,
     DoNotTransHangul: true,
     formatNice: true,
-    fastEztrans: true
+    fastEztrans: true,
+    theme: "Dracula",
+    themeData: {},
+    themeList: Object.keys(styles)
 }
 
 exports.onebyone = {
