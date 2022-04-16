@@ -44,11 +44,13 @@ exports.apply = async (ev, arg) => {
       let ext_data = edTool.read(dir)
       if(!tools.packed){
         const JD = JSON.stringify(ext_data, null, 4)
-        fs.writeFileSync('./test/ed.json', JD, 'utf-8')
-        if(fs.existsSync('./test/ed2.json')){
-          const dats = fs.readFileSync('./test/ed2.json','utf-8')
-          console.log(`Match ${JD === dats}`)
-        }
+        try {
+          fs.writeFileSync('./test/ed.json', JD, 'utf-8')
+          if(fs.existsSync('./test/ed2.json')){
+            const dats = fs.readFileSync('./test/ed2.json','utf-8')
+            console.log(`Match ${JD === dats}`)
+          } 
+        } catch (error) {}
       }
       const ext_dat = ext_data.main
       const max_files = Object.keys(ext_dat).length
