@@ -116,6 +116,18 @@ ipcRenderer.on('loading', (evn, tt) => {
 
 ipcRenderer.on('worked', () => {running = false})
 
+ipcRenderer.on('eztransError', async () => {
+    const result = await Swal.fire({
+        icon: 'error',
+        text: 'dotnet 6.0 이 설치되지 않은 것 같습니다. 5초 내에 다운로드 창을 띄웁니다.',
+        showDenyButton: true,
+        denyButtonText: `설치 후에도 계속 뜨나요?`,
+    })
+    if (result.isDenied){
+        ipcRenderer.send('eztransHelp')
+    }
+})
+
 ipcRenderer.on('check_force', (evn, arg) => {
     Swal.fire({
         icon: 'question',

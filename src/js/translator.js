@@ -155,7 +155,7 @@ class Translator{
                     console.log('requesting')
                     if(this.type2 === 'google'){
                         const a = await translatte(tempTxt, {from: this.langu, to: 'ko'})
-                        await sleep(3000)
+                        await sleep(1000)
                         return decodeSafe(a.text)
                     }
                     else{
@@ -339,14 +339,11 @@ exports.trans = async (ev, arg) => {
                 console.log("close");
             });
             
-            await sleep(1000)
+            await sleep(3000)
             try {
                 await PU.waitUntilUsed(8000)
             } catch (error) {
-                globalThis.mwindow.webContents.send('alert', {
-                    icon: 'error',
-                    message: 'dotnet 6.0 이 설치되지 않은 것 같습니다. 5초 내에 다운로드 창을 띄웁니다.'
-                });
+                globalThis.mwindow.webContents.send('eztransError');
                 setTimeout(() => {open(`https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.1-windows-x86-installer`)}, 2000)
                 try {
                     translator.KillLs()
@@ -421,7 +418,7 @@ exports.trans = async (ev, arg) => {
             if(typeOfFile == '' && globalThis.settings.fastEztrans){
                 const readLen = (translator.getType() === 'eztrans') ? 1000
                                 : (translator.type2 === 'google') ? 1000
-                                : 200
+                                : 220
                 let reads = fileRead.split('\n')
                 let a = ''
                 let l = 0

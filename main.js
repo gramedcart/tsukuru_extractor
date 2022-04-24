@@ -472,6 +472,8 @@ ipcMain.on('extend', async (ev, arg) => {
 
 ipcMain.on('eztrans', eztrans.trans)
 
+ipcMain.on('eztransHelp', () => {open('https://github.com/gramedcart/mvextractor/wiki/ezTrans-%EC%98%A4%EB%A5%98-%ED%95%B4%EA%B2%B0')})
+
 ipcMain.on('minimize', () => {
   getMainWindow().minimize()
 })
@@ -561,14 +563,31 @@ ipcMain.on('updateVersion', async (ev, arg) => {
       }
       const dat0 = fs.readFileSync(path.join(TranslatedDir, file), 'utf-8').split('\n')
       let dat2 = fs.readFileSync(path.join(NewDir, file), 'utf-8')
+      let dat2_dat = dat2.split('\n')
+      function UpReplacer(data, source, to, all=false){
+        for(let i =0;i<data.length;i++){
+          if(data[i] === source){
+            data[i] = to;
+            if(!all){
+              break
+            }
+          }
+        }
+        return data
+      }
       for(i2 in (dat0)){
         TransDict[dat1[i2]] = dat0[i2]
-        dat2 = dat2.replace(dat1[i2], dat0[i2])
+        dat2_dat = UpReplacer(dat2_dat, dat1[i2], dat0[i2], false)
       }
       for(i2 in TransDict){
-        dat2 = dat2.replaceAll(i2, TransDict[i2])
+        dat2_dat = UpReplacer(dat2_dat, dat1[i2], dat0[i2], true)
       }
+      dat2 = dat2_dat.join('\n')
       fs.writeFileSync(path.join(NewDir, file), dat2, 'utf-8')
+
+
+
+
       getMainWindow().webContents.send('loading', i/fileList1.length*100);
       await sleep(0)
     }
