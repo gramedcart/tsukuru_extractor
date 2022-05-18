@@ -521,6 +521,7 @@ exports.trans = async (ev, arg) => {
                                 let rl = readLine
                                 if(!transIt){
                                     let startAble = false
+                                    const translateable = globalThis.settings.translateable
                                     for(const vv in translateable){
                                         if (readLine.replaceAll(' ','').startsWith(translateable[vv])){
                                             startAble = true

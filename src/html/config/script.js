@@ -18,11 +18,17 @@ const CheckboxValues = [
 ipcRenderer.on("settings", (evt, arg) => {
   settings = arg
   const userdict = arg.userdict
+  const translateable = arg.translateable
+
   const ess2 = arg.extractSomeScript2
 
   for(const keys in Object.keys(userdict)){
     const key = Object.keys(userdict)[keys]
     document.getElementById('userdict').value += key + '=' + userdict[key] + '\n'
+  }
+
+  for(const keys of translateable){
+    document.getElementById('translateable').value += keys + '\n'
   }
 
   document.getElementById('extractSomeScript2').value += ess2.join('\n')
@@ -62,6 +68,20 @@ document.getElementById('apply').onclick = () => {
     }
   }
   settings.userdict = userdict
+  {
+    const iVal = (document.getElementById('translateable').value).split('\n')
+    let translateable = []
+    for(let i=0;i<iVal.length;i++){
+      if(typeof(iVal[i]) == 'string'){
+        if(iVal[i].includes('<')){
+          translateable.push(iVal[i])
+        }
+      }
+    }
+    settings.translateable = translateable
+  }
+
+
   CheckboxValues.forEach((val) => {
     settings[val] = document.getElementById(val).checked
   })

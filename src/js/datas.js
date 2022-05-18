@@ -1,5 +1,22 @@
 const styles = require('./styles').default
 
+const defaultTranslatables = [
+    '<profile:',
+    '<desc1:',
+    '<desc2:',
+    '<desc3:',
+    '<SG説明',
+    '<SG説明2:',
+    "<namePop:",
+    "<SGカテゴリ:",
+    '<shop_mes:',
+]
+
+const defaultNote2able = [
+    '選択肢ヘルプ',
+]
+
+
 exports.settings = {
     userdict: {},
     extractJs: false,
@@ -21,6 +38,7 @@ exports.settings = {
     fastEztrans: true,
     theme: "Dracula",
     themeData: {},
+    translateable: defaultTranslatables,
     themeList: Object.keys(styles)
 }
 
