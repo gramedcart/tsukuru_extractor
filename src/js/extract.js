@@ -400,6 +400,7 @@ function forEvent(d, dat_obj, conf, Path){
             }
         }
         if(typeof d.list === 'object' && d.list !== undefined && d.list !== null){
+            let messageHasFace = false
             for(let i=0;i<d.list.length;i++){
                 let acceptable = [401, 102, 405]
                 let ischeckable = false
@@ -427,7 +428,7 @@ function forEvent(d, dat_obj, conf, Path){
                         }
                     }
                     else if(!ischeckable || isIncludeAble(da)){
-                        dat_obj = addtodic(ca, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID})
+                        dat_obj = addtodic(ca, dat_obj, '', {type: "event",code:d.list[i].code,eid:eventID,face:messageHasFace})
                     }
                     return dat_obj
                 }
@@ -437,6 +438,15 @@ function forEvent(d, dat_obj, conf, Path){
                     for(let i2=0;i2<d.list[i].parameters.length;i2++){
                         dat_obj = checker(dat_obj, d.list[i].parameters[i2], Path + `.list.${i}.parameters.${i2}`)
                     }
+                }
+                else{
+                    try {
+                        switch(d.list[i].code){
+                            case 101:
+                                messageHasFace = (d.list[i].parameters[0] !== '')
+                                break
+                        }   
+                    } catch (error) {}
                 }
             }
         }

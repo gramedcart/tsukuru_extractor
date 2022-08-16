@@ -3,7 +3,10 @@ const path = require('path')
 exports.checkIsMapFile = function (fileName) {
     try {
         fileName = path.parse(fileName).name
-        if (fileName.substring(0, 3) == 'Map') {
+        if(fileName === 'Map'){
+            return true
+        }
+        else if (fileName.substring(0, 3) == 'Map') {
             const anum = parseInt(fileName.substring(3, fileName.length))
             if (!isNaN(anum)) {
                 return true

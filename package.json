@@ -1,6 +1,6 @@
 {
   "name": "mv-extractor-pp",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "description": "MV Extractor++",
   "main": "main.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
     "open": "^8.4.0",
+    "request": "^2.88.2",
     "sha3": "^2.1.4",
     "tcp-port-used": "^1.0.2",
     "translatte": "^3.0.1"

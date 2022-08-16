@@ -76,16 +76,18 @@ exports.apply = async (ev, arg) => {
           for(const q of Object.keys(ext_dat[i].data)){
             let output = ''
             let autoline = false
+            let autolineSize = 0
             let originFile = ext_dat[i].data[q].origin ?? i
             if(ext_dat[i].data[q].conf !== undefined){
                 const econf = ext_dat[i].data[q].conf
                 if(arg.autoline && econf.type == 'event' && econf.code == 401){
                     autoline = true
+                    autolineSize = econf.face ? 80 : 60
                 }
             }
             for(let x=parseInt(q);x<ext_dat[i].data[q].m;x++){
               let forUse = Edata[x]
-              if(autoline && (getBinarySize(forUse) > 60)){
+              if(autoline && (getBinarySize(forUse) > autolineSize)){
                   const v = forUse.split(' ')
                   if(v.length > 0){
                     v[(Math.floor(v.length/2)) - 1] = '\n' + v[(Math.floor(v.length/2)) - 1]

@@ -471,9 +471,11 @@ document.getElementById('eztrans').onclick = async () => {
         return
     }
     const infos = {
-        'eztrans': '최대한 많이 번역하는 모드입니다.<br>많은 스크립트를 안전하게 번역합니다.<br>적은 확률로 번역 한 게임에 오류가 발생할 수 있습니다.',
-        'eztransh': '오류가 나올 만한 부분을 번역하지 않는 모드입니다.<br>번역되지 않는 부분이 있을 수 있습니다.',
-        'google': '베타 번역기입니다.<br>중간에 번역이 멈출 수 있습니다.<br>여러가지 언어를 지원합니다.',
+        'eztrans': '최대한 많이 번역하는 모드입니다.<br>많은 스크립트를 안전하게 번역합니다.<br>적은 확률로 번역 한 게임에 오류가 발생할 수 있습니다.<br>일본어만 지원합니다.',
+        'eztransh': '오류가 나올 만한 부분을 번역하지 않는 모드입니다.<br>번역되지 않는 부분이 있을 수 있습니다.<br>일본어만 지원합니다.',
+        'kakao': '카카오 번역 모드입니다.<br>일본어 이외의 언어를 번역하는데 유용합니다',
+        'googleh': '구글 안전 모드입니다.<br>변수들이 흩어지지 않습니다.<br>중간에 번역이 멈출 수 있습니다.<br>여러가지 언어를 지원합니다.',
+        'google': '권장되지 않는 모드의 번역기입니다<br>중간에 번역이 멈출 수 있습니다.<br>여러가지 언어를 지원합니다.',
         'papago': '권장되지 않는 베타 번역기입니다.<br>속도가 굉장히 느리며, 중간에 번역이 멈출 수 있습니다.<br>여러가지 언어를 지원합니다.'
     }
 
@@ -482,9 +484,11 @@ document.getElementById('eztrans').onclick = async () => {
         title: '번역기를 선택해주세요',
         input: 'select',
         inputOptions: {
-            'eztrans': 'eztrans (스마트 모드)',
+            'eztrans': 'eztrans (스마트 모드, 권장)',
+            'kakao': '카카오 번역기 (안전 모드, 권장)',
+            'googleh': '구글 번역기 (안전 모드)',
             'eztransh': 'eztrans (안전 모드)',
-            'google': '구글 번역기 (베타)',
+            'google': '구글 번역기 (위험 모드, 비권장)',
             'papago': '파파고 (베타, 비권장)'
         },
         confirmButtonText: '확인',
@@ -514,18 +518,30 @@ document.getElementById('eztrans').onclick = async () => {
     }
     let langu = 'jp'
     if(!(transtype === 'eztrans'|| transtype === 'eztransh')){
+        const inputs = transtype === 'kakao' ? {
+            'en': '영어 (english)',
+            'jp': '일본어 (日本語)',
+            'cn': '대만어 (台灣語)',
+            'fr': '프랑스어 (Français)',
+            'es': '스페인어 (español)',
+            'ru': '러시아어 (Русский)',
+            'de': "독일어 (deutches)"
+        } : {
+            'en': '영어 (english)',
+            'ja': '일본어 (日本語)',
+            'zh-CN': '대만어 (台灣語)',
+            'fr': '프랑스어 (Français)',
+            'es': '스페인어 (español)',
+            'ru': '러시아어 (Русский)'
+        }
+
+
+
         const langu2 = await Swal.fire({
             icon: 'info',
             title: '시작 언어를 선택해주세요',
             input: 'select',
-            inputOptions: {
-                'en': '영어 (english)',
-                'ja': '일본어 (日本語)',
-                'zh-CN': '대만어 (台灣語)',
-                'fr': '프랑스어 (Français)',
-                'es': '스페인어 (español)',
-                'ru': '러시아어 (Русский)'
-            },
+            inputOptions: inputs,
             confirmButtonText: '확인',
             inputValidator: (value) => {
                 return new Promise((resolve) => {

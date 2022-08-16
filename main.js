@@ -55,10 +55,12 @@ async function loadSettings(){
   storage.set('settings', JSON.stringify(globalThis.settings))
 }
 
+let mainWindow
+
 function createWindow() {
   loadSettings()
   oPath()
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: defaultHeight,
     show: false,

@@ -1,168 +1,256 @@
-const path = require('path')
-const fs = require('fs');
-const PU = require('tcp-port-used');
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const tcp_port_used_1 = __importDefault(require("tcp-port-used"));
 const spawn = require('child_process').spawn;
-const dataBaseO = require('./datas.js')
-const {checkIsMapFile, sleep} = require('./globalutils.js')
-const axios = require('axios')
-const {translateable, note2able, translateableOne, hanguls} = require('./datas.js')
-const edTool = require('./edtool')
-const { performance } = require('perf_hooks');
-const open = require('open');
-const translatte = require("translatte")
-
-function oPath(){
-    return globalThis.oPath
+const datas_js_1 = __importDefault(require("./datas.js"));
+const globalutils_js_1 = require("./globalutils.js");
+const axios_1 = __importDefault(require("axios"));
+const datas_js_2 = require("./datas.js");
+const edTool = __importStar(require("./edtool"));
+const open_1 = __importDefault(require("open"));
+const translatte_1 = __importDefault(require("translatte"));
+const kakaotrans_js_1 = require("./libs/kakaotrans.js");
+let junChori = false;
+function oPath() {
+    return globalThis.oPath;
 }
-
-function applyUserDict(input){
-    const Udict = globalThis.settings.userdict
-  
-    for(let i=0;i<Object.keys(Udict).length;i++){
-      const akey = Object.keys(Udict)[i]
-      input = input.replaceAll(akey,Udict[akey])
+function applyUserDict(input) {
+    const Udict = globalThis.settings.userdict;
+    for (let i = 0; i < Object.keys(Udict).length; i++) {
+        const akey = Object.keys(Udict)[i];
+        input = input.replaceAll(akey, Udict[akey]);
     }
-    return input
+    return input;
 }
-
 function encodeURIp(p) {
-    p = p.replaceAll('■', '■0')
-    p = p.replaceAll('%', '■1')
-    p = p.replaceAll('％', '■2')
-    p = p.replaceAll('|', '■3')
-    return p
+    p = p.replaceAll('■', '@user0');
+    p = p.replaceAll('%', '@user1');
+    p = p.replaceAll('％', '@user2');
+    p = p.replaceAll('|', '@user3');
+    return p;
 }
-
-function decodeURIp(p, encodeSp=false) {
-    p = p.replaceAll('■1', '%')
-    p = p.replaceAll('■0', '■')
-    p = p.replaceAll('■2', '％')
-    p = p.replaceAll('■3', '|')
-    if(encodeSp){
-        p = p.replaceAll(' ', ' ')
+function decodeURIp(p, encodeSp = false) {
+    p = p.replaceAll('@user0', '%');
+    p = p.replaceAll('@user1', '■');
+    p = p.replaceAll('@user2', '％');
+    p = p.replaceAll('@user3', '|');
+    if (encodeSp) {
+        p = p.replaceAll(' ', ' ');
     }
-    return p
+    return p;
 }
-
-function encodeSp(p, change=false){
-    if(change){
-        p = p.replaceAll(' ', ' ')
+function encodeSp(p, change = false) {
+    if (change) {
+        p = p.replaceAll(' ', ' ');
     }
-    return p
+    return p;
 }
-
-
-const fndi = /\\ *V *\[/g
-
-class Translator{
-    constructor(type, type2='', langu='jp'){
-        this.type = type
-        this.type2 = type2
-        this.ls = null
-        this.transMemory = {}
-        this.langu = langu
+function isUnsafe(str) {
+    return (str.includes('<') || str.includes('>') || str.includes('\\'));
+}
+const safeTransRegex = /((\\[A-Za-z]+)((\[[A-Za-z0-9]+\])|(\<[A-Za-z0-9]+\>)))|<br>|(\\(ii|[VvNnPpGgCcIi{}$.|!><^])(\[[0-9]+\])?)/g;
+const fndi = /\\ *V *\[/g;
+function makeid() {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 6; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    setLs(ls){
-        this.ls = ls
+    return `${result}`;
+}
+class Translator {
+    constructor(type, type2 = '', langu = 'jp') {
+        this.type = type;
+        this.type2 = type2;
+        this.ls = null;
+        this.transMemory = {};
+        this.langu = langu;
     }
-    KillLs(ls){
+    setLs(ls) {
+        this.ls = ls;
+    }
+    KillLs() {
         try {
-            this.ls.kill()
-        } catch (error) {}
-    }
-    async translate(text){
-        let isEndPadding = 0
-        while(text.at(text.length - 1) === '\n'){
-            text = text.substring(0, text.length - 1)
-            isEndPadding += 1
+            this.ls.kill();
         }
-        text = await this.translate2(text)
-        while(isEndPadding > 0){
-            text += '\n'
-            isEndPadding -= 1
-        }
-        return text
+        catch (error) { }
     }
-    async translate2(text){
-        if(globalThis.settings.DoNotTransHangul){
-            if(hanguls.test(text)){
-                return text
+    translate(text) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let isEndPadding = 0;
+            while (text.at(text.length - 1) === '\n') {
+                text = text.substring(0, text.length - 1);
+                isEndPadding += 1;
             }
-        }
-        text = applyUserDict(text)
-        if(this.type === 'eztrans'){
-            let t
-            // console.log(text)
-            try {
-                const a =  await axios.get(
-                    'http://localhost:8000/',
-                    {
+            text = yield this.translate2(text);
+            while (isEndPadding > 0) {
+                text += '\n';
+                isEndPadding -= 1;
+            }
+            return text;
+        });
+    }
+    translate2(text) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (globalThis.settings.DoNotTransHangul) {
+                if (datas_js_2.hanguls.test(text)) {
+                    return text;
+                }
+            }
+            text = applyUserDict(text);
+            if (this.type === 'eztrans') {
+                let t;
+                // console.log(text)
+                try {
+                    const a = yield axios_1.default.get('http://localhost:8000/', {
                         params: {
                             text: text
                         },
                         timeout: 10000
-                    }
-                )
-                t = a.data
-            } catch (error) {
-                try {
+                    });
+                    t = a.data;
+                }
+                catch (error) {
                     try {
-                        this.KillLs()
-                    } catch (error) {}
-                    this.ls = spawn(path.join(oPath(), 'exfiles', 'eztrans' ,'eztransServer.exe'));
-                    console.log('spawned')
-                    await sleep(2000)
-                    await PU.waitUntilUsed(8000)
-                } catch (error) {
-                    console.log('spawn failed')
-                }
-                t = a
-            }
-            if(typeof(t) !== 'string' && typeof(t) !== 'number'){
-                return `ERROR: RETURNED ${JSON.stringify(t)}`
-            }
-            return (t)
-        }
-        else if(this.type === 'transEngine'){
-            function encodeSafe(text, sup=false){
-                if(sup){
-                    console.log('encodeSafe')
-                    text.replaceAll('◆','◇').replaceAll('\n','◆')
-                }
-                return text
-            }
-            function decodeSafe(text, sup=false){
-                if(sup){
-                    console.log('decodeSafe')
-                    text.replaceAll('◆','\n')
-                }
-                text.replaceAll(fndi,'\\V[')
-                return text
-            }
-            let t
-            // console.log(text)
-            try {
-                if(text.length < 1){
-                    console.log("zero len")
-                    t = text
-                }
-                else if(Object.keys(this.transMemory).includes(text)){
-                    console.log('from memory')
-                    t = this.transMemory[text]
-                }
-                else{
-                    const tempTxt = encodeSafe(text, this.type2 === 'papago')
-                    console.log('requesting')
-                    if(this.type2 === 'google'){
-                        const a = await translatte(tempTxt, {from: this.langu, to: 'ko'})
-                        await sleep(1000)
-                        return decodeSafe(a.text)
+                        try {
+                            this.KillLs();
+                        }
+                        catch (error) { }
+                        this.ls = spawn(path_1.default.join(oPath(), 'exfiles', 'eztrans', 'eztransServer.exe'));
+                        console.log('spawned');
+                        yield (0, globalutils_js_1.sleep)(2000);
+                        yield tcp_port_used_1.default.waitUntilUsed(8000);
                     }
-                    else{
-                        console.log(tempTxt)
-                        const a = (await axios.get(
-                            'http://localhost:8000/',
-                            {
+                    catch (error) {
+                        console.log('spawn failed');
+                    }
+                }
+                if (typeof (t) !== 'string' && typeof (t) !== 'number') {
+                    return `ERROR: RETURNED ${JSON.stringify(t)}`;
+                }
+                return (t);
+            }
+            else if (this.type === 'transEngine') {
+                function encodeSafe(text, sup = false) {
+                    if (sup) {
+                        console.log('encodeSafe');
+                        text.replaceAll('◆', '◇').replaceAll('\n', '◆');
+                    }
+                    return text;
+                }
+                function decodeSafe(text, sup = false) {
+                    if (sup) {
+                        console.log('decodeSafe');
+                        text.replaceAll('◆', '\n');
+                    }
+                    text.replaceAll(fndi, '\\V[');
+                    return text;
+                }
+                let t;
+                // console.log(text)
+                try {
+                    if (text.length < 1) {
+                        console.log("zero len");
+                        t = text;
+                    }
+                    else if (Object.keys(this.transMemory).includes(text)) {
+                        console.log('from memory');
+                        t = this.transMemory[text];
+                    }
+                    else {
+                        const tempTxt = encodeSafe(text, this.type2 === 'papago');
+                        console.log('requesting');
+                        if (this.type2 === 'google') {
+                            const a = yield (0, translatte_1.default)(tempTxt, { from: (this.langu), to: 'ko' });
+                            yield (0, globalutils_js_1.sleep)(3000);
+                            return (a.text);
+                        }
+                        else if (this.type2 === 'googleh' || this.type2 === 'kakao') {
+                            let posqi = 0;
+                            let ids = {};
+                            function makeSureIsSafe(str) {
+                                while (true) {
+                                    const matches = safeTransRegex.exec(str);
+                                    if (matches === null) {
+                                        return str;
+                                    }
+                                    const m = matches[0];
+                                    const id = `${makeid()}${posqi}`;
+                                    posqi += 1;
+                                    ids[id] = m;
+                                    str = str.replaceAll(m, ` #${id} `);
+                                }
+                            }
+                            let sliced = tempTxt.split('\n');
+                            let mog = [];
+                            for (let i = 0; i < sliced.length; i++) {
+                                const origin = sliced[i];
+                                sliced[i] = makeSureIsSafe(sliced[i]);
+                                if (isUnsafe(sliced[i])) {
+                                    mog.push([origin, i]);
+                                    sliced[i] = 'a';
+                                }
+                            }
+                            const temp2 = sliced.join('\n');
+                            if (mog.length === sliced.length) {
+                                return tempTxt;
+                            }
+                            const a = this.type2 === 'kakao' ? (yield (0, kakaotrans_js_1.kakaoTrans)(temp2, this.langu)) : (yield (0, translatte_1.default)(temp2, { from: (this.langu), to: 'ko' })).text;
+                            let finalStr = a.replaceAll('#', '');
+                            console.log(ids);
+                            for (const key in ids) {
+                                const findRegex = new RegExp(key, 'ig');
+                                finalStr = finalStr.replace(findRegex, ids[key]);
+                                finalStr = finalStr.replaceAll(key, ids[key]);
+                                finalStr = finalStr.replaceAll(key.toLocaleUpperCase(), ids[key]);
+                                finalStr = finalStr.replaceAll(key.toLocaleLowerCase(), ids[key]);
+                            }
+                            yield (0, globalutils_js_1.sleep)(1000);
+                            yield (0, globalutils_js_1.sleep)(1000);
+                            let aSplit = finalStr.split('\n');
+                            for (const m of mog) {
+                                aSplit[m[1]] = m[0];
+                            }
+                            console.log(aSplit);
+                            return aSplit.join('\n');
+                        }
+                        else {
+                            console.log(tempTxt);
+                            const a = (yield axios_1.default.get('http://localhost:8000/', {
                                 params: {
                                     text: tempTxt,
                                     platform: this.type2,
@@ -170,477 +258,493 @@ class Translator{
                                     target: 'ko'
                                 },
                                 timeout: 10000
+                            }));
+                            try {
+                                console.log(a.data.data.translatedContent);
+                                t = a.data.data.translatedContent;
+                                t = decodeSafe(t, this.type2 === 'papago');
+                                this.transMemory[text] = t;
                             }
-                        ))
-                        try {
-                            console.log(a.data.data.translatedContent)
-                            t = a.data.data.translatedContent
-                            t = decodeSafe(t, this.type2 === 'papago')
-                            this.transMemory[text] = t
-                        } catch (error) {
-                            console.log('err: notranslatedContent')
-                            t = text
+                            catch (error) {
+                                console.log('err: notranslatedContent');
+                                t = text;
+                            }
                         }
                     }
                 }
-            } catch (error) {
-                try {
+                catch (error) {
                     try {
-                        this.KillLs()
-                    } catch (error) {}
-                    this.ls = spawn(path.join(oPath(), 'exfiles', 'transEngine' ,'translate_engine.exe'));
-                    console.log('spawned')
-                    await sleep(2000)
-                    await PU.waitUntilUsed(8000)
-                } catch (error) {
-                    console.log('spawn failed')
+                        try {
+                            this.KillLs();
+                        }
+                        catch (error) { }
+                        this.ls = spawn(path_1.default.join(oPath(), 'exfiles', 'transEngine', 'translate_engine.exe'));
+                        console.log('spawned');
+                        yield (0, globalutils_js_1.sleep)(2000);
+                        yield tcp_port_used_1.default.waitUntilUsed(8000);
+                    }
+                    catch (error) {
+                        console.log('spawn failed');
+                    }
                 }
-                t = a
+                if (typeof (t) !== 'string' && typeof (t) !== 'number') {
+                    return `ERROR: RETURNED ${JSON.stringify(t)}`;
+                }
+                return `${t}`;
             }
-            if(typeof(t) !== 'string' && typeof(t) !== 'number'){
-                return `ERROR: RETURNED ${JSON.stringify(t)}`
-            }
-            return (t)
-        }
+        });
     }
-    getType(){
-        return this.type
+    getType() {
+        return this.type;
     }
-    async isCrash(){
-        if(this.type === 'eztrans'){
-            if (!(await PU.check(8000))) {
-                console.log('err')
-                globalThis.mwindow.webContents.send('alert', {
-                    icon: 'error',
-                    message: 'Eztrans 서버와 연결할 수 없습니다.'
-                });
-                globalThis.mwindow.webContents.send('worked', 0);
-                return true
+    isCrash() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.type === 'eztrans') {
+                if (!(yield tcp_port_used_1.default.check(8000))) {
+                    console.log('err');
+                    globalThis.mwindow.webContents.send('alert', {
+                        icon: 'error',
+                        message: 'Eztrans 서버와 연결할 수 없습니다.'
+                    });
+                    globalThis.mwindow.webContents.send('worked', 0);
+                    return true;
+                }
             }
-        }
-        return false
+            return false;
+        });
     }
 }
-
-function setProgressBar(now, max){
-    console.log(`${now} / ${max}`)
-    globalThis.mwindow.webContents.send('loading', (now/max) * 70);
+function setProgressBar(now, max) {
+    console.log(`${now} / ${max}`);
+    globalThis.mwindow.webContents.send('loading', (now / max) * 70);
 }
-
-exports.trans = async (ev, arg) => {
-    const dm = true
-    globalThis.settings.safeTrans = true
+exports.trans = (ev, arg) => __awaiter(void 0, void 0, void 0, function* () {
+    const dm = true;
+    globalThis.settings.safeTrans = true;
     globalThis.settings.smartTrans = true;
     globalThis.settings.fastEztrans = true;
-
-    let compatibilityMode = false
-    let type2 = ''
-    const langu = arg.langu
-    if(arg.type == 'eztransh'){
+    let compatibilityMode = false;
+    let type2 = '';
+    const langu = arg.langu;
+    if (arg.type == 'eztransh') {
         globalThis.settings.smartTrans = false;
-        compatibilityMode = true
-        arg.type = 'eztrans'
+        compatibilityMode = true;
+        arg.type = 'eztrans';
     }
-    if(arg.type == 'papago'){
+    if (arg.type == 'papago') {
         globalThis.settings.smartTrans = false;
-        arg.type = 'transEngine'
-        type2 = 'papago'
+        arg.type = 'transEngine';
+        type2 = 'papago';
     }
-    if(arg.type == 'google'){
+    if (arg.type == 'google') {
         globalThis.settings.smartTrans = false;
-        arg.type = 'transEngine'
-        type2 = 'google'
+        arg.type = 'transEngine';
+        type2 = 'google';
     }
-    const translator = new Translator(arg.type, type2, langu)
-    let ls
-
-
+    if (arg.type == 'googleh') {
+        junChori = true;
+        globalThis.settings.smartTrans = false;
+        arg.type = 'transEngine';
+        type2 = 'googleh';
+    }
+    if (arg.type == 'kakao') {
+        junChori = true;
+        globalThis.settings.smartTrans = false;
+        arg.type = 'transEngine';
+        type2 = 'kakao';
+    }
+    const translator = new Translator(arg.type, type2, langu);
+    let ls;
     try {
         const dir = Buffer.from(arg.dir, "base64").toString('utf8');
-        const edir = path.join(dir, 'Extract')
-        if (!fs.existsSync(edir)) {
+        const edir = path_1.default.join(dir, 'Extract');
+        if (!fs_1.default.existsSync(edir)) {
             globalThis.mwindow.webContents.send('alert', {
                 icon: 'error',
                 message: 'Extract 폴더가 존재하지 않습니다'
             });
             globalThis.mwindow.webContents.send('worked', 0);
-            return
+            return;
         }
-        let isUsed
-        const fileList = fs.readdirSync(edir)
-        const max_files = fileList.length
-        let fullFileLength = 0
-        let workedFileLength = 0
-        console.log(translator.getType())
-        for(const i in fileList){
-            const iPath = path.join(edir, fileList[i])
-            fullFileLength += fs.readFileSync(iPath, 'utf-8').length
+        let isUsed;
+        const fileList = fs_1.default.readdirSync(edir);
+        const max_files = fileList.length;
+        let fullFileLength = 0;
+        let workedFileLength = 0;
+        console.log(translator.getType());
+        for (const i in fileList) {
+            const iPath = path_1.default.join(edir, fileList[i]);
+            fullFileLength += fs_1.default.readFileSync(iPath, 'utf-8').length;
         }
-        console.log(fullFileLength)
-        if(translator.getType() == 'transEngine'){
-            console.log('transEngine')
-            await PU.check(8000).then(function (inUse) {
-                isUsed = inUse
-            })
+        console.log(fullFileLength);
+        if (translator.getType() == 'transEngine' && type2 === 'papago') {
+            console.log('transEngine');
+            yield tcp_port_used_1.default.check(8000).then(function (inUse) {
+                isUsed = inUse;
+            });
             if (isUsed) {
                 globalThis.mwindow.webContents.send('alert', {
                     icon: 'error',
                     message: '포트 8000이 사용중입니다.'
                 });
                 globalThis.mwindow.webContents.send('worked', 0);
-                return
+                return;
             }
-            ls = spawn(path.join(oPath(), 'exfiles', 'transEngine' ,'translate_engine.exe'));
-            translator.setLs(ls)
-
-            await sleep(1000)
+            ls = spawn(path_1.default.join(oPath(), 'exfiles', 'transEngine', 'translate_engine.exe'));
+            translator.setLs(ls);
+            yield (0, globalutils_js_1.sleep)(1000);
             try {
-                await PU.waitUntilUsed(8000)
-            } catch (error) {
+                yield tcp_port_used_1.default.waitUntilUsed(8000);
+            }
+            catch (error) {
                 globalThis.mwindow.webContents.send('alert', {
                     icon: 'error',
                     message: '구동 도중 오류가 발생하였습니다'
                 });
                 try {
-                    translator.KillLs()
-                } catch (error) {   }
+                    translator.KillLs();
+                }
+                catch (error) { }
                 globalThis.mwindow.webContents.send('worked', 0);
-                return
+                return;
             }
-            await sleep(1000)
+            yield (0, globalutils_js_1.sleep)(1000);
         }
-        if(translator.getType() == 'eztrans'){
-            console.log('eztrans')
-            await PU.check(8000).then(function (inUse) {
-                isUsed = inUse
-            })
+        if (translator.getType() == 'eztrans') {
+            console.log('eztrans');
+            yield tcp_port_used_1.default.check(8000).then(function (inUse) {
+                isUsed = inUse;
+            });
             if (isUsed) {
                 globalThis.mwindow.webContents.send('alert', {
                     icon: 'error',
                     message: '포트 8000이 사용중입니다.'
                 });
                 globalThis.mwindow.webContents.send('worked', 0);
-                return
+                return;
             }
-            ls = spawn(path.join(oPath(), 'exfiles', 'eztrans' ,'eztransServer.exe'));
-            translator.setLs(ls)
+            ls = spawn(path_1.default.join(oPath(), 'exfiles', 'eztrans', 'eztransServer.exe'));
+            translator.setLs(ls);
             // ls.stdout.on('data', function (data) {
             //     console.log("eztrans");
             //     console.log('data' + data);
             // });
-            
             ls.stderr.on('data', function (data) {
                 console.log("eztrans - Error");
                 console.log('test: ' + data);
             });
-            
             ls.on('close', function (code) {
                 console.log("eztrans");
                 console.log("close");
             });
-            
-            await sleep(3000)
+            yield (0, globalutils_js_1.sleep)(3000);
             try {
-                await PU.waitUntilUsed(8000)
-            } catch (error) {
-                globalThis.mwindow.webContents.send('eztransError');
-                setTimeout(() => {open(`https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.1-windows-x86-installer`)}, 2000)
-                try {
-                    translator.KillLs()
-                } catch (error) {   }
-                globalThis.mwindow.webContents.send('worked', 0);
-                return
+                yield tcp_port_used_1.default.waitUntilUsed(8000);
             }
-            await sleep(1000)
+            catch (error) {
+                globalThis.mwindow.webContents.send('eztransError');
+                setTimeout(() => { (0, open_1.default)(`https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.1-windows-x86-installer`); }, 2000);
+                try {
+                    translator.KillLs();
+                }
+                catch (error) { }
+                globalThis.mwindow.webContents.send('worked', 0);
+                return;
+            }
+            yield (0, globalutils_js_1.sleep)(1000);
         }
-        let worked_files = 0
-        const edDat = edTool.read(dir)
-        let eed = {}
-        console.log(Object.keys(edDat.main))
+        let worked_files = 0;
+        const edDat = edTool.read(dir);
+        let eed = {};
+        console.log(Object.keys(edDat.main));
         for (const i in fileList) {
-            let typeOfFile = ''
+            let typeOfFile = '';
             if (globalThis.settings.safeTrans || globalThis.settings.smartTrans) {
-                const name = fileList[i]
-                console.log(name)
-                if(compatibilityMode){
+                const name = fileList[i];
+                console.log(name);
+                if (compatibilityMode) {
                     const NoneCompList = [
                         'System.txt'
-                    ]
-                    if(NoneCompList.includes(name)){
-                        console.log('skipping by compatibilityMode')
-                        continue
+                    ];
+                    if (NoneCompList.includes(name)) {
+                        console.log('skipping by compatibilityMode');
+                        continue;
                     }
                 }
                 if (name.includes('ext_scripts.txt')) {
-                    typeOfFile = 'src'
-                    console.log('src')
-                    if(!globalThis.settings.smartTrans ||compatibilityMode){
-                        continue
+                    typeOfFile = 'src';
+                    console.log('src');
+                    if (!globalThis.settings.smartTrans || compatibilityMode) {
+                        continue;
                     }
-                } else if (name.includes('ext_note.txt')) {
-                    typeOfFile = 'note'
-                    if(!globalThis.settings.smartTrans || compatibilityMode){
-                        console.log('skiping note')
-                        continue
+                }
+                else if (name.includes('ext_note.txt')) {
+                    typeOfFile = 'note';
+                    if (!globalThis.settings.smartTrans || compatibilityMode) {
+                        console.log('skiping note');
+                        continue;
                     }
-                } else if (name.includes('ext_note2.txt')) {
-                    typeOfFile = 'note2'
-                    if(!globalThis.settings.smartTrans || compatibilityMode){
-                        console.log('skiping note2')
-                        continue
+                }
+                else if (name.includes('ext_note2.txt')) {
+                    typeOfFile = 'note2';
+                    if (!globalThis.settings.smartTrans || compatibilityMode) {
+                        console.log('skiping note2');
+                        continue;
                     }
-                    else{
-                        let eed2 = edDat.main['ext_note2.json'].data
-                        for(const i2 in eed2){
-                            const cdat = eed2[i2]
-                            eed[i2] = cdat.conf.code
+                    else {
+                        let eed2 = edDat.main['ext_note2.json'].data;
+                        for (const i2 in eed2) {
+                            const cdat = eed2[i2];
+                            eed[i2] = cdat.conf.code;
                         }
                     }
-                } else if ((!(dataBaseO.default.includes(name))) && (!checkIsMapFile(name))) {
-                    console.log('skiping')
-                    continue
                 }
-                else if(name == 'ext_plugins.txt'){
-                    if(globalThis.settings.safeTrans || compatibilityMode){
-                        console.log('skiping ' + name)
-                        continue
+                else if ((!(datas_js_1.default.default.includes(name))) && (!(0, globalutils_js_1.checkIsMapFile)(name))) {
+                    console.log('skiping');
+                    continue;
+                }
+                else if (name == 'ext_plugins.txt') {
+                    if (globalThis.settings.safeTrans || compatibilityMode) {
+                        console.log('skiping ' + name);
+                        continue;
                     }
                 }
             }
-            const iPath = path.join(edir, fileList[i])
-            const fileRead = (fs.readFileSync(iPath, 'utf-8'))
-            let output = ''
-            let transIt = false
-            let folkt = false
-            let typeofit = 0
-
-
-            if(typeOfFile == '' && globalThis.settings.fastEztrans){
+            const iPath = path_1.default.join(edir, fileList[i]);
+            const fileRead = (fs_1.default.readFileSync(iPath, 'utf-8'));
+            let output = '';
+            let transIt = false;
+            let folkt = false;
+            let typeofit = 0;
+            if (typeOfFile == '' && globalThis.settings.fastEztrans) {
                 const readLen = (translator.getType() === 'eztrans') ? 1000
-                                : (translator.type2 === 'google') ? 1000
-                                : 220
-                let reads = fileRead.split('\n')
-                let a = ''
-                let l = 0
-                let chunks = []
-                let debuging = false
-                if(fileList[i] === 'Map004.txt'){
-                    debuging = true
+                    : (translator.type2 === 'google') ? 1000
+                        : (translator.type2 === 'googleh') ? 3000
+                            : (translator.type2 === 'kakao') ? 3000
+                                : 220;
+                let reads = fileRead.split('\n');
+                let a = '';
+                let l = 0;
+                let chunks = [];
+                let debuging = false;
+                if (fileList[i] === 'Map004.txt') {
+                    debuging = true;
                 }
-                while(reads.length > 0){
-                    const d = reads[0]
-                    if(l + d.length > readLen){
-                        l = 0
-                        chunks.push(encodeURIp(a))
-                        a = ''
+                while (reads.length > 0) {
+                    const d = reads[0];
+                    if (l + d.length > readLen) {
+                        l = 0;
+                        chunks.push(encodeURIp(a));
+                        a = '';
                     }
-                    l += d.length
-                    a += d + '\n'
-                    reads.shift()
+                    l += d.length;
+                    a += d + '\n';
+                    reads.shift();
                 }
-                
-
-                chunks.push(encodeURIp(a))
-                for(const v in chunks){
-                    let ouput = ''
-                    let temps = ''
+                chunks.push(encodeURIp(a));
+                for (const v in chunks) {
+                    let ouput = '';
+                    let temps = '';
                     try {
-                        temps = await translator.translate(chunks[v])
-                    } catch (error) {
-                        console.log('err-crash')
-                        if (await translator.isCrash()) {
-                            return
-                        }
-                        temps = chunks[v]
+                        temps = yield translator.translate(chunks[v]);
                     }
-                    const chunkLen = chunks[v].split('\n').length
-                    const tempLen = temps.split('\n').length
-                    const isLine = (chunkLen !== tempLen)
-                    if(temps == chunks[v] || isLine){
-                        console.log(`err-line ${chunkLen} | ${tempLen}`)
-                        const r = chunks[v].split('\n')
-                        let r2 = []
+                    catch (error) {
+                        console.log('err-crash');
+                        if (yield translator.isCrash()) {
+                            return;
+                        }
+                        temps = chunks[v];
+                    }
+                    const chunkLen = chunks[v].split('\n').length;
+                    const tempLen = temps.split('\n').length;
+                    const isLine = (chunkLen !== tempLen);
+                    const hangule = (temps == chunks[v]) && ((!globalThis.settings.DoNotTransHangul) || (!datas_js_2.hanguls.test(temps)));
+                    if (hangule || isLine) {
+                        console.log(`err-line ${chunkLen} | ${tempLen}`);
+                        const r = chunks[v].split('\n');
+                        let r2 = [];
                         for (const a in r) {
-                            const readLine = r[a]
+                            const readLine = r[a];
                             try {
-                                const tr = await translator.translate((readLine))
-                                r2.push(tr)
-                            } catch (error) {
-                                console.log(readLine)
-                                if (await translator.isCrash()) {
-                                    return
+                                const tr = yield translator.translate((readLine));
+                                r2.push(tr);
+                            }
+                            catch (error) {
+                                console.log(readLine);
+                                if (yield translator.isCrash()) {
+                                    return;
                                 }
-                                r2.push(readLine)
+                                r2.push(readLine);
                             }
                         }
-                        ouput = r2.join('\n')
+                        ouput = r2.join('\n');
                     }
-                    else{
-                        ouput = temps
+                    else {
+                        ouput = temps;
                     }
-                    output += encodeSp(decodeURIp(ouput))
-                    setProgressBar(workedFileLength + output.length, fullFileLength)
+                    output += encodeSp(decodeURIp(ouput));
+                    setProgressBar(workedFileLength + output.length, fullFileLength);
                 }
             }
-            else{
-                const read = fileRead.split('\n')
+            else {
+                const read = fileRead.split('\n');
                 for (const v in read) {
                     try {
-                        setProgressBar(workedFileLength + output.length, fullFileLength)
+                        setProgressBar(workedFileLength + output.length, fullFileLength);
                         const readLine = read[v];
-                        switch (typeOfFile){
+                        switch (typeOfFile) {
                             case '':
-                                const ouput = await translator.translate((readLine))
-                                const d = encodeSp(ouput) + '\n'
-                                output += d
-                                break
+                                const ouput = yield translator.translate((readLine));
+                                const d = encodeSp(ouput) + '\n';
+                                output += d;
+                                break;
                             case 'src':
-                                if(readLine.startsWith('D_TEXT ')){
-                                    let rl = readLine.split(' ')
-                                    if(rl.length > 3){
-                                        while(rl.length > 3){
-                                            rl[1] = rl[1]+' '+rl[2]
-                                            rl.splice(2)
+                                if (readLine.startsWith('D_TEXT ')) {
+                                    let rl = readLine.split(' ');
+                                    if (rl.length > 3) {
+                                        while (rl.length > 3) {
+                                            rl[1] = rl[1] + ' ' + rl[2];
+                                            rl.splice(2);
                                         }
                                     }
-                                    if(rl.length == 3 && isNaN(rl[2])){
-                                        console.log(rl.join(' '))
-                                        rl[1] = rl[1]+' '+rl[2]
-                                        rl.splice(2)
+                                    if (rl.length == 3 && isNaN(parseInt(rl[2]))) {
+                                        console.log(rl.join(' '));
+                                        rl[1] = rl[1] + ' ' + rl[2];
+                                        rl.splice(2);
                                     }
-                                    const ouput = await translator.translate((rl[1]))
-                                    rl[1] = encodeSp(ouput, true)
-                                    output += rl.join(' ') + '\n'
+                                    const ouput = yield translator.translate((rl[1]));
+                                    rl[1] = encodeSp(ouput, true);
+                                    output += rl.join(' ') + '\n';
                                 }
-                                else{
-                                    output += readLine + '\n'
+                                else {
+                                    output += readLine + '\n';
                                 }
-                                break
+                                break;
                             case 'note':
-                                let fi = ''
-                                let rl = readLine
-                                if(!transIt){
-                                    let startAble = false
-                                    for(const vv in translateable){
-                                        if (readLine.replaceAll(' ','').startsWith(translateable[vv])){
-                                            startAble = true
-                                            fi = translateable[vv]
-                                            folkt = translateableOne.includes(fi)
-                                            console.log(`${fi} | ${folkt}`)
-                                            break
+                                let fi = '';
+                                let rl = readLine;
+                                if (!transIt) {
+                                    let startAble = false;
+                                    for (const vv in datas_js_2.translateable) {
+                                        if (readLine.replaceAll(' ', '').startsWith(datas_js_2.translateable[vv])) {
+                                            startAble = true;
+                                            fi = datas_js_2.translateable[vv];
+                                            folkt = datas_js_2.translateableOne.includes(fi);
+                                            console.log(`${fi} | ${folkt}`);
+                                            break;
                                         }
                                     }
-                                    if(startAble){
-                                        transIt = true
-                                        rl = rl.substring(fi.length, rl.length)
+                                    if (startAble) {
+                                        transIt = true;
+                                        rl = rl.substring(fi.length, rl.length);
                                     }
-                                    else{
-                                        output += rl + '\n'
-                                        break
+                                    else {
+                                        output += rl + '\n';
+                                        break;
                                     }
                                 }
-                                if(transIt){
-                                    if(rl.includes('>') || (folkt && rl.includes(' '))){
-                                        transIt = false
-                                        let keyString = '>'
-                                        if((folkt && rl.includes(' '))){
-                                            keyString = ' '
+                                if (transIt) {
+                                    if (rl.includes('>') || (folkt && rl.includes(' '))) {
+                                        transIt = false;
+                                        let keyString = '>';
+                                        if ((folkt && rl.includes(' '))) {
+                                            keyString = ' ';
                                         }
-                                        let vax = '>\n'
-                                        vax = rl.substring(rl.indexOf(keyString)) + '\n'
-    
-                                        
-                                        rl = rl.substring(0, rl.indexOf(keyString))
-                                        const ouput = await translator.translate((rl))
-                                        try{
-                                            output += fi + encodeSp(ouput, true) + vax
+                                        let vax = '>\n';
+                                        vax = rl.substring(rl.indexOf(keyString)) + '\n';
+                                        rl = rl.substring(0, rl.indexOf(keyString));
+                                        const ouput = yield translator.translate((rl));
+                                        try {
+                                            output += fi + encodeSp(ouput, true) + vax;
                                         }
-                                        catch{
-                                            output += fi + rl + vax
-                                            if (await translator.isCrash()){
-                                                return
+                                        catch (_a) {
+                                            output += fi + rl + vax;
+                                            if (yield translator.isCrash()) {
+                                                return;
                                             }
                                         }
                                     }
-                                    else{
-                                        const ouput = await translator.translate((rl))
-                                        try{
-                                            output += fi + encodeSp(ouput, true) + '\n'
+                                    else {
+                                        const ouput = yield translator.translate((rl));
+                                        try {
+                                            output += fi + encodeSp(ouput, true) + '\n';
                                         }
-                                        catch{
-                                            output += fi + rl + '\n'
-                                            if (await translator.isCrash()){
-                                                return
+                                        catch (_b) {
+                                            output += fi + rl + '\n';
+                                            if (yield translator.isCrash()) {
+                                                return;
                                             }
                                         }
                                     }
                                 }
-                                else{
-                                    output += rl + '\n'
+                                else {
+                                    output += rl + '\n';
                                 }
-                                break
+                                break;
                             case 'note2':
-                                if(transIt){
-                                    if(eed[v] == 408){
-                                        let run = true
-                                        if(readLine.startsWith('\\>')){
-                                            typeofit = 1
+                                if (transIt) {
+                                    if (eed[v] == 408) {
+                                        let run = true;
+                                        if (readLine.startsWith('\\>')) {
+                                            typeofit = 1;
                                         }
-                                        else if(typeofit == 1){
-                                            run = false
-                                            transIt = false
+                                        else if (typeofit == 1) {
+                                            run = false;
+                                            transIt = false;
                                         }
-                                        if(run){
-                                            const ouput = await translator.translate((readLine))
-                                            try{
-                                                output += encodeSp(ouput, true) + '\n'
+                                        if (run) {
+                                            const ouput = yield translator.translate((readLine));
+                                            try {
+                                                output += encodeSp(ouput, true) + '\n';
                                             }
-                                            catch{
-                                                output += readLine + '\n'
-                                                if (await translator.isCrash()){
-                                                    return
+                                            catch (_c) {
+                                                output += readLine + '\n';
+                                                if (yield translator.isCrash()) {
+                                                    return;
                                                 }
                                             }
                                         }
                                     }
-                                    else{
-                                        transIt = false
+                                    else {
+                                        transIt = false;
                                     }
                                 }
-                                if(!transIt){
-                                    if(note2able.includes(readLine) && eed[v] == 108){
-                                        transIt = true
-                                        typeofit = 0
+                                if (!transIt) {
+                                    if (datas_js_2.note2able.includes(readLine) && eed[v] == 108) {
+                                        transIt = true;
+                                        typeofit = 0;
                                     }
-                                    output += readLine + '\n'
+                                    output += readLine + '\n';
                                 }
-                                break
+                                break;
                         }
-                    } catch (error) {
-                        console.log(read[v])
-                        console.log('err')
-                        if (await translator.isCrash()) {
-                            return
+                    }
+                    catch (error) {
+                        console.log(read[v]);
+                        console.log('err');
+                        if (yield translator.isCrash()) {
+                            return;
                         }
-                        output += read[v] + '\n'
+                        output += read[v] + '\n';
                     }
                 }
             }
-            worked_files += 1
-            workedFileLength += output.length
-            fs.writeFileSync(iPath, output, 'utf-8')
+            worked_files += 1;
+            workedFileLength += output.length;
+            fs_1.default.writeFileSync(iPath, output, 'utf-8');
             // globalThis.mwindow.webContents.send('loading', worked_files / max_files * 100);
-            await sleep(0)
+            yield (0, globalutils_js_1.sleep)(0);
         }
-        translator.KillLs()
+        translator.KillLs();
         globalThis.mwindow.webContents.send('alert', '완료되었습니다');
         globalThis.mwindow.webContents.send('loading', 0);
-    } catch (err) {
-        translator.KillLs()
+    }
+    catch (err) {
+        translator.KillLs();
         globalThis.mwindow.webContents.send('alert', {
             icon: 'error',
             message: JSON.stringify(err, Object.getOwnPropertyNames(err))
         });
     }
     globalThis.mwindow.webContents.send('worked', 0);
-}
+});

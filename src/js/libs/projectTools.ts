@@ -1,5 +1,3 @@
-import { BrowserWindow } from "electron";
-
 interface PTools{
     send: (channel: string, ...args: any[]) => void;
     packed?: boolean;
