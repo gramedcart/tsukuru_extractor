@@ -35,7 +35,6 @@ function kakaoTrans(text, queryLanguage) {
                     result.push(q[0]);
                 }
                 const re = decodeURIComponent(result.join('\n'));
-                console.log(re);
                 resolve(re);
             }
             catch (error) {

@@ -6,13 +6,19 @@
   --Background: #000000;
   --Selected: #000000;
   --Gap: 0px;
-  --font: "NotoSansKR" ;
+  --font: "NotoSansKR"
+;
 }
 
 @font-face {
-  font-family: "NotoSansKR";
+  font-family: 'NotoSansKR';
   src: url("./fonts/NotoSansKR.otf");
 }
+
+.updateInfo {
+  font-size: 12px;
+}
+
 body {
   margin: 0px;
   background-color: var(--Background);
@@ -23,9 +29,14 @@ body {
 }
 
 .center {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: space-around;
-  align-items: stretch;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
 }
 
 .n {
@@ -34,8 +45,12 @@ body {
 }
 
 .n2 {
-  justify-content: center;
-  align-items: stretch;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
 }
 
 .info {
@@ -78,10 +93,19 @@ body {
 .side_main {
   width: 20vw;
   height: 245px;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
 .center_main {
@@ -115,16 +139,20 @@ body {
 .container {
   margin-top: 5px;
   margin-bottom: 5px;
+  display: -ms-grid;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  -ms-grid-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
   grid-gap: var(--Gap);
 }
 
 .container2 {
   margin-top: 5px;
   margin-bottom: 5px;
+  display: -ms-grid;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-gap: var(--Gap);
 }
 
@@ -132,6 +160,7 @@ body {
   position: relative;
   width: 90vw;
   height: 0px;
+  -webkit-transition: 0.2s;
   transition: 0.2s;
 }
 
@@ -195,7 +224,7 @@ body {
   left: 0px;
   width: 0vw;
   position: absolute;
-  background-color: rgba(0, 150, 136, 0.3137254902);
+  background-color: #00968850;
 }
 
 #debug {
@@ -234,4 +263,5 @@ body {
   border: solid 2px var(--mainColor);
   margin-bottom: 10px;
   white-space: nowrap;
-}/*# sourceMappingURL=main.css.map */
+}
+/*# sourceMappingURL=main.css.map */

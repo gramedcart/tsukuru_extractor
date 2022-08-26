@@ -93,8 +93,19 @@ function createWindow() {
       current_version = c(current_version)
       const ver = (await axios.get('https://raw.githubusercontent.com/gramedcart/mvextractor/main/version.json')).data.version
       let last_version = c(ver)
+      const myversion = storage.has('myversion') ? storage.get('myversion') : current_version
       if(current_version < last_version){
         getMainWindow().webContents.send('updateFound');
+      }
+      else if(myversion !== current_version){
+        storage.set("myversion", current_version)
+        sendAlertSmall(`!! 번역기 사용시 아네모네가 아닌 내장 번역기를 사용해주세요 !!
+        <br><br>업데이트 1.18.0<br>
+        <span class="updateInfo">
+        - 업데이트 알림 추가됨<br>
+        - 파일 암복호화 개선<br>
+        - 카카오 번역기 오류 수정<br>
+        </span>`)
       }
     }
     v(app.getVersion())
@@ -120,6 +131,10 @@ const getMainWindow = () => {
 
 function sendAlert(txt){
   getMainWindow().webContents.send('alert', txt);
+}
+
+function sendAlertSmall(txt){
+  getMainWindow().webContents.send('alert_free', {html: txt, width:"90vw"});
 }
 
 function sendError(txt){
@@ -438,10 +453,10 @@ async function extractor(arg){
       }
     })
     if(arg.decryptImg){
-      ExtTool.DecryptDir(dir, "img")
+      await ExtTool.DecryptDir(dir, "img")
     }
     if(arg.decryptAudio){
-      ExtTool.DecryptDir(dir, "audio")
+      await ExtTool.DecryptDir(dir, "audio")
     }
     if(!arg.silent){
       getMainWindow().webContents.send('alert2'); 

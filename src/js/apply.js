@@ -158,8 +158,8 @@ exports.apply = async (ev, arg) => {
         }
       }
       
-      ExtTool.EncryptDir(dir, 'img', arg.instantapply)
-      ExtTool.EncryptDir(dir, 'audio', arg.instantapply)
+      await ExtTool.EncryptDir(dir, 'img', arg.instantapply)
+      await ExtTool.EncryptDir(dir, 'audio', arg.instantapply)
 
       globalThis.mwindow.webContents.send('alert2'); 
       globalThis.mwindow.webContents.send('loading', 0);

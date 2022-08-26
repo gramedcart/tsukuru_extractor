@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Decrypt = exports.Encrypt = void 0;
+exports.Decrypt = exports.Encrypt = exports.DecryptedExtensions = exports.EncryptedExtensions = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const EncryptedExtensions = [".rpgmvo", ".rpgmvm", ".rpgmvw", ".rpgmvp", ".ogg_", ".m4a_", ".wav_", ".png_"];
-const DecryptedExtensions = [".ogg", ".m4a", ".wav", ".png", ".ogg", ".m4a", ".wav", ".png"];
+exports.EncryptedExtensions = [".rpgmvo", ".rpgmvm", ".rpgmvw", ".rpgmvp", ".ogg_", ".m4a_", ".wav_", ".png_"];
+exports.DecryptedExtensions = [".ogg", ".m4a", ".wav", ".png", ".ogg", ".m4a", ".wav", ".png"];
 const HEADER_MV = ["52", "50", "47", "4D", "56", "00", "00", "00", "00", "03", "01", "00", "00", "00", "00", "00"];
 function splitString(str, p) {
     let chunks = [];
@@ -36,7 +36,7 @@ function Encrypt(filePath, saveDir, key) {
         throw "file dosen't exist";
     }
     const extension = path_1.default.parse(filePath).ext.toLowerCase();
-    if (!DecryptedExtensions.includes(extension)) {
+    if (!exports.DecryptedExtensions.includes(extension)) {
         throw "Incompatible file format used.";
     }
     const header = Buffer.from(HEADER_MV.join(''), "hex");
@@ -45,7 +45,7 @@ function Encrypt(filePath, saveDir, key) {
     for (let index = 0; index < keys.length; index++) {
         file[index] = (file[index] ^ hexToByte(keys[index]));
     }
-    const encryptedExt = EncryptedExtensions[DecryptedExtensions.indexOf(extension)];
+    const encryptedExt = exports.EncryptedExtensions[exports.DecryptedExtensions.indexOf(extension)];
     const fileData = Buffer.concat([header, file], header.length + file.length);
     fs_1.default.writeFileSync(path_1.default.join(saveDir, `${path_1.default.parse(filePath).name}${encryptedExt}`), fileData);
 }
@@ -55,7 +55,7 @@ function Decrypt(filePath, saveDir, key) {
         throw "file dosen't exist";
     }
     const extension = path_1.default.parse(filePath).ext.toLowerCase();
-    if (!EncryptedExtensions.includes(extension)) {
+    if (!exports.EncryptedExtensions.includes(extension)) {
         throw "Incompatible file format used.";
     }
     let file = (fs_1.default.readFileSync(filePath).slice(16));
@@ -63,7 +63,7 @@ function Decrypt(filePath, saveDir, key) {
     for (let index = 0; index < keys.length; index++) {
         file[index] = (file[index] ^ hexToByte(keys[index]));
     }
-    const decryptedExt = DecryptedExtensions[EncryptedExtensions.indexOf(extension)];
+    const decryptedExt = exports.DecryptedExtensions[exports.EncryptedExtensions.indexOf(extension)];
     fs_1.default.writeFileSync(path_1.default.join(saveDir, `${path_1.default.parse(filePath).name}${decryptedExt}`), file);
 }
 exports.Decrypt = Decrypt;

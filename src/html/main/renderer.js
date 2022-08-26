@@ -158,6 +158,10 @@ ipcRenderer.on('alert', (evn, tt) => {
     }
 });
 
+ipcRenderer.on('alert_free', (evn, tt) => {
+    Swal.fire(tt)
+});
+
 ipcRenderer.on('alert2', async (evn, tt) => {
     const {isDenied} = await Swal.fire({
         icon: 'success',

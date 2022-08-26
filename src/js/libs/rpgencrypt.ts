@@ -1,8 +1,8 @@
 import fs from "fs"
 import path from "path"
 
-const EncryptedExtensions:string[] = [".rpgmvo", ".rpgmvm", ".rpgmvw", ".rpgmvp", ".ogg_", ".m4a_", ".wav_", ".png_"]
-const DecryptedExtensions:string[] = [".ogg", ".m4a", ".wav", ".png", ".ogg", ".m4a", ".wav", ".png"]
+export const EncryptedExtensions:string[] = [".rpgmvo", ".rpgmvm", ".rpgmvw", ".rpgmvp", ".ogg_", ".m4a_", ".wav_", ".png_"]
+export const DecryptedExtensions:string[] = [".ogg", ".m4a", ".wav", ".png", ".ogg", ".m4a", ".wav", ".png"]
 const HEADER_MV:string[] = ["52", "50", "47", "4D", "56", "00", "00", "00", "00", "03", "01", "00", "00", "00", "00", "00"]
 
 function splitString(str:string, p:number){

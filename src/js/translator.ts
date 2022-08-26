@@ -57,7 +57,7 @@ function encodeSp(p:string, change=false){
 function isUnsafe(str:string){
     return (str.includes('<') || str.includes('>') || str.includes('\\'))
 }
-const safeTransRegex = /((\\[A-Za-z]+)((\[[A-Za-z0-9]+\])|(\<[A-Za-z0-9]+\>)))|<br>|(\\(ii|[VvNnPpGgCcIi{}$.|!><^])(\[[0-9]+\])?)/g
+const safeTransRegex = /(\%[0-9]+)|((\\[A-Za-z]+)((\[[A-Za-z0-9]+\])|(\<[A-Za-z0-9]+\>)))|\\lsoff|<br>|(\\(ii|[VvNnPpGgCcIi{}$.|!><^])(\[[0-9]+\])?)/g
 
 const fndi = /\\ *V *\[/g
 function makeid() {
@@ -182,8 +182,9 @@ class Translator{
                         return (a.text)
                     }
                     else if(this.type2 === 'googleh' || this.type2 === 'kakao'){
+                        await sleep(5000)
                         let posqi = 0
-                        let ids:{[key:string]:string} = {}
+                        let ids:string[] = []
                         function makeSureIsSafe(str:string){
                             while(true){
                                 const matches = safeTransRegex.exec(str)
@@ -191,48 +192,43 @@ class Translator{
                                     return str
                                 }
                                 const m = matches[0]
-                                const id = `${makeid()}${posqi}`
-                                posqi += 1
-                                ids[id] = m
-                                str = str.replaceAll(m, ` #${id} `)
+                                const id = `#a${ids.length}`
+                                ids.push(m)
+                                str = str.replaceAll(m, id)
                             }
                         }
-                        let sliced = tempTxt.split('\n')
+                        let sliced = decodeURIp(tempTxt).split('\n')
                         let mog:[string,number][] = []
                         for(let i=0;i<sliced.length;i++){
                             const origin = sliced[i]
                             sliced[i] = makeSureIsSafe(sliced[i])
                             if(isUnsafe(sliced[i])){
+                                console.log(origin)
                                 mog.push([origin, i])
                                 sliced[i] = 'a'
                             }
                         }
                         const temp2 = sliced.join('\n')
                         if(mog.length === sliced.length){
-                            return tempTxt
+                            return encodeURIp(tempTxt)
                         }
                         const a:string = this.type2 === 'kakao' ? (await kakaoTrans(temp2,this.langu)) : (await translatte(temp2, {from: (this.langu), to: 'ko'})).text
 
-                        let finalStr = a.replaceAll('#','')
-                        console.log(ids)
-                        for(const key in ids){
-                            const findRegex = new RegExp(key, 'ig')
-                            finalStr = finalStr.replace(findRegex, ids[key])
-                            finalStr = finalStr.replaceAll(key, ids[key])
-                            finalStr = finalStr.replaceAll(key.toLocaleUpperCase(), ids[key])
-                            finalStr = finalStr.replaceAll(key.toLocaleLowerCase(), ids[key])
+                        console.log('after process')
+                        let finalStr = a
+                        for(let i=(ids.length - 1);i>=0;i--){
+                            const str = ids[i]
+                            const findRegex = new RegExp(`# *a *${i}`, 'g')
+                            finalStr = finalStr.replace(findRegex, str)
                         }
-                        await sleep(1000)
-                        await sleep(1000)
                         let aSplit = finalStr.split('\n')
                         for(const m of mog){
                             aSplit[m[1]] = m[0]
                         }
                         console.log(aSplit)
-                        return aSplit.join('\n')
+                        return encodeURIp(aSplit.join('\n'))
                     }
                     else{
-                        console.log(tempTxt)
                         const a = (await axios.get(
                             'http://localhost:8000/',
                             {
@@ -246,7 +242,6 @@ class Translator{
                             }
                         ))
                         try {
-                            console.log(a.data.data.translatedContent)
                             t = a.data.data.translatedContent
                             t = decodeSafe(t, this.type2 === 'papago')
                             this.transMemory[text] = t
@@ -257,16 +252,21 @@ class Translator{
                     }
                 }
             } catch (error) {
-                try {
+                if(this.type2 === 'googleh' || this.type2 === 'kakao'){
+                    console.log(error)
+                }
+                else{
                     try {
-                        this.KillLs()
-                    } catch (error) {}
-                    this.ls = spawn(path.join(oPath(), 'exfiles', 'transEngine' ,'translate_engine.exe'));
-                    console.log('spawned')
-                    await sleep(2000)
-                    await PU.waitUntilUsed(8000)
-                } catch (error) {
-                    console.log('spawn failed')
+                        try {
+                            this.KillLs()
+                        } catch (error) {}
+                        this.ls = spawn(path.join(oPath(), 'exfiles', 'transEngine' ,'translate_engine.exe'));
+                        console.log('spawned')
+                        await sleep(2000)
+                        await PU.waitUntilUsed(8000)
+                    } catch (error) {
+                        console.log('spawn failed')
+                    }
                 }
             }
             if(typeof(t) !== 'string' && typeof(t) !== 'number'){
@@ -294,10 +294,12 @@ class Translator{
     }
 }
 
-function setProgressBar(now, max){
+function setProgressBar(now:number, max:number, multipl=70){
     console.log(`${now} / ${max}`)
-    globalThis.mwindow.webContents.send('loading', (now/max) * 70);
+    globalThis.mwindow.webContents.send('loading', (now/max) * multipl);
 }
+
+let translateMemorys:{[key:string]:string} = {}
 
 exports.trans = async (ev, arg) => {
     const dm = true
@@ -441,10 +443,10 @@ exports.trans = async (ev, arg) => {
         const edDat = edTool.read(dir)
         let eed = {}
         console.log(Object.keys(edDat.main))
-        for (const i in fileList) {
-            let typeOfFile = ''
+        let typeOfFile = ''
+        function checkVaildTransFile(name:string){
             if (globalThis.settings.safeTrans || globalThis.settings.smartTrans) {
-                const name = fileList[i]
+                let typeOfFile = ''
                 console.log(name)
                 if(compatibilityMode){
                     const NoneCompList = [
@@ -452,26 +454,26 @@ exports.trans = async (ev, arg) => {
                     ]
                     if(NoneCompList.includes(name)){
                         console.log('skipping by compatibilityMode')
-                        continue
+                        return false
                     }
                 }
                 if (name.includes('ext_scripts.txt')) {
                     typeOfFile = 'src'
                     console.log('src')
                     if(!globalThis.settings.smartTrans ||compatibilityMode){
-                        continue
+                        return false
                     }
                 } else if (name.includes('ext_note.txt')) {
                     typeOfFile = 'note'
                     if(!globalThis.settings.smartTrans || compatibilityMode){
                         console.log('skiping note')
-                        continue
+                        return false
                     }
                 } else if (name.includes('ext_note2.txt')) {
                     typeOfFile = 'note2'
                     if(!globalThis.settings.smartTrans || compatibilityMode){
                         console.log('skiping note2')
-                        continue
+                        return false
                     }
                     else{
                         let eed2 = edDat.main['ext_note2.json'].data
@@ -482,14 +484,134 @@ exports.trans = async (ev, arg) => {
                     }
                 } else if ((!(dataBaseO.default.includes(name))) && (!checkIsMapFile(name))) {
                     console.log('skiping')
-                    continue
+                    return false
                 }
                 else if(name == 'ext_plugins.txt'){
                     if(globalThis.settings.safeTrans || compatibilityMode){
                         console.log('skiping ' + name)
-                        continue
+                        return false
                     }
                 }
+                return true
+            }
+        }
+
+
+        const useOldWay = (translator.getType() === 'eztrans')
+        const readLen = (translator.getType() === 'eztrans') ? 1000
+            : (translator.type2 === 'google') ? 1000
+            : (translator.type2 === 'googleh') ? 4500
+            : (translator.type2 === 'kakao') ? 4500
+            : 220
+
+        if(!useOldWay){
+            let readed:string[] = []
+            let transTargetLen = 0
+            for(const i in fileList){
+                if(!checkVaildTransFile(fileList[i])){
+                    continue
+                }
+                const iPath = path.join(edir, fileList[i])
+                const read = fs.readFileSync(iPath, 'utf-8')
+                transTargetLen += read.length
+                readed = readed.concat(read.split('\n'))
+            }
+            let memoryAdd:{[key:string]:string} = {}
+            let mem:string[] = []
+            let ind = 0
+            for(const s of readed){
+                ind += 1
+                if(!mem.includes(s)){
+                    mem.push(s)
+                    memoryAdd[s] = s
+                }
+                if(ind % 1000 === 0){
+                    console.log(`parsing: ${ind} / ${readed.length}`)
+                    await sleep(1)
+                }
+            }
+            let chunks:string[] = []
+            let chunkKeys:string[] = []
+            let cLen = 0
+            let translatedLen = 0
+            async function doTrans(){
+                let translated = ''
+                console.log('translating new')
+                const chunkJoin = chunks.join('\n')
+                console.log(chunkJoin)
+                try {
+                    translated = await translator.translate(encodeURIp(chunkJoin))
+                } catch (error) {
+                    translated = chunkJoin
+                }
+                let translatedSplit = translated.split('\n')
+
+                const isLine = (translatedSplit.length !== chunks.length)
+                const hangule = (translated === chunkJoin) && ((!globalThis.settings.DoNotTransHangul) || (!hanguls.test(translated)))
+                if(hangule || isLine){
+                    async function reTrans(i:number, size:number){
+                        try {
+                            const sliced = chunks.slice(i,i+(size-1))
+                            const slicejoin = sliced.join('\n')
+                            console.log(`retranslating: ${i} / ${slicejoin.length}`)
+                            const retrans = (await translator.translate(encodeURIp(slicejoin))).split('\n')
+                            if(retrans.length !== sliced.length){
+                                throw 'err'
+                            }
+                            for(let i2=0;i2<sliced.length;i2++){
+                                chunks[i + i2] = retrans[i2]
+                            }
+                            translatedLen += slicejoin.length
+                            setProgressBar(translatedLen, transTargetLen, 100)
+                        } catch (error) {
+                            console.log(`error on ${chunks.slice(i,i+(size-1))}`)
+                        }
+                    }
+                    console.log(`err-line ${chunks.length} | ${translatedSplit.length}`)
+                    const retransSize = Math.floor(chunks.length / 5)
+                    for(let i=0;i<chunks.length;i+=retransSize){
+                        reTrans(i, retransSize)
+                    }
+                }
+                else{
+                    for(let i=0;i<chunks.length;i++){
+                        translatedLen += chunks[i].length
+                        setProgressBar(translatedLen, transTargetLen, 100)
+                        chunks[i] = translatedSplit[i]
+                    }
+                }
+                for(let i=0;i<chunks.length;i++){
+                    translateMemorys[chunkKeys[i]] = chunks[i]
+                }
+                chunks = []
+                chunkKeys = []
+                cLen = 0
+            }
+            for(const key in memoryAdd){
+                const toTrans = memoryAdd[key]
+                const len = (toTrans.length + 1)
+                if(toTrans.length === 1){
+                    translatedLen += 1
+                    translateMemorys[key] = toTrans
+                    setProgressBar(translatedLen, transTargetLen, 100)
+                }
+                else if(cLen + len > readLen){
+                    await doTrans()
+                }
+                else{
+                    cLen += len
+                    chunks.push(toTrans)
+                    chunkKeys.push(key)
+                }
+            }
+            await doTrans()
+        }
+
+
+        for (const i in fileList) {
+            typeOfFile = ''
+            if(!checkVaildTransFile(fileList[i])){
+                continue
             }
             const iPath = path.join(edir, fileList[i])
             const fileRead = (fs.readFileSync(iPath, 'utf-8'))
@@ -500,73 +622,76 @@ exports.trans = async (ev, arg) => {
 
 
             if(typeOfFile == '' && globalThis.settings.fastEztrans){
-                const readLen = (translator.getType() === 'eztrans') ? 1000
-                                : (translator.type2 === 'google') ? 1000
-                                : (translator.type2 === 'googleh') ? 3000
-                                : (translator.type2 === 'kakao') ? 3000
-                                : 220
-                let reads = fileRead.split('\n')
-                let a = ''
-                let l = 0
-                let chunks = []
-                let debuging = false
-                if(fileList[i] === 'Map004.txt'){
-                    debuging = true
-                }
-                while(reads.length > 0){
-                    const d = reads[0]
-                    if(l + d.length > readLen){
-                        l = 0
-                        chunks.push(encodeURIp(a))
-                        a = ''
+                if(!useOldWay){
+                    const readed = fileRead.split('\n')
+                    let resultArray:string[] = []
+                    for(const s of readed){
+                        resultArray.push(translateMemorys[s])
                     }
-                    l += d.length
-                    a += d + '\n'
-                    reads.shift()
-                }
-                
-
-                chunks.push(encodeURIp(a))
-                for(const v in chunks){
-                    let ouput = ''
-                    let temps = ''
-                    try {
-                        temps = await translator.translate(chunks[v])
-                    } catch (error) {
-                        console.log('err-crash')
-                        if (await translator.isCrash()) {
-                            return
-                        }
-                        temps = chunks[v]
-                    }
-                    const chunkLen = chunks[v].split('\n').length
-                    const tempLen = temps.split('\n').length
-                    const isLine = (chunkLen !== tempLen)
-                    const hangule = (temps == chunks[v]) && ((!globalThis.settings.DoNotTransHangul) || (!hanguls.test(temps)))
-                    if(hangule || isLine){
-                        console.log(`err-line ${chunkLen} | ${tempLen}`)
-                        const r = chunks[v].split('\n')
-                        let r2 = []
-                        for (const a in r) {
-                            const readLine = r[a]
-                            try {
-                                const tr = await translator.translate((readLine))
-                                r2.push(tr)
-                            } catch (error) {
-                                console.log(readLine)
-                                if (await translator.isCrash()) {
-                                    return
-                                }
-                                r2.push(readLine)
-                            }
-                        }
-                        ouput = r2.join('\n')
-                    }
-                    else{
-                        ouput = temps
-                    }
-                    output += encodeSp(decodeURIp(ouput))
+                    console.log('applied new')
+                    output += encodeSp(decodeURIp(resultArray.join('\n')))
                     setProgressBar(workedFileLength + output.length, fullFileLength)
+                }
+                else{
+                    let reads = fileRead.split('\n')
+                    let a = ''
+                    let l = 0
+                    let chunks = []
+                    while(reads.length > 0){
+                        const d = reads[0]
+                        if(l + d.length > readLen){
+                            l = 0
+                            chunks.push(encodeURIp(a))
+                            a = ''
+                        }
+                        l += d.length
+                        a += d + '\n'
+                        reads.shift()
+                    }
+                    
+
+                    chunks.push(encodeURIp(a))
+                    for(const v in chunks){
+                        let ouput = ''
+                        let temps = ''
+                        try {
+                            temps = await translator.translate(chunks[v])
+                        } catch (error) {
+                            console.log('err-crash')
+                            if (await translator.isCrash()) {
+                                return
+                            }
+                            temps = chunks[v]
+                        }
+                        const chunkLen = chunks[v].split('\n').length
+                        const tempLen = temps.split('\n').length
+                        const isLine = (chunkLen !== tempLen)
+                        const hangule = (temps == chunks[v]) && ((!globalThis.settings.DoNotTransHangul) || (!hanguls.test(temps)))
+                        if(hangule || isLine){
+                            console.log(`err-line ${chunkLen} | ${tempLen}`)
+                            const r = chunks[v].split('\n')
+                            let r2 = []
+                            for (const a in r) {
+                                const readLine = r[a]
+                                try {
+                                    const tr = await translator.translate((readLine))
+                                    r2.push(tr)
+                                } catch (error) {
+                                    console.log(readLine)
+                                    if (await translator.isCrash()) {
+                                        return
+                                    }
+                                    r2.push(readLine)
+                                }
+                            }
+                            ouput = r2.join('\n')
+                        }
+                        else{
+                            ouput = temps
+                        }
+                        output += encodeSp(decodeURIp(ouput))
+                        setProgressBar(workedFileLength + output.length, fullFileLength)
+                    }
                 }
             }
             else{
