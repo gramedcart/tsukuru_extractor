@@ -72,7 +72,7 @@ function encodeSp(p, change = false) {
 function isUnsafe(str) {
     return (str.includes('<') || str.includes('>') || str.includes('\\'));
 }
-const safeTransRegex = /(\%[0-9]+)|((\\[A-Za-z]+)((\[[A-Za-z0-9]+\])|(\<[A-Za-z0-9]+\>)))|\\lsoff|<br>|(\\(ii|[VvNnPpGgCcIi{}$.|!><^])(\[[0-9]+\])?)/g;
+const safeTransRegex = /(\%[0-9]+)|((\\[A-Za-z]+)((\[[A-Za-z0-9]+\])|(\<[A-Za-z0-9]+\>)))|(\\lsoff)|(<br>)|(\\(ii|[VvNnPpGgCcIi{}$.|!><^])(\[[0-9]+\])?)|(#)|(%)|(■[0-9]+)/g;
 const fndi = /\\ *V *\[/g;
 function makeid() {
     let result = '';
@@ -195,12 +195,14 @@ class Translator {
                             while (true) {
                                 const matches = safeTransRegex.exec(str);
                                 if (matches === null) {
-                                    return str;
+                                    console.log(str);
+                                    return str.replaceAll('㈜', '#');
                                 }
                                 const m = matches[0];
-                                const id = `#a${ids.length}`;
+                                const id = `#${ids.length}`;
+                                const vid = `㈜${ids.length}`;
                                 ids.push(m);
-                                str = str.replaceAll(m, id);
+                                str = str.replaceAll(m, vid);
                             }
                         }
                         let sliced = decodeURIp(tempTxt).split('\n');
@@ -223,14 +225,13 @@ class Translator {
                         let finalStr = a;
                         for (let i = (ids.length - 1); i >= 0; i--) {
                             const str = ids[i];
-                            const findRegex = new RegExp(`# *a *${i}`, 'g');
+                            const findRegex = new RegExp(`# *${i}`, 'g');
                             finalStr = finalStr.replace(findRegex, str);
                         }
                         let aSplit = finalStr.split('\n');
                         for (const m of mog) {
                             aSplit[m[1]] = m[0];
                         }
-                        console.log(aSplit);
                         return encodeURIp(aSplit.join('\n'));
                     }
                     else {
@@ -538,7 +539,6 @@ exports.trans = async (ev, arg) => {
                 let translated = '';
                 console.log('translating new');
                 const chunkJoin = chunks.join('\n');
-                console.log(chunkJoin);
                 try {
                     translated = await translator.translate(encodeURIp(chunkJoin));
                 }

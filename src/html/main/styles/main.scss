@@ -239,3 +239,10 @@ body{
     margin-bottom: 10px;
     white-space: nowrap;
 }
+
+.updateInfoContainer{
+    height: 60vh;
+    overflow-y:scroll;
+    border: 3px solid var(--Highlight1);
+    padding: 12px;
+}

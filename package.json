@@ -1,13 +1,14 @@
 {
   "name": "mv-extractor-pp",
-  "version": "1.18.0",
+  "version": "1.18.1",
   "description": "MV Extractor++",
   "main": "main.js",
   "scripts": {
     "codepage": "chcp 65001",
     "start2": "electron . start",
     "start": "npm-run-all --parallel codepage start2",
-    "build": "electron-builder --windows portable nsis:x64"
+    "build": "electron-builder --windows portable nsis:x64",
+    "build2": "electron-builder --windows portable"
   },
   "repository": {
     "type": "git",
