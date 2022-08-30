@@ -447,7 +447,6 @@ exports.trans = async (ev, arg) => {
         let typeOfFile = ''
         function checkVaildTransFile(name:string){
             if (globalThis.settings.safeTrans || globalThis.settings.smartTrans) {
-                let typeOfFile = ''
                 console.log(name)
                 if(compatibilityMode){
                     const NoneCompList = [
@@ -613,6 +612,7 @@ exports.trans = async (ev, arg) => {
             if(!checkVaildTransFile(fileList[i])){
                 continue
             }
+            console.log(typeOfFile)
             const iPath = path.join(edir, fileList[i])
             const fileRead = (fs.readFileSync(iPath, 'utf-8'))
             let output = ''

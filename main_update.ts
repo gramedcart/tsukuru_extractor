@@ -1,6 +1,10 @@
 export default function sendUpdateInfo(){
     sendAlertSmall(`<div class="updateInfoContainer">
     !! 번역기 사용시 아네모네가 아닌 내장 번역기를 사용해주세요 !!
+    <br><br>업데이트 1.18.3<br>
+    <span class="updateInfo">
+    - eztrans 사용시 스마트 번역이 제대로 되지 않는 오류 수정<br>
+    </span>
     <br><br>업데이트 1.18.2<br>
     <span class="updateInfo">
     - eztrans 사용시 %가 제대로 번역되지 않는 오류 수정<br>
