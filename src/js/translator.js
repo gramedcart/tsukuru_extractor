@@ -54,8 +54,8 @@ function encodeURIp(p) {
     return p;
 }
 function decodeURIp(p, encodeSp = false) {
-    p = p.replaceAll('@user0', '%');
-    p = p.replaceAll('@user1', '■');
+    p = p.replaceAll('@user0', '■');
+    p = p.replaceAll('@user1', '%');
     p = p.replaceAll('@user2', '％');
     p = p.replaceAll('@user3', '|');
     if (encodeSp) {
