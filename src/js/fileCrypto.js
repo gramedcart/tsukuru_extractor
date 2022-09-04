@@ -53,11 +53,12 @@ async function DecryptDir(DataDir, type) {
         fs_1.default.rmSync(ExtractImgDir, { recursive: true, force: true });
     }
     fs_1.default.mkdirSync(ExtractImgDir);
-    const imgDir = path_1.default.join(path_1.default.dirname(DataDir), type);
+    const imgDir = path_1.default.join(path_1.default.dirname(DataDir), type).replaceAll('\\', '/').replace(/[$^*+?()\[\]]/g, '\\$&');
+    console.log(imgDir);
     let files = [];
     const imgd = imgDir.replaceAll('\\', '/');
     for (const exts of rpgencrypt.EncryptedExtensions) {
-        const glob = path_1.default.join(imgDir, '**', `*${exts}`).replaceAll('\\', '/');
+        const glob = `${imgDir}/**/*${exts}`;
         const fi = await (0, fast_glob_1.default)(`${glob}`);
         for (const file of fi) {
             files.push(file);
@@ -85,14 +86,16 @@ exports.DecryptDir = DecryptDir;
 async function EncryptDir(DataDir, type, instantapply) {
     const SysFile = reader(path_1.default.join(DataDir, "System.json"));
     const Key = SysFile.encryptionKey;
-    const ExtractImgDir = path_1.default.join(DataDir, `Extract_${type}`);
+    const ExtractImgDirReal = path_1.default.join(DataDir, `Extract_${type}`);
+    const ExtractImgDir = ExtractImgDirReal.replaceAll('\\', '/').replace(/[$^*+?()\[\]]/g, '\\$&');
     const CompleteDir = (() => {
         if (instantapply) {
             return path_1.default.join(path_1.default.dirname(DataDir), type);
         }
         return path_1.default.join(DataDir, 'Completed', type);
     })();
-    if (!fs_1.default.existsSync(ExtractImgDir)) {
+    if (!fs_1.default.existsSync(ExtractImgDirReal)) {
+        console.log('encrypt');
         return;
     }
     if (!fs_1.default.existsSync(CompleteDir)) {
@@ -100,8 +103,10 @@ async function EncryptDir(DataDir, type, instantapply) {
     }
     let files = [];
     const imgd = CompleteDir.replaceAll('\\', '/');
+    console.log(ExtractImgDir);
     for (const exts of rpgencrypt.DecryptedExtensions) {
-        const glob = path_1.default.join(ExtractImgDir, '**', `*${exts}`).replaceAll('\\', '/');
+        const glob = `${ExtractImgDir}/**/*${exts}`;
+        console.log(glob);
         const fi = await (0, fast_glob_1.default)(`${glob}`);
         for (const file of fi) {
             files.push(file);

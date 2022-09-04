@@ -1,7 +1,7 @@
 "use strict";
 
 import path from 'path';
-import fs from 'fs';
+import fs, { readdirSync } from 'fs';
 import * as rpgencrypt from "./libs/rpgencrypt";
 import yaml from 'js-yaml';
 import fg from "fast-glob";
@@ -23,7 +23,6 @@ const sleep = (ms:number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
 export async function DecryptDir (DataDir:string, type:string):Promise<void> {
     globalThis.mwindow.webContents.send('loading', 0);
     globalThis.mwindow.webContents.send('loadingTag', `${type} 복호화 중`);
@@ -35,11 +34,12 @@ export async function DecryptDir (DataDir:string, type:string):Promise<void> {
     }
     fs.mkdirSync(ExtractImgDir)
 
-    const imgDir = path.join(path.dirname(DataDir), type)
+    const imgDir = path.join(path.dirname(DataDir), type).replaceAll('\\','/').replace(/[$^*+?()\[\]]/g,'\\$&')
+    console.log(imgDir)
     let files:string[] = []
     const imgd = imgDir.replaceAll('\\','/')
     for (const exts of rpgencrypt.EncryptedExtensions){
-        const glob = path.join(imgDir, '**', `*${exts}`).replaceAll('\\','/')
+        const glob = `${imgDir}/**/*${exts}`
         const fi =await fg(`${glob}`)
         for(const file of fi){
             files.push(file)
@@ -68,14 +68,16 @@ export async function DecryptDir (DataDir:string, type:string):Promise<void> {
 export async function EncryptDir (DataDir:string, type:string, instantapply:boolean) {
     const SysFile = reader(path.join(DataDir, "System.json"))
     const Key = SysFile.encryptionKey
-    const ExtractImgDir = path.join(DataDir, `Extract_${type}`)
+    const ExtractImgDirReal = path.join(DataDir, `Extract_${type}`)
+    const ExtractImgDir = ExtractImgDirReal.replaceAll('\\','/').replace(/[$^*+?()\[\]]/g,'\\$&')
     const CompleteDir = (()=>{
         if(instantapply){
             return path.join(path.dirname(DataDir), type)
         }
         return path.join(DataDir, 'Completed', type)
     })()
-    if(!fs.existsSync(ExtractImgDir)){
+    if(!fs.existsSync(ExtractImgDirReal)){
+        console.log('encrypt')
         return
     }
     if(!fs.existsSync(CompleteDir)){
@@ -83,8 +85,10 @@ export async function EncryptDir (DataDir:string, type:string, instantapply:bool
     }
     let files:string[] = []
     const imgd = CompleteDir.replaceAll('\\','/')
+    console.log(ExtractImgDir)
     for (const exts of rpgencrypt.DecryptedExtensions){
-        const glob = path.join(ExtractImgDir, '**', `*${exts}`).replaceAll('\\','/')
+        const glob = `${ExtractImgDir}/**/*${exts}`
+        console.log(glob)
         const fi =await fg(`${glob}`)
         for(const file of fi){
             files.push(file)
