@@ -27,7 +27,6 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const rpgencrypt = __importStar(require("./libs/rpgencrypt"));
 const js_yaml_1 = __importDefault(require("js-yaml"));
-const fast_glob_1 = __importDefault(require("fast-glob"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 function reader(dir) {
     if (fs_1.default.existsSync(dir + '.yaml')) {
@@ -43,6 +42,26 @@ function reader(dir) {
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
+function getFilesRecursively(directory, dita = null) {
+    let files = [];
+    const filesInDirectory = fs_1.default.readdirSync(directory);
+    const dira = dita !== null && dita !== void 0 ? dita : '';
+    for (const file of filesInDirectory) {
+        const absolute = path_1.default.join(directory, file);
+        const absoluteDira = path_1.default.join(dira, file);
+        if (fs_1.default.statSync(absolute).isDirectory()) {
+            const fi = getFilesRecursively(absolute, absoluteDira);
+            for (const f of fi) {
+                files.push(f);
+            }
+        }
+        else {
+            files.push(absoluteDira);
+        }
+    }
+    return files;
+}
+;
 async function DecryptDir(DataDir, type) {
     globalThis.mwindow.webContents.send('loading', 0);
     globalThis.mwindow.webContents.send('loadingTag', `${type} 복호화 중`);
@@ -53,27 +72,20 @@ async function DecryptDir(DataDir, type) {
         fs_1.default.rmSync(ExtractImgDir, { recursive: true, force: true });
     }
     fs_1.default.mkdirSync(ExtractImgDir);
-    const imgDir = path_1.default.join(path_1.default.dirname(DataDir), type).replaceAll('\\', '/').replace(/[$^*+?()\[\]]/g, '\\$&');
+    const imgDir = path_1.default.join(path_1.default.dirname(DataDir), type);
     console.log(imgDir);
-    let files = [];
-    const imgd = imgDir.replaceAll('\\', '/');
-    for (const exts of rpgencrypt.EncryptedExtensions) {
-        const glob = `${imgDir}/**/*${exts}`;
-        const fi = await (0, fast_glob_1.default)(`${glob}`);
-        for (const file of fi) {
-            files.push(file);
-        }
-    }
+    const files = getFilesRecursively(imgDir);
     for (let i = 0; i < files.length; i++) {
         globalThis.mwindow.webContents.send('loadingTag', `${type} 복호화 중 : `);
         globalThis.mwindow.webContents.send('loading', ((i / files.length) * 100));
-        const loc = files[i];
-        let tlan = path_1.default.dirname(loc).replaceAll('\\', '/').substring(imgd.length);
+        const loc = path_1.default.join(imgDir, files[i]);
+        let tlan = path_1.default.dirname(files[i]);
         if (tlan.startsWith('/')) {
             tlan = tlan.substring(1);
         }
         try {
             const pat = path_1.default.join(ExtractImgDir, tlan);
+            console.log(loc);
             fs_extra_1.default.mkdirsSync(pat);
             rpgencrypt.Decrypt(loc, pat, Key);
         }
@@ -87,7 +99,7 @@ async function EncryptDir(DataDir, type, instantapply) {
     const SysFile = reader(path_1.default.join(DataDir, "System.json"));
     const Key = SysFile.encryptionKey;
     const ExtractImgDirReal = path_1.default.join(DataDir, `Extract_${type}`);
-    const ExtractImgDir = ExtractImgDirReal.replaceAll('\\', '/').replace(/[$^*+?()\[\]]/g, '\\$&');
+    const ExtractImgDir = ExtractImgDirReal;
     const CompleteDir = (() => {
         if (instantapply) {
             return path_1.default.join(path_1.default.dirname(DataDir), type);
@@ -101,31 +113,23 @@ async function EncryptDir(DataDir, type, instantapply) {
     if (!fs_1.default.existsSync(CompleteDir)) {
         fs_1.default.mkdirSync(CompleteDir);
     }
-    let files = [];
-    const imgd = CompleteDir.replaceAll('\\', '/');
+    const files = getFilesRecursively(ExtractImgDir);
     console.log(ExtractImgDir);
-    for (const exts of rpgencrypt.DecryptedExtensions) {
-        const glob = `${ExtractImgDir}/**/*${exts}`;
-        console.log(glob);
-        const fi = await (0, fast_glob_1.default)(`${glob}`);
-        for (const file of fi) {
-            files.push(file);
-        }
-    }
     for (let i = 0; i < files.length; i++) {
         globalThis.mwindow.webContents.send('loadingTag', `${type} 암호화 중 : `);
         globalThis.mwindow.webContents.send('loading', ((i / files.length) * 100));
-        const loc = files[i];
-        let tlan = path_1.default.dirname(loc).replaceAll('\\', '/').substring(imgd.length - 1);
+        const loc = path_1.default.join(ExtractImgDir, files[i]);
+        let tlan = path_1.default.dirname(files[i]);
         if (tlan.startsWith('/')) {
             tlan = tlan.substring(1);
         }
         try {
             const pat = path_1.default.join(CompleteDir, tlan);
+            console.log(loc);
             fs_extra_1.default.mkdirsSync(pat);
             rpgencrypt.Encrypt(loc, pat, Key);
         }
-        catch (err) { }
+        catch (_a) { }
         await sleep(1);
     }
     globalThis.mwindow.webContents.send('loading', 0);

@@ -3,6 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function sendUpdateInfo() {
     sendAlertSmall(`<div class="updateInfoContainer">
     !! 번역기 사용시 아네모네가 아닌 내장 번역기를 사용해주세요 !!
+    <br><br>업데이트 1.18.5<br>
+    <span class="updateInfo">
+    - 암호화/복호화 개선<br>
+    </span>
     <br><br>업데이트 1.18.4<br>
     <span class="updateInfo">
     - 암호화/복호화 폴더이름 오류 수정<br>

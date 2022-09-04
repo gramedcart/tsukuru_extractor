@@ -4,7 +4,7 @@ import path from 'path';
 import fs, { readdirSync } from 'fs';
 import * as rpgencrypt from "./libs/rpgencrypt";
 import yaml from 'js-yaml';
-import fg from "fast-glob";
+import Glob from 'glob'
 import fsx from 'fs-extra'
 
 function reader(dir:string){
@@ -23,6 +23,25 @@ const sleep = (ms:number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getFilesRecursively (directory:string, dita:null|string = null):string[] {
+    let files:string[] = []
+    const filesInDirectory = fs.readdirSync(directory);
+    const dira = dita ?? ''
+    for (const file of filesInDirectory) {
+      const absolute = path.join(directory, file);
+      const absoluteDira = path.join(dira, file);
+      if (fs.statSync(absolute).isDirectory()) {
+          const fi = getFilesRecursively(absolute, absoluteDira);
+          for(const f of fi){
+            files.push(f)
+          }
+      } else {
+          files.push(absoluteDira);
+      }
+    }
+    return files
+};
+
 export async function DecryptDir (DataDir:string, type:string):Promise<void> {
     globalThis.mwindow.webContents.send('loading', 0);
     globalThis.mwindow.webContents.send('loadingTag', `${type} 복호화 중`);
@@ -34,27 +53,20 @@ export async function DecryptDir (DataDir:string, type:string):Promise<void> {
     }
     fs.mkdirSync(ExtractImgDir)
 
-    const imgDir = path.join(path.dirname(DataDir), type).replaceAll('\\','/').replace(/[$^*+?()\[\]]/g,'\\$&')
+    const imgDir = path.join(path.dirname(DataDir), type)
     console.log(imgDir)
-    let files:string[] = []
-    const imgd = imgDir.replaceAll('\\','/')
-    for (const exts of rpgencrypt.EncryptedExtensions){
-        const glob = `${imgDir}/**/*${exts}`
-        const fi =await fg(`${glob}`)
-        for(const file of fi){
-            files.push(file)
-        }
-    }
+    const files:string[] = getFilesRecursively(imgDir)
     for(let i=0;i<files.length;i++){
         globalThis.mwindow.webContents.send('loadingTag', `${type} 복호화 중 : `);
         globalThis.mwindow.webContents.send('loading', ((i/files.length)*100))
-        const loc = files[i]
-        let tlan = path.dirname(loc).replaceAll('\\','/').substring(imgd.length)
+        const loc = path.join(imgDir,files[i])
+        let tlan = path.dirname(files[i])
         if(tlan.startsWith('/')){
             tlan = tlan.substring(1)
         }
         try{
             const pat =path.join(ExtractImgDir , tlan)
+            console.log(loc)
             fsx.mkdirsSync(pat)
             rpgencrypt.Decrypt(loc, pat, Key)
         }catch{}
@@ -69,7 +81,7 @@ export async function EncryptDir (DataDir:string, type:string, instantapply:bool
     const SysFile = reader(path.join(DataDir, "System.json"))
     const Key = SysFile.encryptionKey
     const ExtractImgDirReal = path.join(DataDir, `Extract_${type}`)
-    const ExtractImgDir = ExtractImgDirReal.replaceAll('\\','/').replace(/[$^*+?()\[\]]/g,'\\$&')
+    const ExtractImgDir = ExtractImgDirReal
     const CompleteDir = (()=>{
         if(instantapply){
             return path.join(path.dirname(DataDir), type)
@@ -83,33 +95,23 @@ export async function EncryptDir (DataDir:string, type:string, instantapply:bool
     if(!fs.existsSync(CompleteDir)){
         fs.mkdirSync(CompleteDir)
     }
-    let files:string[] = []
-    const imgd = CompleteDir.replaceAll('\\','/')
+    const files = getFilesRecursively(ExtractImgDir)
     console.log(ExtractImgDir)
-    for (const exts of rpgencrypt.DecryptedExtensions){
-        const glob = `${ExtractImgDir}/**/*${exts}`
-        console.log(glob)
-        const fi =await fg(`${glob}`)
-        for(const file of fi){
-            files.push(file)
-        }
-    }
-
-
 
     for(let i=0;i<files.length;i++){
         globalThis.mwindow.webContents.send('loadingTag', `${type} 암호화 중 : `);
         globalThis.mwindow.webContents.send('loading', ((i/files.length)*100))
-        const loc = files[i]
-        let tlan = path.dirname(loc).replaceAll('\\','/').substring(imgd.length - 1)
+        const loc = path.join(ExtractImgDir,files[i])
+        let tlan = path.dirname(files[i])
         if(tlan.startsWith('/')){
             tlan = tlan.substring(1)
         }
         try{
             const pat =path.join(CompleteDir , tlan)
+            console.log(loc)
             fsx.mkdirsSync(pat)
             rpgencrypt.Encrypt(loc, pat, Key)
-        }catch(err){}
+        }catch{}
         await sleep(1)
     }
 

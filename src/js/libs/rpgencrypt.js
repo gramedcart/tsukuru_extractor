@@ -31,39 +31,39 @@ function VerifyFakeHeader(filePath) {
     }
     return true;
 }
-function Encrypt(filePath, saveDir, key) {
+async function Encrypt(filePath, saveDir, key) {
     if (!fs_1.default.existsSync(filePath)) {
         throw "file dosen't exist";
     }
     const extension = path_1.default.parse(filePath).ext.toLowerCase();
     if (!exports.DecryptedExtensions.includes(extension)) {
-        throw "Incompatible file format used.";
+        return;
     }
     const header = Buffer.from(HEADER_MV.join(''), "hex");
-    let file = fs_1.default.readFileSync(filePath);
+    let file = await fs_1.default.promises.readFile(filePath);
     const keys = splitString(key, 2);
     for (let index = 0; index < keys.length; index++) {
         file[index] = (file[index] ^ hexToByte(keys[index]));
     }
     const encryptedExt = exports.EncryptedExtensions[exports.DecryptedExtensions.indexOf(extension)];
     const fileData = Buffer.concat([header, file], header.length + file.length);
-    fs_1.default.writeFileSync(path_1.default.join(saveDir, `${path_1.default.parse(filePath).name}${encryptedExt}`), fileData);
+    await fs_1.default.promises.writeFile(path_1.default.join(saveDir, `${path_1.default.parse(filePath).name}${encryptedExt}`), fileData);
 }
 exports.Encrypt = Encrypt;
-function Decrypt(filePath, saveDir, key) {
+async function Decrypt(filePath, saveDir, key) {
     if (!fs_1.default.existsSync(filePath)) {
         throw "file dosen't exist";
     }
     const extension = path_1.default.parse(filePath).ext.toLowerCase();
     if (!exports.EncryptedExtensions.includes(extension)) {
-        throw "Incompatible file format used.";
+        return;
     }
-    let file = (fs_1.default.readFileSync(filePath).slice(16));
+    let file = ((await fs_1.default.promises.readFile(filePath)).slice(16));
     const keys = splitString(key, 2);
     for (let index = 0; index < keys.length; index++) {
         file[index] = (file[index] ^ hexToByte(keys[index]));
     }
     const decryptedExt = exports.DecryptedExtensions[exports.EncryptedExtensions.indexOf(extension)];
-    fs_1.default.writeFileSync(path_1.default.join(saveDir, `${path_1.default.parse(filePath).name}${decryptedExt}`), file);
+    await fs_1.default.promises.writeFile(path_1.default.join(saveDir, `${path_1.default.parse(filePath).name}${decryptedExt}`), file);
 }
 exports.Decrypt = Decrypt;

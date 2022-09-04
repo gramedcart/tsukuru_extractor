@@ -1,6 +1,7 @@
 import fs from "fs"
 import path from "path"
 
+
 export const EncryptedExtensions:string[] = [".rpgmvo", ".rpgmvm", ".rpgmvw", ".rpgmvp", ".ogg_", ".m4a_", ".wav_", ".png_"]
 export const DecryptedExtensions:string[] = [".ogg", ".m4a", ".wav", ".png", ".ogg", ".m4a", ".wav", ".png"]
 const HEADER_MV:string[] = ["52", "50", "47", "4D", "56", "00", "00", "00", "00", "03", "01", "00", "00", "00", "00", "00"]
@@ -33,17 +34,17 @@ function VerifyFakeHeader(filePath:string){
 }
 
 
-export function Encrypt(filePath:string, saveDir:string, key:string){
+export async function Encrypt(filePath:string, saveDir:string, key:string){
     if(!fs.existsSync(filePath)){
         throw "file dosen't exist"
     }
     const extension = path.parse(filePath).ext.toLowerCase()
     if (!DecryptedExtensions.includes(extension))
     {
-        throw "Incompatible file format used."
+        return
     }
     const header = Buffer.from(HEADER_MV.join(''), "hex")
-    let file = fs.readFileSync(filePath)
+    let file = await fs.promises.readFile(filePath)
     const keys = splitString(key, 2)
     for (let index = 0; index < keys.length; index++)
     {
@@ -51,24 +52,24 @@ export function Encrypt(filePath:string, saveDir:string, key:string){
     }
     const encryptedExt = EncryptedExtensions[DecryptedExtensions.indexOf(extension)]
     const fileData = Buffer.concat([header, file], header.length + file.length)
-    fs.writeFileSync(path.join(saveDir, `${path.parse(filePath).name}${encryptedExt}`), fileData)
+    await fs.promises.writeFile(path.join(saveDir, `${path.parse(filePath).name}${encryptedExt}`), fileData)
 }
 
-export function Decrypt(filePath:string, saveDir:string, key:string){
+export async function Decrypt(filePath:string, saveDir:string, key:string){
     if(!fs.existsSync(filePath)){
         throw "file dosen't exist"
     }
     const extension = path.parse(filePath).ext.toLowerCase()
     if (!EncryptedExtensions.includes(extension))
     {
-        throw "Incompatible file format used."
+        return
     }
-    let file = (fs.readFileSync(filePath).slice(16))
+    let file = ((await fs.promises.readFile(filePath)).slice(16))
     const keys = splitString(key, 2)
     for (let index = 0; index < keys.length; index++)
     {
         file[index] = (file[index] ^ hexToByte(keys[index]));
     }
     const decryptedExt = DecryptedExtensions[EncryptedExtensions.indexOf(extension)]
-    fs.writeFileSync(path.join(saveDir, `${path.parse(filePath).name}${decryptedExt}`), file)
+    await fs.promises.writeFile(path.join(saveDir, `${path.parse(filePath).name}${decryptedExt}`), file)
 }
