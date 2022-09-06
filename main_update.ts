@@ -1,6 +1,10 @@
 export default function sendUpdateInfo(){
     sendAlertSmall(`<div class="updateInfoContainer">
     !! 번역기 사용시 아네모네가 아닌 내장 번역기를 사용해주세요 !!
+    <br><br>업데이트 1.18.6<br>
+    <span class="updateInfo">
+    - 프로젝트 변환 오류 수정<br>
+    </span>
     <br><br>업데이트 1.18.5<br>
     <span class="updateInfo">
     - 암호화/복호화 개선<br>

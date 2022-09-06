@@ -533,7 +533,8 @@ document.getElementById('eztrans').onclick = async () => {
         } : {
             'en': '영어 (english)',
             'ja': '일본어 (日本語)',
-            'zh-CN': '대만어 (台灣語)',
+            'zh-CN': '대만어-간체 (台灣語)',
+            'zh-TW': '대만어-정체 (台灣語)',
             'fr': '프랑스어 (Français)',
             'es': '스페인어 (español)',
             'ru': '러시아어 (Русский)'

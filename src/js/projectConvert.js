@@ -56,6 +56,13 @@ async function ConvertProject(dir) {
             projectTools_1.default.worked();
             return;
         }
+        for (const a of '$^*+?()[]') {
+            if (dir.includes(a)) {
+                projectTools_1.default.sendError("경로가 올바르지 않습니다");
+                projectTools_1.default.worked();
+                return;
+            }
+        }
         const fd = await electron_1.dialog.showOpenDialog(globalThis.mwindow, {
             title: "프로젝트 저장 위치 선택",
             properties: ['openDirectory']
@@ -118,7 +125,7 @@ async function ConvertProject(dir) {
                 const key = sysdata.encryptionKey;
                 for (const i in encryptedFiles) {
                     setProgressBar(50 + (parseInt(i) / encryptedFiles.length * 50));
-                    rpgencrypt.Decrypt(encryptedFiles[i], path_1.default.dirname(encryptedFiles[i]), key);
+                    await rpgencrypt.Decrypt(encryptedFiles[i], path_1.default.dirname(encryptedFiles[i]), key);
                     fs_1.default.rmSync(encryptedFiles[i]);
                 }
             }

@@ -37,6 +37,14 @@ export async function ConvertProject(dir:string){
             tools.worked()
             return
         }
+
+        for(const a of '$^*+?()[]'){
+            if(dir.includes(a)){
+                tools.sendError("경로가 올바르지 않습니다")
+                tools.worked()
+                return
+            }
+        }
     
         const fd = await dialog.showOpenDialog(globalThis.mwindow, {
             title: "프로젝트 저장 위치 선택",
@@ -103,7 +111,7 @@ export async function ConvertProject(dir:string){
                 const key:string = sysdata.encryptionKey
                 for(const i in encryptedFiles){
                     setProgressBar(50 + (parseInt(i)/encryptedFiles.length*50))
-                    rpgencrypt.Decrypt(encryptedFiles[i], path.dirname(encryptedFiles[i]), key)
+                    await rpgencrypt.Decrypt(encryptedFiles[i], path.dirname(encryptedFiles[i]), key)
                     fs.rmSync(encryptedFiles[i])
                 }
             }
