@@ -195,11 +195,10 @@ class Translator {
                             while (true) {
                                 const matches = safeTransRegex.exec(str);
                                 if (matches === null) {
-                                    console.log(str);
-                                    return str.replaceAll('㈜', '#');
+                                    return str.replaceAll('㈜', '@');
                                 }
                                 const m = matches[0];
-                                const id = `#${ids.length}`;
+                                const id = `@${ids.length}`;
                                 const vid = `㈜${ids.length}`;
                                 ids.push(m);
                                 str = str.replaceAll(m, vid);
@@ -221,11 +220,10 @@ class Translator {
                             return encodeURIp(tempTxt);
                         }
                         const a = this.type2 === 'kakao' ? (await (0, kakaotrans_js_1.kakaoTrans)(temp2, this.langu)) : (await (0, translatte_1.default)(temp2, { from: (this.langu), to: 'ko' })).text;
-                        console.log('after process');
                         let finalStr = a;
                         for (let i = (ids.length - 1); i >= 0; i--) {
                             const str = ids[i];
-                            const findRegex = new RegExp(`# *${i}`, 'g');
+                            const findRegex = new RegExp(`@ *${i}`, 'g');
                             finalStr = finalStr.replace(findRegex, str);
                         }
                         let aSplit = finalStr.split('\n');
@@ -548,40 +546,69 @@ exports.trans = async (ev, arg) => {
                 const isLine = (translatedSplit.length !== chunks.length);
                 const hangule = (translated === chunkJoin) && ((!globalThis.settings.DoNotTransHangul) || (!datas_js_2.hanguls.test(translated)));
                 if (hangule || isLine) {
-                    async function reTrans(i, size) {
+                    async function reTrans(offset, size) {
                         try {
-                            const sliced = chunks.slice(i, i + (size - 1));
+                            const sliced = chunks.slice(offset, offset + size);
                             const slicejoin = sliced.join('\n');
-                            console.log(`retranslating: ${i} / ${slicejoin.length}`);
+                            console.log(`retranslating: ${offset} / ${slicejoin.length}`);
                             const retrans = (await translator.translate(encodeURIp(slicejoin))).split('\n');
                             if (retrans.length !== sliced.length) {
+                                console.log(`err-line ${retrans.length} | ${sliced.length}`);
                                 throw 'err';
                             }
                             for (let i2 = 0; i2 < sliced.length; i2++) {
-                                chunks[i + i2] = retrans[i2];
+                                if (chunks[offset + i2] === sliced[i2]) {
+                                    chunks[offset + i2] = retrans[i2];
+                                }
+                                else {
+                                    console.log('verify Error');
+                                    console.log(chunks[offset + i2]);
+                                    console.log(sliced[i2]);
+                                    console.log(retrans[i2]);
+                                }
                             }
                             translatedLen += slicejoin.length;
                             setProgressBar(translatedLen, transTargetLen, 100);
                         }
                         catch (error) {
-                            console.log(`error on ${chunks.slice(i, i + (size - 1))}`);
+                            console.log(`error on ${offset}, rere-translating`);
+                            const sliced = chunks.slice(offset, offset + size);
+                            if (sliced.length <= 5) {
+                                for (let i2 = 0; i2 < sliced.length; i2++) {
+                                    const org = chunks[offset + i2];
+                                    const r = (await translator.translate(encodeURIp(org)));
+                                    console.log(`rere: ${i2} / ${sliced.length}`);
+                                    if (!r.includes('\n')) {
+                                        chunks[offset + i2] = r;
+                                    }
+                                    else {
+                                        console.log(`ERROR: ${org}`);
+                                    }
+                                    translatedLen += org.length;
+                                    setProgressBar(translatedLen, transTargetLen, 100);
+                                }
+                            }
+                            else {
+                                await reTrans(offset, Math.floor(size / 2));
+                                await reTrans(offset + Math.floor(size / 2), Math.ceil(size / 2));
+                            }
                         }
                     }
                     console.log(`err-line ${chunks.length} | ${translatedSplit.length}`);
                     const retransSize = Math.floor(chunks.length / 5);
                     for (let i = 0; i < chunks.length; i += retransSize) {
-                        reTrans(i, retransSize);
+                        await reTrans(i, retransSize);
                     }
                 }
                 else {
                     for (let i = 0; i < chunks.length; i++) {
                         translatedLen += chunks[i].length;
-                        setProgressBar(translatedLen, transTargetLen, 100);
                         chunks[i] = translatedSplit[i];
                     }
+                    setProgressBar(translatedLen, transTargetLen, 100);
                 }
                 for (let i = 0; i < chunks.length; i++) {
-                    translateMemorys[chunkKeys[i]] = chunks[i];
+                    translateMemorys[chunkKeys[i]] = chunks[i].replaceAll('\n', '');
                 }
                 chunks = [];
                 chunkKeys = [];
@@ -611,7 +638,6 @@ exports.trans = async (ev, arg) => {
             if (!checkVaildTransFile(fileList[i])) {
                 continue;
             }
-            console.log(typeOfFile);
             const iPath = path_1.default.join(edir, fileList[i]);
             const fileRead = (fs_1.default.readFileSync(iPath, 'utf-8'));
             let output = '';
@@ -674,7 +700,6 @@ exports.trans = async (ev, arg) => {
                                     r2.push(tr);
                                 }
                                 catch (error) {
-                                    console.log(readLine);
                                     if (await translator.isCrash()) {
                                         return;
                                     }
