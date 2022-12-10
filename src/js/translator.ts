@@ -9,7 +9,7 @@ import { translateable, note2able, translateableOne, hanguls } from './datas.js'
 import * as edTool from './edtool';
 import zlib from 'zlib'
 import open from 'open'
-import translatte from "translatte";
+import { translate as gTranslate } from '@vitalets/google-translate-api';
 import { kakaoTrans } from './libs/kakaotrans.js';
 import { postProcessTranslate, preProcessTranslate } from './libs/preprocess.js';
 import { app } from 'electron';
@@ -176,7 +176,7 @@ class Translator{
                     const tempTxt = encodeSafe(text, this.type2 === 'papago')
                     console.log('requesting')
                     if(this.type2 === 'google'){
-                        const a = await translatte(tempTxt, {from: (this.langu), to: 'ko'})
+                        const a = await gTranslate(tempTxt, {from: (this.langu), to: 'ko'})
                         await sleep(3000)
                         return (a.text)
                     }
@@ -212,7 +212,7 @@ class Translator{
                         if(mog.length === sliced.length){
                             return encodeURIp(tempTxt)
                         }
-                        const a:string = this.type2 === 'kakao' ? (await kakaoTrans(temp2,this.langu)) : (await translatte(temp2, {from: (this.langu), to: 'ko'})).text
+                        const a:string = this.type2 === 'kakao' ? (await kakaoTrans(temp2,this.langu)) : (await gTranslate(temp2, {from: (this.langu), to: 'ko'})).text
                         let finalStr = a
                         for(let i=(ids.length - 1);i>=0;i--){
                             const str = ids[i]

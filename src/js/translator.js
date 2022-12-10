@@ -37,7 +37,7 @@ const datas_js_2 = require("./datas.js");
 const edTool = __importStar(require("./edtool"));
 const zlib_1 = __importDefault(require("zlib"));
 const open_1 = __importDefault(require("open"));
-const translatte_1 = __importDefault(require("translatte"));
+const google_translate_api_1 = require("@vitalets/google-translate-api");
 const kakaotrans_js_1 = require("./libs/kakaotrans.js");
 const preprocess_js_1 = require("./libs/preprocess.js");
 const electron_1 = require("electron");
@@ -190,7 +190,7 @@ class Translator {
                     const tempTxt = encodeSafe(text, this.type2 === 'papago');
                     console.log('requesting');
                     if (this.type2 === 'google') {
-                        const a = await (0, translatte_1.default)(tempTxt, { from: (this.langu), to: 'ko' });
+                        const a = await (0, google_translate_api_1.translate)(tempTxt, { from: (this.langu), to: 'ko' });
                         await (0, globalutils_js_1.sleep)(3000);
                         return (a.text);
                     }
@@ -226,7 +226,7 @@ class Translator {
                         if (mog.length === sliced.length) {
                             return encodeURIp(tempTxt);
                         }
-                        const a = this.type2 === 'kakao' ? (await (0, kakaotrans_js_1.kakaoTrans)(temp2, this.langu)) : (await (0, translatte_1.default)(temp2, { from: (this.langu), to: 'ko' })).text;
+                        const a = this.type2 === 'kakao' ? (await (0, kakaotrans_js_1.kakaoTrans)(temp2, this.langu)) : (await (0, google_translate_api_1.translate)(temp2, { from: (this.langu), to: 'ko' })).text;
                         let finalStr = a;
                         for (let i = (ids.length - 1); i >= 0; i--) {
                             const str = ids[i];
