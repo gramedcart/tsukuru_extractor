@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -31,9 +35,12 @@ const globalutils_js_1 = require("./globalutils.js");
 const axios_1 = __importDefault(require("axios"));
 const datas_js_2 = require("./datas.js");
 const edTool = __importStar(require("./edtool"));
+const zlib_1 = __importDefault(require("zlib"));
 const open_1 = __importDefault(require("open"));
 const translatte_1 = __importDefault(require("translatte"));
 const kakaotrans_js_1 = require("./libs/kakaotrans.js");
+const preprocess_js_1 = require("./libs/preprocess.js");
+const electron_1 = require("electron");
 let junChori = false;
 function oPath() {
     return globalThis.oPath;
@@ -138,7 +145,7 @@ class Translator {
                         this.KillLs();
                     }
                     catch (error) { }
-                    this.ls = spawn(path_1.default.join(oPath(), 'exfiles', 'eztrans', 'eztransServer.exe'));
+                    this.ls = spawn(path_1.default.join(oPath(), 'exfiles', 'eztrans', 'eztransServer2.exe'));
                     console.log('spawned');
                     await (0, globalutils_js_1.sleep)(2000);
                     await tcp_port_used_1.default.waitUntilUsed(8000);
@@ -302,9 +309,15 @@ function setProgressBar(now, max, multipl = 70) {
     console.log(`${now} / ${max}`);
     globalThis.mwindow.webContents.send('loading', (now / max) * multipl);
 }
-let translateMemorys = {};
+const asciiRegex = /^[\x00-\x7F]*$/;
+function isASCII(str) {
+    return asciiRegex.test(str);
+}
 exports.trans = async (ev, arg) => {
+    var _a;
+    let translateMemorys = {};
     const dm = true;
+    let usePreProcess = (_a = arg.usePreProcess) !== null && _a !== void 0 ? _a : false;
     globalThis.settings.safeTrans = true;
     globalThis.settings.smartTrans = true;
     globalThis.settings.fastEztrans = true;
@@ -337,6 +350,15 @@ exports.trans = async (ev, arg) => {
         globalThis.settings.smartTrans = false;
         arg.type = 'transEngine';
         type2 = 'kakao';
+        if (arg.langu === 'en') {
+            usePreProcess = true;
+        }
+    }
+    if (arg.type == 'kakaosafe') {
+        junChori = true;
+        globalThis.settings.smartTrans = false;
+        arg.type = 'transEngine';
+        type2 = 'kakao';
     }
     const translator = new Translator(arg.type, type2, langu);
     let ls;
@@ -356,6 +378,9 @@ exports.trans = async (ev, arg) => {
         const max_files = fileList.length;
         let fullFileLength = 0;
         let workedFileLength = 0;
+        if (usePreProcess) {
+            await (0, preprocess_js_1.preProcessTranslate)(edir);
+        }
         console.log(translator.getType());
         for (const i in fileList) {
             const iPath = path_1.default.join(edir, fileList[i]);
@@ -483,7 +508,7 @@ exports.trans = async (ev, arg) => {
                         }
                     }
                 }
-                else if ((!(datas_js_1.default.default.includes(name))) && (!(0, globalutils_js_1.checkIsMapFile)(name))) {
+                else if ((!(datas_js_1.default.includes(name))) && (!(0, globalutils_js_1.checkIsMapFile)(name))) {
                     console.log('skiping');
                     return false;
                 }
@@ -614,12 +639,23 @@ exports.trans = async (ev, arg) => {
                 chunkKeys = [];
                 cLen = 0;
             }
+            const cacheFilePath = path_1.default.join(electron_1.app.getPath('userData'), 'cache.bin');
+            if (fs_1.default.existsSync(cacheFilePath)) {
+                const cache = JSON.parse(zlib_1.default.inflateSync(fs_1.default.readFileSync(cacheFilePath)).toString('utf-8'));
+                if (cache[arg.type]) {
+                    translateMemorys = cache[arg.type];
+                }
+            }
             for (const key in memoryAdd) {
                 const toTrans = memoryAdd[key];
                 const len = (toTrans.length + 1);
-                if (toTrans.length === 1) {
-                    translatedLen += 1;
+                if ((toTrans.length <= 1) || toTrans.startsWith('@@Excludes') || toTrans.startsWith('---') || toTrans.startsWith('//')) {
+                    translatedLen += toTrans.length;
                     translateMemorys[key] = toTrans;
+                    setProgressBar(translatedLen, transTargetLen, 100);
+                }
+                else if (Object.keys(translateMemorys).includes(key)) {
+                    translatedLen += translateMemorys[key].length;
                     setProgressBar(translatedLen, transTargetLen, 100);
                 }
                 else if (cLen + len > readLen) {
@@ -632,6 +668,12 @@ exports.trans = async (ev, arg) => {
                 }
             }
             await doTrans();
+            let cdat = {};
+            if (fs_1.default.existsSync(cacheFilePath)) {
+                cdat = JSON.parse(zlib_1.default.inflateSync(fs_1.default.readFileSync(cacheFilePath)).toString('utf-8'));
+            }
+            cdat[arg.type] = translateMemorys;
+            fs_1.default.writeFileSync(cacheFilePath, zlib_1.default.deflateSync(Buffer.from(JSON.stringify(cdat), 'utf-8')));
         }
         for (const i in fileList) {
             typeOfFile = '';
@@ -787,7 +829,7 @@ exports.trans = async (ev, arg) => {
                                         try {
                                             output += fi + encodeSp(ouput, true) + vax;
                                         }
-                                        catch (_a) {
+                                        catch (_b) {
                                             output += fi + rl + vax;
                                             if (await translator.isCrash()) {
                                                 return;
@@ -799,7 +841,7 @@ exports.trans = async (ev, arg) => {
                                         try {
                                             output += fi + encodeSp(ouput, true) + '\n';
                                         }
-                                        catch (_b) {
+                                        catch (_c) {
                                             output += fi + rl + '\n';
                                             if (await translator.isCrash()) {
                                                 return;
@@ -827,7 +869,7 @@ exports.trans = async (ev, arg) => {
                                             try {
                                                 output += encodeSp(ouput, true) + '\n';
                                             }
-                                            catch (_c) {
+                                            catch (_d) {
                                                 output += readLine + '\n';
                                                 if (await translator.isCrash()) {
                                                     return;
@@ -864,6 +906,9 @@ exports.trans = async (ev, arg) => {
             fs_1.default.writeFileSync(iPath, output, 'utf-8');
             // globalThis.mwindow.webContents.send('loading', worked_files / max_files * 100);
             await (0, globalutils_js_1.sleep)(0);
+        }
+        if (usePreProcess) {
+            await (0, preprocess_js_1.postProcessTranslate)(edir);
         }
         translator.KillLs();
         globalThis.mwindow.webContents.send('alert', '완료되었습니다');

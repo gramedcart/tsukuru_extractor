@@ -16,7 +16,8 @@ const ExtTool = require('./src/js/extract.js')
 const path = require('path')
 const edTool = require('./src/js/edtool.js')
 let mainid = 0
-const defaultHeight = 350
+const defaultHeight = 550
+// 350 + 170
 const axios = require('axios')
 const dataBaseO = require('./src/js/datas.js')
 const applyjs = require("./src/js/apply.js")
@@ -79,6 +80,7 @@ function createWindow() {
   mainWindow.setMenu(null)
   // and load the index.html of the app.
   mainWindow.loadFile('./src/html/main/index.html')
+  // mainWindow.loadFile('./src/html/simple/index.html')
   mainWindow.webContents.on('did-finish-load', function () {
     mainWindow.show();
     getMainWindow().webContents.send('is_version', app.getVersion());
@@ -92,7 +94,7 @@ function createWindow() {
         return v
       }
       const currentVersion = c(currentVersionNumber)
-      const ver = (await axios.get('https://raw.githubusercontent.com/gramedcart/mvextractor/main/version.json')).data.version
+      const ver = (await axios.get('https://raw.githubusercontent.com/gramedcart/tsukuru_extractor/main/version.json')).data.version
       let last_version = c(ver)
       const myversion = storage.has('myversion') ? storage.get('myversion') : currentVersion
       if(currentVersion < last_version){
@@ -162,10 +164,14 @@ ipcMain.on('license', () => {
   licenseWindow.show()
 })
 
+ipcMain.on('changeURL', (ev, arg) => {
+  globalThis.mwindow.loadFile(arg)
+})
+
 ipcMain.on('settings', () => {
   globalThis.settingsWindow = new BrowserWindow({
     width: 800,
-    height: 400,
+    height: 700,
     resizable: false,
     show: false,
     autoHideMenuBar: true,
@@ -221,7 +227,7 @@ ipcMain.on('gamePatcher', (ev, dir) => {
 
 
 ipcMain.on('updatePage', () => {
-  open('https://github.com/gramedcart/mvextractor/releases/latest')
+  open('https://github.com/gramedcart/tsukuru_extractor/releases/latest')
 })
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -275,9 +281,6 @@ ipcMain.on('select_folder', async (ev, typeo) => {
     }
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
 
 async function extractor(arg){
   try {
@@ -373,7 +376,9 @@ async function extractor(arg){
 
     const max_files = fileList.length
     let worked_files = 0
+    let jT = 0
     ExtTool.init_extract(arg)
+    let performT = performance.now()
     for (const i in fileList){
       worked_files += 1
       const fileName = fileList[i]
@@ -397,21 +402,26 @@ async function extractor(arg){
       runBackup()
       if (checkIsMapFile(fileName)){
         file = fs.readFileSync(dir + '/' + fileName, 'utf8')
+        jT += file.length
         await ExtTool.format_extracted(await ExtTool.extract(file, conf, 'map'))
       }
       else if (Object.keys(onebyone).includes(fileName)){
         file = fs.readFileSync(dir + '/' + fileName, 'utf8')
+        jT += file.length
         await ExtTool.format_extracted(await ExtTool.extract(file, conf, onebyone[fileName]))
       }
       else if (arg.exJson){
         if(!dataBaseO.ignores.includes(fileName)){
           file = fs.readFileSync(dir + '/' + fileName, 'utf8')
+          jT += file.length
           await ExtTool.format_extracted(await ExtTool.extract(file, conf, 'ex'))
         }
       }
       getMainWindow().webContents.send('loading', worked_files/max_files*100);
       await sleep(0)
     }
+    const pTime = performance.now() - performT
+    console.log(`perform in ${(pTime).toFixed(3)}ms\nPerformed Texts: ${jT}\nText per ms: ${(jT / pTime).toFixed(3)}`)
     const gbKeys = {...Object.keys(globalThis.gb)}
     for (const i in gbKeys){
       const fileName = gbKeys[i]
@@ -477,14 +487,9 @@ function oPath(){
   }
 }
 
-
-ipcMain.on('extend', async (ev, arg) => {
-  getMainWindow().setSize(800, defaultHeight+170, true)
-})
-
 ipcMain.on('eztrans', eztrans.trans)
 
-ipcMain.on('eztransHelp', () => {open('https://github.com/gramedcart/mvextractor/wiki/ezTrans-%EC%98%A4%EB%A5%98-%ED%95%B4%EA%B2%B0')})
+ipcMain.on('eztransHelp', () => {open('https://github.com/gramedcart/tsukuru_extractor/wiki/ezTrans-%EC%98%A4%EB%A5%98-%ED%95%B4%EA%B2%B0')})
 
 ipcMain.on('minimize', () => {
   getMainWindow().minimize()
@@ -499,11 +504,11 @@ ipcMain.on('app_version', (event) => {
 });
 
 ipcMain.on('updates', ()=> {
-  open("https://github.com/gramedcart/mvextractor/releases/")
+  open("https://github.com/gramedcart/tsukuru_extractor/releases/")
 })
 
 ipcMain.on('updates', ()=> {
-  open("https://github.com/gramedcart/mvextractor/releases/")
+  open("https://github.com/gramedcart/tsukuru_extractor/releases/")
 })
 
 ipcMain.on('openFolder', (ev, arg) => {

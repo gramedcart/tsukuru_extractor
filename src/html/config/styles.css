@@ -1,21 +1,32 @@
 body {
     margin: 0px;
-    background-color: #121212;
-    color: #dfe6e9;
+    background-color: #282a36;
+    color: #f8f8f2;
     overflow-x: hidden;
+}
+body::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+    background-color: #282a36; /* or add it to the track */
+}
+
+/* Add a thumb */
+body::-webkit-scrollbar-thumb {
+    background: #44475a;
 }
 
 #container {
     margin-left: 30px;
+    margin-top: 10px;
 }
 
 textarea {
     width: 80vw;
-    height: 40vh;
+    height: 20vh;
     border: none;
     resize: none;
-    background-color: #ffffff10;
-    color: wheat;
+    background-color: #21222C;
+    color: #f8f8f2;
 }
 
 .br {
@@ -23,11 +34,18 @@ textarea {
 }
 
 .unrec{
-    color: #f50057;
+    color: #ff5555;
+}
+
+.warn{
+    color: #ff5555;
+    font-size: large;
+    font-weight: bold;
+
 }
 
 .rec{
-    color: #8bc34a;
+    color: #50fa7b;
 }
 
 #ex {
@@ -37,7 +55,7 @@ textarea {
 
 .btn {
     border: transparent;
-    background-color: #ffffff10;
+    background-color: #21222C;
     color: #dfe6e9;
     height: 30px;
     margin-top: 5px;
@@ -46,7 +64,7 @@ textarea {
 
 .btn2 {
     border: transparent;
-    background-color: #ffffff10;
+    background-color: #21222C;
     color: #dfe6e9;
     height: 30px;
     width: 25vw;

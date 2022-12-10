@@ -84,11 +84,14 @@ exports.apply = async (ev, arg) => {
                     autoline = true
                     autolineSize = econf.face ? 80 : 60
                 }
+                if(arg.isComment){
+                  continue
+                }
             }
             for(let x=parseInt(q);x<ext_dat[i].data[q].m;x++){
               let forUse = Edata[x]
               if(autoline && (getBinarySize(forUse) > autolineSize)){
-                  const v = forUse.split(' ')
+                  let v = forUse.split(' ')
                   if(v.length > 0){
                     v[(Math.floor(v.length/2)) - 1] = '\n' + v[(Math.floor(v.length/2)) - 1]
                   }

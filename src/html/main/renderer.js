@@ -218,11 +218,9 @@ document.getElementById('apply').onclick = () => {_mode=1;_reload()}
 _reload()
 
 if(true){
-    document.getElementById('addons_btn').onclick = () => {
-        document.getElementById("addons").style.height = "165px";
-        ipcRenderer.send('extend', 460)
-        menu_open = true
-    }
+    document.getElementById("addons").style.height = "165px";
+    ipcRenderer.send('extend', 460)
+    menu_open = true
     
     const InfoList = {
         'ext_plugin': '추출 시 플러그인을\n추출합니다',
@@ -232,12 +230,11 @@ if(true){
         'ext': '추출 모드로\n전환합니다',
         'apply': '적용 모드로\n전환합니다',
         'changeAll': '문자열을 일괄\n변경합니다',
-        'addons_btn': '추가 기능을\n펼칩니다',
-        'eztrans': 'Extract 폴더 내\n파일을 이지트랜스로\n번역합니다',
+        'addons_btn': '도움말을\n펼칩니다',
+        'eztrans': 'Extract 폴더 내\n파일을 번역기로\n번역합니다',
         'ext_note': '노트/메모를\n추출합니다',
         'exJson': 'Rpg Maker에\n기본적으로는\n존재하지 않는\nJSON 또는 CSV를\n추출합니다',
         'autoline': '적용 시 자동\n줄바꿈을 합니다',
-        'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
         'instantapply': '적용 시 Completed\n폴더 대신\n원본 폴더에\n즉시 적용합니다',
         'versionUp': '버전 업 툴을\n엽니다',
         'settings': '설정',
@@ -483,18 +480,25 @@ document.getElementById('eztrans').onclick = async () => {
         'papago': '권장되지 않는 베타 번역기입니다.<br>속도가 굉장히 느리며, 중간에 번역이 멈출 수 있습니다.<br>여러가지 언어를 지원합니다.'
     }
 
+
+    const selectOptions = globalSettings.hideUnrecomenedTranslators ? {
+        'eztrans': 'eztrans (스마트 모드, 권장)',
+        'kakao': '카카오 번역기 (안전 모드, 권장)',
+        'eztransh': 'eztrans (안전 모드)',
+    }:{
+        'eztrans': 'eztrans (스마트 모드, 권장)',
+        'kakao': '카카오 번역기 (안전 모드, 권장)',
+        'eztransh': 'eztrans (안전 모드)',
+        'googleh': '구글 번역기 (안전 모드, 비권장)',
+        'google': '구글 번역기 (위험 모드, 비권장)',
+        'papago': '파파고 (베타, 비권장)'
+    }
+
     const v = await Swal.fire({
         icon: 'info',
         title: '번역기를 선택해주세요',
         input: 'select',
-        inputOptions: {
-            'eztrans': 'eztrans (스마트 모드, 권장)',
-            'kakao': '카카오 번역기 (안전 모드, 권장)',
-            'googleh': '구글 번역기 (안전 모드)',
-            'eztransh': 'eztrans (안전 모드)',
-            'google': '구글 번역기 (위험 모드, 비권장)',
-            'papago': '파파고 (베타, 비권장)'
-        },
+        inputOptions: selectOptions,
         confirmButtonText: '확인',
         inputValidator: (value) => {
             return new Promise((resolve) => {
@@ -539,8 +543,6 @@ document.getElementById('eztrans').onclick = async () => {
             'es': '스페인어 (español)',
             'ru': '러시아어 (Русский)'
         }
-
-
 
         const langu2 = await Swal.fire({
             icon: 'info',

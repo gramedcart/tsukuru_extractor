@@ -1,8 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.beautifyCodes2 = exports.beautifyCodes = exports.hanguls = exports.note2able = exports.translateableOne = exports.translateable = exports.ignores = exports.onebyone = exports.settings = void 0;
-const styles = require('./styles').default;
-exports.settings = {
+const styles = require('./styles').default
+
+export const settings = {
     userdict: {},
     extractJs: false,
     extractSomeScript: false,
@@ -26,8 +24,9 @@ exports.settings = {
     extractPlus: [],
     themeList: Object.keys(styles),
     hideUnrecomenedTranslators: true
-};
-exports.onebyone = {
+}
+
+export const onebyone = {
     'Actors.json': 'actor',
     'Armors.json': 'item',
     'Classes.json': 'class',
@@ -40,7 +39,8 @@ exports.onebyone = {
     'Items.json': 'item',
     'ext_plugins.json': 'plugin',
     'Troops.json': 'ene2'
-};
+}
+
 const odat = [
     'Actors.txt',
     'Armors.txt',
@@ -54,9 +54,10 @@ const odat = [
     'Weapons.txt',
     'Items.txt',
     'Troops.txt',
-];
-exports.default = odat;
-exports.ignores = [
+]
+export default odat
+
+export const ignores = [
     'Actors.json',
     'Animations.json',
     'Armors.json',
@@ -71,8 +72,9 @@ exports.ignores = [
     'Tilesets.json',
     'Troops.json',
     'Weapons.json'
-];
-exports.translateable = [
+]
+
+export const translateable = [
     '<profile:',
     '<desc1:',
     '<desc2:',
@@ -82,17 +84,22 @@ exports.translateable = [
     "<namePop:",
     "<SGカテゴリ:",
     '<shop_mes:',
-];
-exports.translateableOne = [
+]
+
+export const translateableOne = [
     "<namePop:"
-];
-exports.note2able = [
+]
+
+export const note2able = [
     '選択肢ヘルプ',
-];
-exports.hanguls = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
-exports.beautifyCodes = [
+]
+
+export const hanguls = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
+export const beautifyCodes = [
     108
-];
-exports.beautifyCodes2 = [
-    355, 356, 357
-];
+]
+
+export const beautifyCodes2 = [
+    355,356,357
+]

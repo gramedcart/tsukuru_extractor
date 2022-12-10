@@ -1,0 +1,71 @@
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./sweetalert2/css.css">
+    <script src="./sweetalert2/main.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+    <link href="./back.css" rel="stylesheet">
+    <title>MV Extractor++</title>
+</head>
+
+<body draggable="false">
+    <div class="alligner">
+        <div id="loading_bar">
+            <div id="loading-text">0%</div>
+            <div id="icon1" class="icon">&times;</div>
+            <div id="icon2" class="icon">-</div>
+            <div id="border_r"></div>
+        </div>
+    </div>
+    <div id="mainMenu" style="display: none">
+        <div class="alligner">
+            <div class="center mt">
+                <img src="./icon.png" width="128px" height="128px">
+            </div>
+            <div class="center">
+                <h1>Tsukuru Extractor</h1>
+            </div>
+            <span class="subtitle center">(구) MVExtractor++</span>
+        </div>
+        <div class="box-cont">
+            <div class="box">
+                <span class="box-title" id="simpuru">심플 모드</span>
+            </div>
+            <div class="box">
+                <span class="box-title" id="gokupu">고급 모드</span>
+            </div>
+        </div>
+    </div>
+    <div id="simpleMenu" style="display: none">
+        <div class="alligner">
+            <div class="center gaps">
+                <p class="info">게임 폴더:</p>
+                <input type="text" id="folder_input" class="highlight2 vw7">
+                <button id="sel" class="highlight2">선택</button>
+            </div>
+            <div class="center gaps">
+                <div class="btnx" id="marTrans">기계 번역</div>
+                <div class="btnx" id="handTrans">손번역</div>
+            </div>
+            <div class="alligner" id="marCont" style="display: none">
+                <div class="center gaps">
+                    <p class="info">번역기:</p>
+                    <select type="text" id="trans_input" class="highlight2 vw7">
+                        <option value=""></option>
+                        <option value="eztrans">Eztrans</option>
+                        <option value="kakao">카카오</option>
+                    </select>
+                </div>
+            </div>
+            <div class="alligner" id="handCont" style="display: none">
+                <div class="center">
+                    <span>손번역은 현재 고급모드에서만 가능합니다</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="center smalmar" style="display: none;">
+        <div class="btnx btxSel">심플모드</div>
+        <div class="btnx">고급모드</div>
+    </div>
+    <script src="./rend.js"></script>
+</body>

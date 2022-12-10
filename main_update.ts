@@ -1,6 +1,22 @@
 export default function sendUpdateInfo(){
     sendAlertSmall(`<div class="updateInfoContainer">
     !! 번역기 사용시 아네모네가 아닌 내장 번역기를 사용해주세요 !!
+    <br><br>업데이트 2.0.0<br>
+    <span class="updateInfo">
+    - 추출 속도 개선<br>
+    - 설정창 디자인 수정<br>
+    - 텍스트 간 구분 추가<br>
+    - 카카오 번역기 스마트 모드 추가<br>
+    - 다음 code를 가진 데이터를 추가로 추출하기 설정 추가<br>
+    - 스크립트 추출 시 코드 122 추출 설정 삭제<br>
+    - Node.js 19로 업데이트<br>
+    - Electron 22로 업데이트<br>
+    - 보안 취약점 수정<br>
+    </span>
+    <br><br>업데이트 1.18.7<br>
+    <span class="updateInfo">
+    - 카카오 번역 오류 수정<br>
+    </span>
     <br><br>업데이트 1.18.6<br>
     <span class="updateInfo">
     - 프로젝트 변환 오류 수정<br>

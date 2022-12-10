@@ -1,0 +1,149 @@
+
+
+body{
+    margin: 0px;
+    background-color: var(--Background);
+    color: var(--mainColor);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-family: var(--font);
+}
+
+.alligner{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100vw;
+    gap: 10px;
+}
+
+.mt{
+    margin-top: 20px;
+}
+.center{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.box-cont{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+#loading_bar{
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    width: 100vw;
+    height: 20px;
+    background-color: var(--Highlight2);
+}
+
+#loading-text{
+    position: absolute;
+    left: 10px;
+    top: 0px;
+    font-size: 12px;
+    visibility: hidden;
+}
+
+#icon1{
+    position: absolute;
+    left: 96vw;
+    top: 0px;
+}
+
+#icon2{
+    position: absolute;
+    left: 90vw;
+    top: 0px;
+}
+
+.icon{
+    -webkit-app-region: no-drag;
+    height: 20px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.subtitle{
+    margin-top: -30px;
+    font-size: 14px;
+}
+
+.box{
+    background-color: var(--Highlight3);
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+}
+
+.smalmar{
+    position: absolute;
+    top: 515px;
+    left: 0px;
+    width: 100%;
+    gap: 70px
+}
+
+.box-title{
+    font-size: 18px;
+}
+
+.btnx{
+    width: 40% !important;
+    background-color: var(--Highlight1);
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+.btxSel{
+    background-color: var(--Selected);
+}
+.btnx[selected]{
+    background-color: var(--Selected);
+}
+
+
+@mixin light($color) {
+    border-radius: 10px;
+    border: transparent;
+    background-color: #{$color};
+    color: var(--mainColor);  
+}
+.highlight2{
+    @include light(var(--Highlight3));
+    font-family: var(--font);
+}
+
+.vw7{
+    width: 70vw;
+}
+
+.gaps{
+    gap: 10px
+}
+
+.tooltip {
+    background: #333;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    display: none;
+
+}
+
+.tooltip[data-show] {
+    display: block;
+}
+
+.trans_input{
+    height: 15px;
+}

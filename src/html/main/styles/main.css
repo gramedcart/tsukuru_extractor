@@ -271,4 +271,24 @@ body {
   border: 3px solid var(--Highlight1);
   padding: 12px;
 }
+
+.btnx {
+  width: 40% !important;
+  background-color: var(--Highlight1);
+  text-align: center;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.btxSel {
+  background-color: var(--Selected);
+}
+
+.smalmar {
+  position: absolute;
+  top: 515px;
+  left: 0px;
+  width: 100%;
+}
 /*# sourceMappingURL=main.css.map */
