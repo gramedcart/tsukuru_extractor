@@ -147,3 +147,14 @@ body{
 .trans_input{
     height: 15px;
 }
+
+.updateInfoContainer{
+    height: 60vh;
+    overflow-y:scroll;
+    border: 3px solid var(--Highlight1);
+    padding: 12px;
+}
+
+.updateInfo{
+    font-size: 12px;
+}

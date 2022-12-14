@@ -9,6 +9,9 @@
     
     ipcRenderer.on('getGlobalSettings', (evn, tt) => {
         globalSettings = tt
+        if(tt.language === 'en'){
+            globalThis.loadEn()
+        }
         const tData = (globalSettings.themeData)
         let root = document.documentElement;
         for(const i in tData){
@@ -103,4 +106,8 @@
     });
     changeMenu('main')
 
+    ipcRenderer.on('alert_free', (evn, tt) => {
+        //@ts-ignore
+        Swal.fire(tt)
+    });
 })()

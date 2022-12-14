@@ -23,7 +23,8 @@ export const settings = {
     themeData: {},
     extractPlus: [],
     themeList: Object.keys(styles),
-    hideUnrecomenedTranslators: true
+    hideUnrecomenedTranslators: true,
+    language: 'en'
 }
 
 export const onebyone = {

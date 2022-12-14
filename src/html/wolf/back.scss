@@ -83,7 +83,7 @@ body{
 
 .smalmar{
     position: absolute;
-    top: 515px;
+    bottom: 10px;
     left: 0px;
     width: 100%;
     gap: 70px
@@ -116,7 +116,6 @@ body{
     color: var(--mainColor);  
     padding: 20px;
     text-align: center;
-
 }
 
 @mixin light($color) {
@@ -151,6 +150,7 @@ body{
     font-size: 13px;
     border-radius: 4px;
     display: none;
+    text-align: center;
 
 }
 
@@ -170,7 +170,12 @@ body{
     width: 90%;
 }
 
-#runbtn{
+.options-grid .btn{
+    height: 30px;
+    line-height: 30px;
+}
+
+.runbtn{
     @include light(var(--Highlight3));
     text-align: center;
     padding: 60px 20px;
@@ -180,9 +185,11 @@ body{
     border-radius: 10px;
 }
 
-#runbtn:hover{
+.runbtn:hover{
     border: 1px solid #bd93f9;
 }
+
+
 
 #addons {
     position: relative;
@@ -212,5 +219,5 @@ body{
     display: flex;
     width: 90%;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
 }

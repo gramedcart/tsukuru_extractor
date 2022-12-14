@@ -21,6 +21,9 @@ ipcRenderer.on("settings", (evt, arg) => {
     const userdict = arg.userdict
     const ess2 = arg.extractSomeScript2
     const extractPlus = arg.extractPlus
+    if(arg.language === 'en'){
+      globalThis.loadEn()
+    }
   
     for(const keys in Object.keys(userdict)){
       const key = Object.keys(userdict)[keys];
@@ -28,8 +31,8 @@ ipcRenderer.on("settings", (evt, arg) => {
     }
   
     (document.getElementById('extractSomeScript2') as HTMLTextAreaElement).value += ess2.join('\n');
-    (document.getElementById('extractPlus') as HTMLTextAreaElement).value += extractPlus.map(String).join('\n')
-  
+    (document.getElementById('extractPlus') as HTMLTextAreaElement).value += extractPlus.map(String).join('\n');
+    (document.getElementById('language') as HTMLSelectElement).value = arg.language
     CheckboxValues.forEach((val) => {
       (document.getElementById(val) as HTMLInputElement).checked = gsettings[val]
     })
@@ -85,7 +88,7 @@ document.getElementById('apply').onclick = () => {
   }
   gsettings.extractPlus = extP
 
-
+  gsettings.language = (document.getElementById('language') as HTMLSelectElement).value
   ipcRenderer.send('applysettings', gsettings);
 }
 

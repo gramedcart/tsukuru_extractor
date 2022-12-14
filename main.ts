@@ -89,6 +89,9 @@ function createWindow() {
       const currentVersion = c(currentVersionNumber)
       const ver = (await axios.get('https://raw.githubusercontent.com/gramedcart/tsukuru_extractor/main/version.json')).data.version
       let last_version = c(ver)
+      if(!storage.has('myversion')){
+        storage.set("myversion", 0)
+      }
       const myversion = storage.has('myversion') ? storage.get('myversion') : currentVersion
       if(currentVersion < last_version){
         getMainWindow().webContents.send('updateFound');
@@ -612,6 +615,13 @@ ipcMain.on('updateVersion', async (ev, arg) => {
 process.on('uncaughtException', function (err) {
   console.log(err);
 })
+
+ipcMain.on('setheight', (ev,arg) =>{
+  globalThis.mwindow.setResizable(true);
+  globalThis.mwindow.setSize(800, arg, false)
+  globalThis.mwindow.setResizable(false)
+})
+
 
 ipcMain.on('log', async(ev, arg) => console.log(arg))
 ipcMain.on('projectConvert', async(ev, arg) => prjc.ConvertProject(arg))

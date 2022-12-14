@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="../../lib/enlang/enlang.js"></script>
         <meta charset="utf-8">
         <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
         <link href="./styles.css" rel="stylesheet">
-        <title>설정</title>
+        <title>Config</title>
     </head>
     <body>
         <div id="container">
@@ -19,6 +20,12 @@
             </label><br><br>
             <label class="boxc">내용 없는 문자열 추출
                 <input type="checkbox" id="ExtractAddLine">
+            </label><br><br>
+            <label class="boxc">Language / 언어
+                <select name="pets" id="language">
+                    <option value="en">English</option>
+                    <option value="ko">한국어</option>
+                </select>
             </label><br><br>
             <label>기계번역 사용자 사전</label><br><br>
             <textarea id="userdict" spellcheck="false" placeholder="Hina=히나&#10;橋本=하시모토&#10;ひかり=히카리&#10;.."></textarea><br><br>

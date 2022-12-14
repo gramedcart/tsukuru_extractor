@@ -1,9 +1,12 @@
+<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
+    <script src="../../lib/enlang/enlang.js"></script>
     <link rel="stylesheet" href="../../lib/sweetalert2/css.css">
     <script src="../../lib/sweetalert2/main.js"></script>
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
     <link href="./back.css" rel="stylesheet">
+
     <title>MV Extractor++</title>
 </head>
 
@@ -19,44 +22,59 @@
     <div id="simpleMenu" style="display: none">
         <div class="alligner">
             <div class="center gaps">
-                <p class="info">게임 폴더:</p>
+                <p class="info" enlang="Game Folder:">게임 폴더:</p>
                 <input type="text" id="folder_input" class="highlight2 vw7">
-                <button id="sel" class="highlight2">선택</button>
+                <button id="sel" class="highlight2" enlang="Select">선택</button>
             </div>
             <div class="center gaps">
-                <div class="btnx" id="marTrans">추출모드</div>
-                <div class="btnx" id="handTrans">적용모드</div>
+                <div class="btnx" id="marTrans" enlang="Extract">추출모드</div>
+                <div class="btnx" id="handTrans" enlang="Apply">적용모드</div>
             </div>
             <div class="alligner" id="marCont" style="display: none">
                 <div class="center">
                     <div class="center2 gaps">
                         <div class="options-grid">
-                            <div class="btn" id="ext-buran">
+                            <div class="btn" id="ext-buran" enlang="Extract Unstable">
                                 불안정 추출
                             </div>
-                            <div class="btn" id="ext-all">
+                            <div class="btn" id="ext-all" enlang="Extract All">
                                 모두 추출
                             </div>
                             <div class="btn"></div>
+                            <div class="btn"></div>
+                            <div class="btn"></div>
+                            <div class="btn"></div>
+
                         </div>
-                        <div id="runbtn">RUN</div>
+                        <div id="runbtn" class="runbtn">RUN</div>
     
                     </div>
                 </div>
             </div>
             <div class="alligner" id="handCont" style="display: none">
                 <div class="center">
-                    <span>손번역은 현재 고급모드에서만 가능합니다</span>
+                    <div class="center2 gaps">
+                        <div class="options-grid">
+                            <div class="btn"></div>
+                            <div class="btn"></div>
+                            <div class="btn"></div>
+                            <div class="btn"></div>
+                            <div class="btn"></div>
+                            <div class="btn"></div>
+                        </div>
+                        <div id="runbtn2" class="runbtn">RUN</div>
+
+                    </div>
                 </div>
             </div>
         </div>
         <div id="addons-block" class="center">
             <div id="addons" class="highlight">
                 <div class="container2">
-                    <button class="btn" id="eztrans">기계 번역</button>
-                    <button class="btn" id="changeAll">문자열 일괄 변경</button>
+                    <button class="btn" id="eztrans" enlang="Machine Translator">기계 번역</button>
+                    <button class="btn" id="changeAll"></button>
                     <button class="btn" id="versionUp"></button>
-                    <button class="btn" id="settings">설정</button>
+                    <button class="btn" id="settings" enlang="Config">설정</button>
                 </div>
             </div>
         </div>

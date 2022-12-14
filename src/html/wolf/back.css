@@ -100,7 +100,7 @@ body {
 
 .smalmar {
   position: absolute;
-  top: 515px;
+  bottom: 10px;
   left: 0px;
   width: 100%;
   gap: 70px;
@@ -168,6 +168,7 @@ body {
   font-size: 13px;
   border-radius: 4px;
   display: none;
+  text-align: center;
 }
 
 .tooltip[data-show] {
@@ -188,7 +189,12 @@ body {
   width: 90%;
 }
 
-#runbtn {
+.options-grid .btn {
+  height: 30px;
+  line-height: 30px;
+}
+
+.runbtn {
   border-radius: 10px;
   border: transparent;
   background-color: var(--Highlight3);
@@ -201,7 +207,7 @@ body {
   border-radius: 10px;
 }
 
-#runbtn:hover {
+.runbtn:hover {
   border: 1px solid #bd93f9;
 }
 
@@ -242,8 +248,8 @@ body {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 /*# sourceMappingURL=back.css.map */

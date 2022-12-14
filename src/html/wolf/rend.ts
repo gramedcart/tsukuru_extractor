@@ -5,10 +5,15 @@
     const simpleMenu = document.querySelector('#simpleMenu') as HTMLDivElement
     const Popper = (window as any).Popper as any
     
-    let globalSettings
+    let globalSettings:{[key:string]:any}
     
+    ipcRenderer.send('setheight', 420);
+
     ipcRenderer.on('getGlobalSettings', (evn, tt) => {
         globalSettings = tt
+        if(tt.language === 'en'){
+            globalThis.loadEn()
+        }
         const tData = (globalSettings.themeData)
         let root = document.documentElement;
         for(const i in tData){
@@ -17,13 +22,14 @@
     })
     
 
-    function genPopper(id:string, text:string){
-
+    function genPopper(id:string, text:string, entext:string|null = null){
+        entext = entext ?? text
         const tooltip = document.createElement('div')
         tooltip.classList.add('tooltip')
         document.body.appendChild(tooltip)
         const button = document.getElementById(id)
-        tooltip.innerText = text
+        tooltip.innerHTML = text.replace(/\r/g, '').replace(/\n/g, '<br>');
+        tooltip.setAttribute('enlang', entext)
         const popperInstance = Popper.createPopper(button, tooltip, {
             modifiers: [
               {
@@ -62,28 +68,6 @@
         }
     }
     
-    function loadSimple(){
-        changeMenu('simple')
-        {
-            genPopper('marTrans', '게임에서 텍스트를 추출합니다')
-            document.getElementById('marTrans').onclick = () => {
-                document.getElementById('handTrans').removeAttribute('selected')
-                document.getElementById('marTrans').setAttribute('selected', '')
-                document.getElementById('marCont').style.display = 'flex'
-                document.getElementById('handCont').style.display = 'none'
-
-            }
-            genPopper('handTrans', '추출한 텍스트를 다시 게임에 적용합니다')
-            document.getElementById('handTrans').onclick = () => {
-                document.getElementById('marTrans').removeAttribute('selected')
-                document.getElementById('handTrans').setAttribute('selected', '')
-                document.getElementById('handCont').style.display = 'flex'
-                document.getElementById('marCont').style.display = 'none'
-
-            }
-        }
-    }
-    
     document.getElementById('icon1').onclick = () => {ipcRenderer.send('close')}
     document.getElementById('icon2').onclick = () => {ipcRenderer.send('minimize')}
     document.getElementById('sel').addEventListener('click', () => {
@@ -98,9 +82,28 @@
     document.getElementById('WolfBtn').onclick = () => {
         ipcRenderer.send('changeURL', './src/html/main/index.html')
     }
-    genPopper('ext-buran', '수정 시 불안정할 수 있는 텍스트도 추출합니다.')
-    genPopper('ext-all', '발견할 수 있는 이벤트 내의 모든 텍스트를 추출합니다.')
-    genPopper('runbtn', '추출을 시작합니다')
-    loadSimple()
+    changeMenu('simple')
+    {
+        genPopper('ext-buran', '수정 시 불안정할 수 있는 텍스트도 추출합니다.', 'Extract text that can make errors the game when modifying it.')
+        genPopper('ext-all', '발견할 수 있는 이벤트 내의 모든 텍스트를 추출합니다.\n수정 시 오류가 나기 쉽습니다.', 'Extract all Texts from game.\nEditing these strings is prone to errors.')
+        genPopper('runbtn', '추출을 시작합니다', 'Start extract')
+        genPopper('runbtn2', '적용을 시작합니다', 'Start apply')
+        genPopper('marTrans', '게임에서 텍스트를 추출합니다', 'Extract strings from the game')
+        genPopper('handTrans', '추출한 텍스트를 다시 게임에 적용합니다', 'Apply the extracted text back to the game')
+        document.getElementById('marTrans').onclick = () => {
+            document.getElementById('handTrans').removeAttribute('selected')
+            document.getElementById('marTrans').setAttribute('selected', '')
+            document.getElementById('marCont').style.display = 'flex'
+            document.getElementById('handCont').style.display = 'none'
+
+        }
+        document.getElementById('handTrans').onclick = () => {
+            document.getElementById('marTrans').removeAttribute('selected')
+            document.getElementById('handTrans').setAttribute('selected', '')
+            document.getElementById('handCont').style.display = 'flex'
+            document.getElementById('marCont').style.display = 'none'
+
+        }
+    }
     
 })()

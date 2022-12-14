@@ -34,6 +34,9 @@
     document.querySelector('#sel').addEventListener('click', () => {
         ipcRenderer.send('select_folder', 'folder_input');
     });
+
+    ipcRenderer.send('setheight', 550);
+
     
     ipcRenderer.on('set_path', (evn, tt) => {
         (document.getElementById(tt.type) as HTMLInputElement).value = tt.dir
@@ -59,6 +62,10 @@
     
     
     ipcRenderer.on('getGlobalSettings', (evn, tt) => {
+        if(tt.language === 'en'){
+            
+            globalThis.loadEn()
+        }
         globalSettings = tt
         const tData = (globalSettings.themeData)
         let root = document.documentElement;
