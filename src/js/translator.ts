@@ -302,7 +302,7 @@ function isASCII(str:string) {
 }
 
 
-exports.trans = async (ev, arg) => {
+export const trans = async (ev, arg) => {
     let translateMemorys:{[key:string]:string} = {}
 
     const dm = true

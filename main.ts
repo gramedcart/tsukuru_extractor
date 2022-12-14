@@ -1,32 +1,26 @@
 // Modules to control application life and create native browser window
 // E:\Gamr\Tool\PPLSS\www\data\Extracted
-const {
-  app,
-  BrowserWindow,
-  ipcMain,
-  dialog,
-  globalShortcut
-} = require('electron');
-const fs = require('fs');
-const open = require('open');
+import { app, BrowserWindow, ipcMain, dialog, globalShortcut } from 'electron';
+import fs from 'fs';
+import open from 'open';
 const tools = require('./src/js/libs/projectTools').default;
-const Store = require('electron-store');
+import Store from 'electron-store';
 const storage = new Store();
-const ExtTool = require('./src/js/extract.js')
-const path = require('path')
-const edTool = require('./src/js/edtool.js')
+import * as ExtTool from './src/js/extract.js';
+import path from 'path';
+import * as edTool from './src/js/edtool.js';
 let mainid = 0
 const defaultHeight = 550
 // 350 + 170
-const axios = require('axios')
-const dataBaseO = require('./src/js/datas.js')
-const applyjs = require("./src/js/apply.js")
-const eztrans = require("./src/js/translator.js")
-const {checkIsMapFile, sleep} = require('./src/js/globalutils.js')
-const yaml = require('js-yaml');
-const prjc = require('./src/js/projectConvert')
-const Themes = require('./src/js/styles').default;
-const sendUpdateInfo = require('./main_update').default;
+import axios from 'axios';
+import * as dataBaseO from './src/js/datas.js';
+import * as applyjs from "./src/js/apply.js";
+import * as eztrans from "./src/js/translator.js";
+import { checkIsMapFile, sleep } from './src/js/globalutils.js';
+import * as yaml from 'js-yaml';
+import * as prjc from './src/js/projectConvert';
+import Themes from './src/js/styles'
+import sendUpdateInfo from './main_update'
 require('./src/js/fonts')
 
 function ErrorAlert(msg){
@@ -46,7 +40,7 @@ async function loadSettings(){
   let givensettings = {}
 
   if(storage.has('settings')){
-    givensettings = JSON.parse(storage.get('settings'))
+    givensettings = JSON.parse(storage.get('settings') as any)
   }
 
   globalThis.settings = dataBaseO.settings
@@ -61,7 +55,7 @@ let mainWindow
 
 function createWindow() {
   loadSettings()
-  oPath()
+  setOPath()
   mainWindow = new BrowserWindow({
     width: 800,
     height: defaultHeight,
@@ -72,15 +66,14 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
     },
     icon: path.join(__dirname, 'res/icon.png')
   })
   
   mainWindow.setMenu(null)
   // and load the index.html of the app.
-  mainWindow.loadFile('./src/html/main/index.html')
-  // mainWindow.loadFile('./src/html/simple/index.html')
+  // mainWindow.loadFile('./src/html/main/index.html')
+  mainWindow.loadFile('./src/html/simple/index.html')
   mainWindow.webContents.on('did-finish-load', function () {
     mainWindow.show();
     getMainWindow().webContents.send('is_version', app.getVersion());
@@ -166,6 +159,8 @@ ipcMain.on('license', () => {
 
 ipcMain.on('changeURL', (ev, arg) => {
   globalThis.mwindow.loadFile(arg)
+  if(arg.endsWith('main/index.html')){
+  }
 })
 
 ipcMain.on('settings', () => {
@@ -178,7 +173,6 @@ ipcMain.on('settings', () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
     },
     icon: path.join(__dirname, 'res/icon.png'),
   })
@@ -209,7 +203,6 @@ ipcMain.on('gamePatcher', (ev, dir) => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
     },
     icon: path.join(__dirname, 'res/icon.png'),
   })
@@ -329,11 +322,11 @@ async function extractor(arg){
             return
           }
         }
-        let hail = fs.readFileSync(jsdir + '/plugins.js', 'utf-8')
-        hail = hail.split('$plugins =')
-        hail = hail[hail.length - 1] + '  '
-        hail = hail.substring(hail.indexOf('['), hail.lastIndexOf(']') + 1)
-        fs.writeFileSync(dir + '/ext_plugins.json', JSON.stringify(JSON.parse(hail)), 'utf-8')
+        let hail2 = fs.readFileSync(jsdir + '/plugins.js', 'utf-8')
+        let hail = hail2.split('$plugins =')
+        hail2 = hail[hail.length - 1] + '  '
+        hail2 = hail2.substring(hail.indexOf('['), hail.lastIndexOf(']') + 1)
+        fs.writeFileSync(dir + '/ext_plugins.json', JSON.stringify(JSON.parse(hail2)), 'utf-8')
       }
     }
     globalThis.externMsg = {}
@@ -478,7 +471,7 @@ ipcMain.on('extract', async (ev, arg) => {
 
 ipcMain.on('apply', applyjs.apply)
 
-function oPath(){
+function setOPath(){
   if(tools.packed){
     globalThis.oPath = process.resourcesPath
   }
@@ -532,7 +525,7 @@ ipcMain.on('changeAllString', async (ev, arg) => {
       worked()
       getMainWindow().webContents.send('alert', {icon: 'error', message: 'Extract 폴더가 존재하지 않습니다'}); 
     } 
-  } catch (error) {
+  } catch (err) {
     worked()
     getMainWindow().webContents.send('alert', {icon: 'error', message: JSON.stringify(err, Object.getOwnPropertyNames(err))}); 
   }
@@ -567,7 +560,7 @@ ipcMain.on('updateVersion', async (ev, arg) => {
     const OldDir = path.join(arg.dir3_base, 'Extract')
     const NewDir = path.join(arg.dir2_base, 'Extract')
     const fileList1 = fs.readdirSync(OldDir)
-    for(i in (fileList1)){
+    for(let i in (fileList1)){
       const parsed = path.parse(fileList1[i])
       const file = parsed.name.concat(parsed.ext)
       let TransDict = {}
@@ -592,11 +585,11 @@ ipcMain.on('updateVersion', async (ev, arg) => {
         }
         return data
       }
-      for(i2 in (dat0)){
+      for(let i2 in (dat0)){
         TransDict[dat1[i2]] = dat0[i2]
         dat2_dat = UpReplacer(dat2_dat, dat1[i2], dat0[i2], false)
       }
-      for(i2 in TransDict){
+      for(let i2 in TransDict){
         dat2_dat = UpReplacer(dat2_dat, dat1[i2], dat0[i2], true)
       }
       dat2 = dat2_dat.join('\n')
@@ -605,7 +598,7 @@ ipcMain.on('updateVersion', async (ev, arg) => {
 
 
 
-      getMainWindow().webContents.send('loading', i/fileList1.length*100);
+      getMainWindow().webContents.send('loading', Number(i)/fileList1.length*100);
       await sleep(0)
     }
     getMainWindow().webContents.send('alert', '완료되었습니다')

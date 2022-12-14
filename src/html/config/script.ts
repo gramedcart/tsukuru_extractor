@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-let settings = {}
+let gsettings:{[key:string]:any} = {}
 const CheckboxValues = [
   'ExtractAddLine',
   'onefile_src',
@@ -17,23 +17,23 @@ const CheckboxValues = [
 
 ipcRenderer.on("settings", (evt, arg) => {
   try{
-    settings = arg
+    gsettings = arg
     const userdict = arg.userdict
     const ess2 = arg.extractSomeScript2
     const extractPlus = arg.extractPlus
   
     for(const keys in Object.keys(userdict)){
-      const key = Object.keys(userdict)[keys]
-      document.getElementById('userdict').value += key + '=' + userdict[key] + '\n'
+      const key = Object.keys(userdict)[keys];
+      (document.getElementById('userdict') as HTMLTextAreaElement).value += key + '=' + userdict[key] + '\n'
     }
   
-    document.getElementById('extractSomeScript2').value += ess2.join('\n')
-    document.getElementById('extractPlus').value += extractPlus.map(String).join('\n')
+    (document.getElementById('extractSomeScript2') as HTMLTextAreaElement).value += ess2.join('\n');
+    (document.getElementById('extractPlus') as HTMLTextAreaElement).value += extractPlus.map(String).join('\n')
   
     CheckboxValues.forEach((val) => {
-      document.getElementById(val).checked = settings[val]
+      (document.getElementById(val) as HTMLInputElement).checked = gsettings[val]
     })
-    document.getElementById('update').innerText = `업데이트 확인 (현재: ${settings.version})`
+    document.getElementById('update').innerText = `업데이트 확인 (현재: ${gsettings.version})`
     document.getElementById('update').onclick = () => {ipcRenderer.send('updates')}
     document.getElementById('license').onclick = () => {ipcRenderer.send('license')}
     _reload()
@@ -44,7 +44,7 @@ ipcRenderer.on("settings", (evt, arg) => {
 })
 
 function _reload(){
-  if(settings.extractSomeScript){
+  if(gsettings.extractSomeScript){
     document.getElementById('extractSomeScript2').className = ''
   }
   else{
@@ -53,12 +53,12 @@ function _reload(){
 }
 
 document.getElementById('extractSomeScript').addEventListener('change', (event) => {
-  settings.extractSomeScript = document.getElementById('extractSomeScript').checked
+  gsettings.extractSomeScript = (document.getElementById('extractSomeScript') as HTMLInputElement).checked
   _reload()
 })
 
 document.getElementById('apply').onclick = () => {
-  const iVal = (document.getElementById('userdict').value).split('\n')
+  const iVal = ((document.getElementById('userdict') as HTMLInputElement).value).split('\n')
   let userdict = {}
   for(let i=0;i<iVal.length;i++){
     if(typeof(iVal[i]) == 'string'){
@@ -68,14 +68,14 @@ document.getElementById('apply').onclick = () => {
       }
     }
   }
-  settings.userdict = userdict
+  gsettings.userdict = userdict
   CheckboxValues.forEach((val) => {
-    settings[val] = document.getElementById(val).checked
+    gsettings[val] = (document.getElementById(val) as HTMLInputElement).checked
   })
-  settings.theme = 'Dracula'
-  settings.extractSomeScript2 = document.getElementById('extractSomeScript2').value.split('\n')
+  gsettings.theme = 'Dracula'
+  gsettings.extractSomeScript2 = (document.getElementById('extractSomeScript2') as HTMLTextAreaElement).value.split('\n')
 
-  const extractPlusValues = document.getElementById('extractPlus').value.split('\n')
+  const extractPlusValues = (document.getElementById('extractPlus') as HTMLTextAreaElement).value.split('\n')
   let extP = []
   for(const val of extractPlusValues){
     const tn = parseInt(val)
@@ -83,12 +83,12 @@ document.getElementById('apply').onclick = () => {
       extP.push(tn)
     }
   }
-  settings.extractPlus = extP
+  gsettings.extractPlus = extP
 
 
-  ipcRenderer.send('applysettings', settings);
+  ipcRenderer.send('applysettings', gsettings);
 }
 
 document.getElementById('close').onclick = () => {
-  ipcRenderer.send('closesettings', settings);
+  ipcRenderer.send('closesettings', gsettings);
 }

@@ -18,6 +18,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/aes-js": "^3.1.1",
+    "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.190",
     "@types/tcp-port-used": "^1.0.1",
     "electron": "^22.0.0",

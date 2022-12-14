@@ -1,0 +1,216 @@
+
+
+body{
+    margin: 0px;
+    background-color: var(--Background);
+    color: var(--mainColor);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-family: var(--font);
+}
+
+.alligner{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100vw;
+    gap: 10px;
+}
+
+.mt{
+    margin-top: 20px;
+}
+.center{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.box-cont{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+#loading_bar{
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    width: 100vw;
+    height: 20px;
+    background-color: var(--Highlight2);
+}
+
+#loading-text{
+    position: absolute;
+    left: 10px;
+    top: 0px;
+    font-size: 12px;
+    visibility: hidden;
+}
+
+#icon1{
+    position: absolute;
+    left: 96vw;
+    top: 0px;
+}
+
+#icon2{
+    position: absolute;
+    left: 90vw;
+    top: 0px;
+}
+
+.icon{
+    -webkit-app-region: no-drag;
+    height: 20px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.subtitle{
+    margin-top: -30px;
+    font-size: 14px;
+}
+
+.box{
+    background-color: var(--Highlight3);
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+}
+
+.smalmar{
+    position: absolute;
+    top: 515px;
+    left: 0px;
+    width: 100%;
+    gap: 70px
+}
+
+.box-title{
+    font-size: 18px;
+}
+
+.btnx{
+    width: 40% !important;
+    background-color: var(--Highlight1);
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+.btxSel{
+    background-color: var(--Selected);
+}
+.btnx[selected]{
+    background-color: var(--Selected);
+}
+
+.btn{
+    border: transparent;
+    background-color: var(--Highlight2);
+    font-family: var(--font);
+    color: var(--mainColor);  
+    padding: 20px;
+    text-align: center;
+
+}
+
+@mixin light($color) {
+    border-radius: 10px;
+    border: transparent;
+    background-color: #{$color};
+    color: var(--mainColor);  
+}
+.highlight{
+    @include light(var(--Highlight2));
+    font-family: var(--font);
+}
+.highlight2{
+    @include light(var(--Highlight3));
+    font-family: var(--font);
+}
+
+
+.vw7{
+    width: 70vw;
+}
+
+.gaps{
+    gap: 10px
+}
+
+.tooltip {
+    background: #333;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    display: none;
+
+}
+
+.tooltip[data-show] {
+    display: block;
+}
+
+.trans_input{
+    height: 15px;
+}
+
+.options-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: var(--Highlight1);
+    grid-gap: var(--Gap);
+    width: 90%;
+}
+
+#runbtn{
+    @include light(var(--Highlight3));
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 12px;
+    font-size: 20px;
+    font-weight: 900;
+    border-radius: 10px;
+}
+
+#runbtn:hover{
+    border: 1px solid #bd93f9;
+}
+
+#addons {
+    position: relative;
+    width: calc(90vw - 150px);
+    height: 0px;
+    transition: 0.2s;
+}
+
+#addons-block{
+    position: absolute;
+    bottom: 80px;
+    margin-top: 10px;
+    height: 52.5px;
+}
+
+.container2 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: var(--Gap);
+    @include light(var(--Highlight3));
+
+}
+
+.center2{
+    display: flex;
+    width: 90%;
+    justify-content: center;
+    align-items: flex-start;
+}

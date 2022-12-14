@@ -1,5 +1,7 @@
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../lib/sweetalert2/css.css">
+    <script src="../../lib/sweetalert2/main.js"></script>
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
     <link href="./back.css" rel="stylesheet">
     <title>MV Extractor++</title>
@@ -14,25 +16,6 @@
             <div id="border_r"></div>
         </div>
     </div>
-    <div id="mainMenu" style="display: none">
-        <div class="alligner">
-            <div class="center mt">
-                <img src="./icon.png" width="128px" height="128px">
-            </div>
-            <div class="center">
-                <h1>Tsukuru Extractor</h1>
-            </div>
-            <span class="subtitle center">(구) MVExtractor++</span>
-        </div>
-        <div class="box-cont">
-            <div class="box">
-                <span class="box-title" id="gokupu">RPG MV/MZ</span>
-            </div>
-            <div class="box">
-                <span class="box-title" id="simpuru">Wolf RPG</span>
-            </div>
-        </div>
-    </div>
     <div id="simpleMenu" style="display: none">
         <div class="alligner">
             <div class="center gaps">
@@ -45,13 +28,20 @@
                 <div class="btnx" id="handTrans">적용모드</div>
             </div>
             <div class="alligner" id="marCont" style="display: none">
-                <div class="center gaps">
-                    <p class="info">번역기:</p>
-                    <select type="text" id="trans_input" class="highlight2 vw7">
-                        <option value=""></option>
-                        <option value="eztrans">Eztrans</option>
-                        <option value="kakao">카카오</option>
-                    </select>
+                <div class="center">
+                    <div class="center2 gaps">
+                        <div class="options-grid">
+                            <div class="btn" id="ext-buran">
+                                불안정 추출
+                            </div>
+                            <div class="btn" id="ext-all">
+                                모두 추출
+                            </div>
+                            <div class="btn"></div>
+                        </div>
+                        <div id="runbtn">RUN</div>
+    
+                    </div>
                 </div>
             </div>
             <div class="alligner" id="handCont" style="display: none">
@@ -60,9 +50,19 @@
                 </div>
             </div>
         </div>
+        <div id="addons-block" class="center">
+            <div id="addons" class="highlight">
+                <div class="container2">
+                    <button class="btn" id="eztrans">기계 번역</button>
+                    <button class="btn" id="changeAll">문자열 일괄 변경</button>
+                    <button class="btn" id="versionUp"></button>
+                    <button class="btn" id="settings">설정</button>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="center smalmar" style="display: none;">
-        <div class="btnx">MV/MZ</div>
+        <div class="btnx" id="WolfBtn">MV/MZ</div>
         <div class="btnx btxSel">Wolf</div>
     </div>
     <script src="./rend.js"></script>

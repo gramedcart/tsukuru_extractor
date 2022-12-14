@@ -1,16 +1,13 @@
-const {
-    ipcMain,
-    dialog,
-} = require('electron');
-const fs = require('fs');
-const path = require('path')
-const { JSDOM } = require("jsdom");
+import { ipcMain, dialog } from 'electron';
+import fs from 'fs';
+import path from 'path';
+import { JSDOM } from "jsdom";
 
-function sendAlert(txt){
+function sendAlert(txt:string){
     globalThis.mwindow.webContents.send('alert', txt);
 }
 
-function ErrorAlert(txt){
+function ErrorAlert(txt:string){
     globalThis.mwindow.webContents.send('alert', {icon: 'error',  message: txt});
 }
 
@@ -25,7 +22,7 @@ ipcMain.on('selFont', async (ev, dir) => {
       worked()
       return
     }
-    if(path.parse(dir).name !== 'data' && (!arg.force)){
+    if(path.parse(dir).name !== 'data'){
       ErrorAlert('data 폴더가 아닙니다')
       worked()
       return

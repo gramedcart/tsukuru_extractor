@@ -1,9 +1,9 @@
-const fs = require('fs');
-const ExtTool = require('./extract.js')
-const path = require('path')
-const edTool = require('./edtool.js')
+import fs from 'fs';
+import * as  ExtTool from './extract.js';
+import path from 'path';
+import * as edTool from './edtool.js';
 const tools = require('./libs/projectTools').default;
-const yaml = require('js-yaml');
+import yaml from 'js-yaml';
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -11,7 +11,7 @@ function sleep(ms) {
 function getBinarySize(string) {
     return Buffer.byteLength(string, 'utf8');
 }
-exports.apply = async (ev, arg) => {
+export const apply = async (ev, arg) => {
     try {
       const dir = (Buffer.from(arg.dir, "base64").toString('utf8'));
       if (! fs.existsSync(dir + '/Extract')){

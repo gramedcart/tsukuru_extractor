@@ -55,14 +55,10 @@
 
     function changeMenu(type:'main'|'simple'){
         bottomMenu.style.display = 'none'
-        mainMenu.style.display = 'none'
         simpleMenu.style.display = 'none'
         if(type === 'simple'){
             simpleMenu.style.display = 'block'
             bottomMenu.style.display = 'flex'
-        }
-        else if(type === 'main'){
-            mainMenu.style.display = 'block'
         }
     }
     
@@ -90,8 +86,6 @@
     
     document.getElementById('icon1').onclick = () => {ipcRenderer.send('close')}
     document.getElementById('icon2').onclick = () => {ipcRenderer.send('minimize')}
-    document.getElementById('gokupu').onclick = () => {ipcRenderer.send('changeURL', './src/html/main/index.html')}
-    document.getElementById('simpuru').onclick = () => {ipcRenderer.send('changeURL', './src/html/wolf/index.html')}
     document.getElementById('sel').addEventListener('click', () => {
         ipcRenderer.send('select_folder', 'folder_input');
     });
@@ -101,6 +95,12 @@
             document.getElementById(tt.type).innerText = tt.dir
         }
     });
-    changeMenu('main')
-
+    document.getElementById('WolfBtn').onclick = () => {
+        ipcRenderer.send('changeURL', './src/html/main/index.html')
+    }
+    genPopper('ext-buran', '수정 시 불안정할 수 있는 텍스트도 추출합니다.')
+    genPopper('ext-all', '발견할 수 있는 이벤트 내의 모든 텍스트를 추출합니다.')
+    genPopper('runbtn', '추출을 시작합니다')
+    loadSimple()
+    
 })()

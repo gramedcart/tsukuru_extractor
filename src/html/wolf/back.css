@@ -1,0 +1,249 @@
+body {
+  margin: 0px;
+  background-color: var(--Background);
+  color: var(--mainColor);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  font-family: var(--font);
+}
+
+.alligner {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  width: 100vw;
+  gap: 10px;
+}
+
+.mt {
+  margin-top: 20px;
+}
+
+.center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.box-cont {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+#loading_bar {
+  -moz-user-select: none;
+   -ms-user-select: none;
+       user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  width: 100vw;
+  height: 20px;
+  background-color: var(--Highlight2);
+}
+
+#loading-text {
+  position: absolute;
+  left: 10px;
+  top: 0px;
+  font-size: 12px;
+  visibility: hidden;
+}
+
+#icon1 {
+  position: absolute;
+  left: 96vw;
+  top: 0px;
+}
+
+#icon2 {
+  position: absolute;
+  left: 90vw;
+  top: 0px;
+}
+
+.icon {
+  -webkit-app-region: no-drag;
+  height: 20px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.subtitle {
+  margin-top: -30px;
+  font-size: 14px;
+}
+
+.box {
+  background-color: var(--Highlight3);
+  border-radius: 20px;
+  padding: 20px;
+  cursor: pointer;
+}
+
+.smalmar {
+  position: absolute;
+  top: 515px;
+  left: 0px;
+  width: 100%;
+  gap: 70px;
+}
+
+.box-title {
+  font-size: 18px;
+}
+
+.btnx {
+  width: 40% !important;
+  background-color: var(--Highlight1);
+  text-align: center;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.btxSel {
+  background-color: var(--Selected);
+}
+
+.btnx[selected] {
+  background-color: var(--Selected);
+}
+
+.btn {
+  border: transparent;
+  background-color: var(--Highlight2);
+  font-family: var(--font);
+  color: var(--mainColor);
+  padding: 20px;
+  text-align: center;
+}
+
+.highlight {
+  border-radius: 10px;
+  border: transparent;
+  background-color: var(--Highlight2);
+  color: var(--mainColor);
+  font-family: var(--font);
+}
+
+.highlight2 {
+  border-radius: 10px;
+  border: transparent;
+  background-color: var(--Highlight3);
+  color: var(--mainColor);
+  font-family: var(--font);
+}
+
+.vw7 {
+  width: 70vw;
+}
+
+.gaps {
+  gap: 10px;
+}
+
+.tooltip {
+  background: #333;
+  color: white;
+  font-weight: bold;
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+  display: none;
+}
+
+.tooltip[data-show] {
+  display: block;
+}
+
+.trans_input {
+  height: 15px;
+}
+
+.options-grid {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
+  background-color: var(--Highlight1);
+  grid-gap: var(--Gap);
+  width: 90%;
+}
+
+#runbtn {
+  border-radius: 10px;
+  border: transparent;
+  background-color: var(--Highlight3);
+  color: var(--mainColor);
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 12px;
+  font-size: 20px;
+  font-weight: 900;
+  border-radius: 10px;
+}
+
+#runbtn:hover {
+  border: 1px solid #bd93f9;
+}
+
+#addons {
+  position: relative;
+  width: calc(90vw - 150px);
+  height: 0px;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+}
+
+#addons-block {
+  position: absolute;
+  bottom: 80px;
+  margin-top: 10px;
+  height: 52.5px;
+}
+
+.container2 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: var(--Gap);
+  border-radius: 10px;
+  border: transparent;
+  background-color: var(--Highlight3);
+  color: var(--mainColor);
+}
+
+.center2 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 90%;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+/*# sourceMappingURL=back.css.map */

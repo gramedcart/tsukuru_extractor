@@ -1,0 +1,40 @@
+import { WolfMapEvent, WolfParserIo } from "./io";
+
+export function wolfExtractMap(data:Buffer){
+    const io = new WolfParserIo(data)
+    const magic = io.readBytes(20)
+    if (!io.byteArrayCompare(magic, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 79, 76, 70, 77, 0, 85, 0, 0, 0])){
+        throw 'Unvalid'
+    }
+    const len = io.readU4le()
+    const check = io.readU1()
+    if (!(check == 102)) {
+        console.log(check)
+        throw 'Unvalid'
+    }
+    const unk = io.readLenStr()
+    const tilesetId = io.readU4le();
+    const width = io.readU4le();
+    const height = io.readU4le();
+    const eventSize = io.readU4le();
+    let map:number[] = []
+    for (let i = 0; i < ((width * height) * 3); i++) {
+        map.push(io.readU4le());
+    }
+    let events:WolfMapEvent[] = [];
+    for (let i = 0; i < eventSize; i++) {
+      events.push(io.readMapEvent())
+    }
+    const check3 = io.readU1();
+    if (!(check3 == 102)) {
+      throw 'ValidationNotEqualError'
+    }
+    return {
+        events: events
+    }
+
+}
+
+export function wolfExtractCommon(){
+
+}
