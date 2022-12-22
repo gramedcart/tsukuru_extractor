@@ -197,14 +197,178 @@ export class WolfParserIo{
         for (let i = 0; i < 4; i++) {
           flags.push(this.readRouteOptions())
         }
-        let vars:number[] = [];
+        let lets:number[] = [];
         for (let i = 0; i < 4; i++) {
-          vars.push(this.readU4le());
+          lets.push(this.readU4le());
         }
         let values:number[] = [];
         for (let i = 0; i < 4; i++) {
           values.push(this.readU4le());
         }
+    }
+
+    readCEvent(){
+        const checka = this.readU1();
+        if (!(checka === 142)) {
+          throw `ValidationNotEqualError ${checka} 1 `
+        }
+        const id = this.readU4le();
+        const runCond = this.readU1();
+        const c = this.readU4le();
+        if (!(c === 2000000)) {
+            return false
+            // throw `ValidationNotEqualError ${c} 2 `
+        }
+        const d = this.readU4le();
+        if (!(d === 0)) {
+          return false
+            // throw `ValidationNotEqualError ${d} 3 `
+        }
+        const enabledNumArgNum = this.readU1();
+        const enabledStrArgNum = this.readU1();
+        const name = this.readLenStr();
+        const len = this.readU4le();
+        let ins:WolfCmd[] = [];
+        for (let i = 0; i < len; i++) {
+            const inst = this.readCInstruction()
+            if(inst){
+                ins.push(inst);
+            }
+        }
+        const noteLen = this.readU4le();
+        const unk = this.readBytes(noteLen);
+        if (noteLen >= 1) {
+          const note = this.readLenStr();
+        }
+        const check = this.readU1();
+        if (!( ((check === 142) || (check === 143) || (check === 144)) )) {
+            throw `ValidationNotEqualError ${check}`
+        }
+        if (check !== 142) {
+          const hmm = this.readHmm()
+        }
+        return {events: ins}
+    }
+
+    readCInstruction(){
+        const u8ArgLen = this.readU1();
+        let u8Arg:number[] = [];
+        for (let i = 0; i < u8ArgLen; i++) {
+          u8Arg.push(this.readU4le());
+        }
+        const indent = this.readU1();
+        const strArgLen = this.readU1();
+        let strArg:lenStr[] = [];
+        for (let i = 0; i < strArgLen; i++) {
+          strArg.push(this.readLenStr());
+        }
+        const l4 = this.readU1();
+        if (l4 >= 1) {
+          const l5 = this.readBytes(6);
+        }
+        if (l4 >= 1) {
+          const l6 = this.readU4le();
+          if (l6 <= 65536) {
+            const l7 = this.readKuku()
+          }
+        }
+        return {numArg:u8Arg, strArg: strArg}
+    }
+    readKuku(){
+        const ku1 = this.readU1();
+        const ku2Len = this.readU1();
+        let ku2:number[] = [];
+        for (let i = 0; i < ku2Len; i++) {
+          ku2.push(this.readU4le());
+        }
+        const ku3Len = this.readU1();
+        const ku3 = this.readBytes(ku3Len);
+    }
+    readHmm(){
+      const argNamesLen = this.readU4le();
+      let argNames:lenStr[] = [];
+      for (let i = 0; i < argNamesLen; i++) {
+        argNames.push(this.readLenStr());
+      }
+      const typeLen = this.readU4le();
+      let types:number[] = [];
+      for (let i = 0; i < typeLen; i++) {
+        types.push(this.readU1());
+      }
+      const argSpecialStrDataLen = this.readU4le();
+      let argSpecialStrData:lenStr[][] = [];
+      for (let i = 0; i < argSpecialStrDataLen; i++) {
+        argSpecialStrData.push(this.readArgSpecialStrData());
+      }
+      const argSpecialNumDataLen = this.readU4le();
+      let argSpecialNumData:number[][] = [];
+      for (let i = 0; i < argSpecialNumDataLen; i++) {
+        argSpecialNumData.push(this.readArgSpecialNumData());
+      }
+      const argDefaultLen = this.readU4le();
+      let argDefault:number[] = [];
+      for (let i = 0; i < argDefaultLen; i++) {
+        argDefault.push(this.readU4le());
+      }
+      const check = this.readU1();
+      if (!( ((check == 143) || (check == 144)) )) {
+        throw 'ValidationNotAnyOfError'
+      }
+      if (check === 144) {
+        const po = this.readCpo()
+      }
+    }
+    readArgSpecialStrData(){
+      const valuesLen = this.readU4le();
+      let values:lenStr[] = [];
+      for (let i = 0; i < valuesLen; i++) {
+        values.push(this.readLenStr());
+      }
+      return values
+    }
+
+    readArgSpecialNumData(){
+      const valuesLen = this.readU4le();
+      let values:number[] = [];
+      for (let i = 0; i < valuesLen; i++) {
+        values.push(this.readU4le());
+      }
+      return values
+    }
+
+    readCpo(){
+      const color = this.readU4le();
+      let varNames:lenStr[] = [];
+      for (var i = 0; i < 100; i++) {
+        varNames.push(this.readLenStr());
+      }
+      const check = this.readU1();
+      if (!( ((check == 144) || (check == 145)) )) {
+        throw `ValidationNotAnyOfError ${check} [144|145]`
+      }
+      if (check == 145) {
+        const wm = this.readWm()
+      }
+    }
+
+    readWm(){
+      const a = this.readLenStr()
+      const check = this.readU1();
+      if (!( ((check == 145) || (check == 146)) )) {
+        throw `ValidationNotAnyOfError ${check} [145|146]`
+      }
+      if (check == 146) {
+        const returner = this.readWmReturn()
+      }
+    }
+
+    readWmReturn(){
+      const name =this.readLenStr()
+      const valueId = this.readU4le();
+      const check = this.readU1();
+      if (!(check == 146)) {
+        throw `ValidationNotEqualError ${check} [146]`
+      }
     }
 }
 
@@ -214,7 +378,7 @@ interface WolfRoute{
     u4Arg: number[]
 }
 
-interface WolfCmd{
+export interface WolfCmd{
     numArg:number[],
     strArg:lenStr[]
 }

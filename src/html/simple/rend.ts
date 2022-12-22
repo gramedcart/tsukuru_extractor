@@ -89,15 +89,13 @@
 
             }
         }
-    }
     
+    }
     document.getElementById('icon1').onclick = () => {ipcRenderer.send('close')}
     document.getElementById('icon2').onclick = () => {ipcRenderer.send('minimize')}
     document.getElementById('gokupu').onclick = () => {ipcRenderer.send('changeURL', './src/html/main/index.html')}
     document.getElementById('simpuru').onclick = () => {ipcRenderer.send('changeURL', './src/html/wolf/index.html')}
-    document.getElementById('sel').addEventListener('click', () => {
-        ipcRenderer.send('select_folder', 'folder_input');
-    });
+
     ipcRenderer.on('set_path', (evn, tt) => {
         (document.getElementById(tt.type) as HTMLInputElement).value = tt.dir
         if(tt.type !== 'folder_input'){

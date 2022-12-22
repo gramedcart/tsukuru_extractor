@@ -16,7 +16,8 @@ function worked(){
   globalThis.mwindow.webContents.send('loading', 0);
 }
 
-ipcMain.on('selFont', async (ev, dir) => {
+export function initFontIPC(){
+  ipcMain.on('selFont', async (ev, dir) => {
     if(!fs.existsSync(dir)){
       ErrorAlert('지정된 디렉토리가 없습니다')
       worked()
@@ -79,3 +80,4 @@ ipcMain.on('changeFontSize', async (ev, arg) => {
     worked()
     
 });
+}

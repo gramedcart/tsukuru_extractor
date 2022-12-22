@@ -1,12 +1,18 @@
 import { writeFileSync, readFileSync } from 'fs'
 import zlib from 'zlib'
+import {encode, decode} from '@msgpack/msgpack'
 
 const WolfExtDataParser = {
     create: (dir:string)=>{
-        writeFileSync(dir,zlib.deflateSync(Buffer.from(JSON.stringify(globalThis.WolfExtData), 'utf-8')))
+        writeFileSync(dir,zlib.deflateSync(Buffer.from(encode({
+            ext: globalThis.WolfExtData,
+            cache: globalThis.WolfCache
+        }))))
     },
     read:(dir:string) =>{
-        globalThis.WolfExtData = JSON.parse(zlib.inflateSync(readFileSync(dir)).toString('utf-8'))
+        const ca =  decode(zlib.inflateSync(readFileSync(dir))) as any
+        globalThis.WolfExtData = ca.ext
+        globalThis.WolfCache = ca.cache
     }
 }
 

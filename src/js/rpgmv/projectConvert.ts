@@ -2,9 +2,9 @@ import fs from 'fs'
 import fsa from 'fs-extra'
 import {app, dialog} from 'electron'
 import path from 'path'
-import tools from './libs/projectTools'
+import tools from '../libs/projectTools'
 import fg from 'fast-glob'
-import * as rpgencrypt from './libs/rpgencrypt'
+import * as rpgencrypt from '../libs/rpgencrypt'
 
 function setProgressBar(now:number, max:number=100){
     globalThis.mwindow.webContents.send('loading', (now/max) * 100);

@@ -581,7 +581,8 @@
         const a = {
             dir: Buffer.from((document.getElementById('folder_input') as HTMLInputElement).value.replace('\\','/'), "utf8").toString('base64'),
             type: transtype,
-            langu: langu
+            langu: langu,
+            game: 'mv'
         };
         running = true
         ipcRenderer.send('eztrans', a);

@@ -9,6 +9,7 @@ export declare global {
     var iconPath:string
     var WolfExtData: extData[]
     var WolfEncoding:'utf8'|'shift-jis'
+    var WolfCache: {[key:string]:Buffer}
 }
 
 interface extData{

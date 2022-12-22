@@ -205,6 +205,7 @@ body {
   font-size: 20px;
   font-weight: 900;
   border-radius: 10px;
+  border: 1px solid var(--Highlight3);
 }
 
 .runbtn:hover {
@@ -251,5 +252,23 @@ body {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+}
+
+[btn-active] {
+  background-color: var(--Selected);
+}
+
+#border_r {
+  -moz-user-select: none;
+   -ms-user-select: none;
+       user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  height: 20px;
+  top: 0px;
+  left: 0px;
+  width: 0vw;
+  position: absolute;
+  background-color: #00968850;
 }
 /*# sourceMappingURL=back.css.map */

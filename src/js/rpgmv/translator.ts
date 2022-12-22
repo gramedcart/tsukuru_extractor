@@ -10,8 +10,8 @@ import * as edTool from './edtool';
 import zlib from 'zlib'
 import open from 'open'
 import { translate as gTranslate } from '@vitalets/google-translate-api';
-import { kakaoTrans } from './libs/kakaotrans.js';
-import { postProcessTranslate, preProcessTranslate } from './libs/preprocess.js';
+import { kakaoTrans } from '../libs/kakaotrans.js';
+import { postProcessTranslate, preProcessTranslate } from '../libs/preprocess.js';
 import { app } from 'electron';
 
 let junChori = false
@@ -357,7 +357,7 @@ export const trans = async (ev, arg) => {
 
     try {
         const dir = Buffer.from(arg.dir, "base64").toString('utf8');
-        const edir = path.join(dir, 'Extract')
+        const edir = arg.game === 'wolf' ? path.join(dir, '_Extract', 'Texts') : path.join(dir, 'Extract')
         if (!fs.existsSync(edir)) {
             globalThis.mwindow.webContents.send('alert', {
                 icon: 'error',
@@ -375,6 +375,8 @@ export const trans = async (ev, arg) => {
             await preProcessTranslate(edir)
         }
         console.log(translator.getType())
+
+
         for(const i in fileList){
             const iPath = path.join(edir, fileList[i])
             fullFileLength += fs.readFileSync(iPath, 'utf-8').length
@@ -457,11 +459,19 @@ export const trans = async (ev, arg) => {
             await sleep(1000)
         }
         let worked_files = 0
-        const edDat = edTool.read(dir)
+        const edDat:any = arg.game === 'wolf' ? null : edTool.read(dir)
         let eed = {}
-        console.log(Object.keys(edDat.main))
         let typeOfFile = ''
         function checkVaildTransFile(name:string){
+            if(arg.game === 'wolf'){
+                if(name.includes('map.txt')){
+                    return true
+                }
+                else if(name.includes('commonEvent.txt')){
+                    return true
+                }
+                return false
+            }
             if (globalThis.settings.safeTrans || globalThis.settings.smartTrans) {
                 console.log(name)
                 if(compatibilityMode){

@@ -183,6 +183,7 @@ body{
     font-size: 20px;
     font-weight: 900;
     border-radius: 10px;
+    border: 1px solid var(--Highlight3);
 }
 
 .runbtn:hover{
@@ -220,4 +221,20 @@ body{
     width: 90%;
     justify-content: center;
     align-items: center;
+}
+
+[btn-active]{
+    background-color: var(--Selected);
+}
+
+#border_r{
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    height: 20px;
+    top: 0px;
+    left: 0px;
+    width: 0vw;
+    position: absolute;
+    background-color: #00968850;
 }

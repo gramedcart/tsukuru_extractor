@@ -3,31 +3,33 @@
 import { app, BrowserWindow, ipcMain, dialog, globalShortcut } from 'electron';
 import fs from 'fs';
 import open from 'open';
-const tools = require('./src/js/libs/projectTools').default;
+import tools from './src/js/libs/projectTools'
 import Store from 'electron-store';
 const storage = new Store();
-import * as ExtTool from './src/js/extract.js';
+import * as ExtTool from './src/js/rpgmv/extract.js';
 import path from 'path';
-import * as edTool from './src/js/edtool.js';
+import * as edTool from './src/js/rpgmv/edtool.js';
 let mainid = 0
 const defaultHeight = 550
 // 350 + 170
 import axios from 'axios';
-import * as dataBaseO from './src/js/datas.js';
-import * as applyjs from "./src/js/apply.js";
-import * as eztrans from "./src/js/translator.js";
-import { checkIsMapFile, sleep } from './src/js/globalutils.js';
+import * as dataBaseO from './src/js/rpgmv/datas.js';
+import * as applyjs from "./src/js/rpgmv/apply.js";
+import * as eztrans from "./src/js/rpgmv/translator.js";
+import { checkIsMapFile, sleep } from './src/js/rpgmv/globalutils.js';
 import * as yaml from 'js-yaml';
-import * as prjc from './src/js/projectConvert';
-import Themes from './src/js/styles'
+import * as prjc from './src/js/rpgmv/projectConvert';
+import Themes from './src/js/rpgmv/styles'
 import sendUpdateInfo from './main_update'
-require('./src/js/fonts')
+import { wolfInit } from './src/js/wolf/main.js';
+import { initFontIPC } from './src/js/rpgmv/fonts';
+
 
 function ErrorAlert(msg){
   sendError(msg)
 }
 
-function worked(){
+export function worked(){
   getMainWindow().webContents.send('worked', 0);
   getMainWindow().webContents.send('loading', 0);
 }
@@ -104,7 +106,7 @@ function createWindow() {
     v(app.getVersion())
     globalThis.settings.themeData = Themes[globalThis.settings.theme]
     getMainWindow().webContents.send('getGlobalSettings', globalThis.settings);
-    if(!tools.packeds){
+    if(!tools.packed){
       globalShortcut.register('Control+Shift+I', () => {
         mainWindow.webContents.openDevTools()
         return false;
@@ -621,7 +623,8 @@ ipcMain.on('setheight', (ev,arg) =>{
   globalThis.mwindow.setSize(800, arg, false)
   globalThis.mwindow.setResizable(false)
 })
-
+wolfInit()
+initFontIPC()
 
 ipcMain.on('log', async(ev, arg) => console.log(arg))
 ipcMain.on('projectConvert', async(ev, arg) => prjc.ConvertProject(arg))

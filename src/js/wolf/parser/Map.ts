@@ -1,4 +1,4 @@
-import { WolfMapEvent, WolfParserIo } from "./io";
+import { WolfCmd, WolfMapEvent, WolfParserIo } from "./io";
 
 export function wolfExtractMap(data:Buffer){
     const io = new WolfParserIo(data)
@@ -32,9 +32,36 @@ export function wolfExtractMap(data:Buffer){
     return {
         events: events
     }
-
 }
 
-export function wolfExtractCommon(){
-
+export function wolfExtractCommon(data:Buffer){
+    const io = new WolfParserIo(data)
+    const magic = io.readBytes(10)
+    if (!io.byteArrayCompare(magic, [0, 87, 0, 0, 79, 76, 85, 70, 67,  0])){
+        // throw 'Unvalid'
+        console.log(Uint8Array.from(magic))
+    }
+    const check = io.readU1();
+    if (!(check == 144)) {
+        console.log(check)
+    }
+    const eventsLen = io.readU4le();
+    let events:WolfCmd[] = [];
+    for (let i = 0; i < eventsLen; i++) {
+        const ev = io.readCEvent()
+        if(ev){
+            for(const e of ev.events){
+                events.push(e)
+            }
+        }
+        else{
+            break
+        }
+    }
+    // const footer = io.readU1();
+    // if (!(footer == 144)) {
+    //   throw `footer Error ${footer}`
+    // }
+    console.log(events)
+    return events
 }

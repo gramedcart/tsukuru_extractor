@@ -2,7 +2,7 @@
 
 import path from 'path';
 import fs, { readdirSync } from 'fs';
-import * as rpgencrypt from "./libs/rpgencrypt";
+import * as rpgencrypt from "../libs/rpgencrypt";
 import yaml from 'js-yaml';
 import Glob from 'glob'
 import fsx from 'fs-extra'

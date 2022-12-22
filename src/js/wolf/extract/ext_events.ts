@@ -27,38 +27,47 @@ function addString(str:lenStr, sourceFile:string, targetFile:string, codeStr:str
     })
 }
 
-const untranslates = [140, 112, 300, 212, 250]
+const untranslates = [140, 112, 300, 212, 250, 122, 150]
 
-export function extractEvent(cmds:Commands[], file:string){
+export function extractEvent(cmds:Commands[], file:string, conf:{[key:string]:boolean}, conf2:{[key:string]:boolean} = {}){
     for(const cmd of cmds){
         const type = (cmd.numArg[0]) //Type
         switch (type){
             case 101:
             case 102:
-            case 103:
-            case 122:{
+            case 103:{
                 let i = 0;
                 for(const str of cmd.strArg){
-                    addString(str, file, 'map', `${type}-${i}`)
+                    if(conf2.commonevent){
+                        addString(str, file, 'commonEvent', `${type}-${i}`)
+                    }
+                    else{
+                        addString(str, file, 'map', `${type}-${i}`)
+                    }
                     i += 1
                 }
                 break
             }
+            case 122:
             case 150:{
-                let i = 0;
-                for(const str of cmd.strArg){
-                    addString(str, file, 'external', `${type}-${i}`)
-                    i += 1
+                // external Extraction
+                if(conf.extBuran){
+                    let i = 0;
+                    for(const str of cmd.strArg){
+                        addString(str, file, 'external', `${type}-${i}`)
+                        i += 1
+                    }
+                    break
                 }
-                break
             }
             case 300:{
-                let i = 0;
-                for(const str of cmd.strArg){
-                    addString(str, file, 'note', `${type}-${i}`)
-                    i += 1
-                }
-                break
+                // // note Extraction
+                // let i = 0;
+                // for(const str of cmd.strArg){
+                //     addString(str, file, 'note', `${type}-${i}`)
+                //     i += 1
+                // }
+                // break
             }
             default:{
                 if(cmd.strArg.length > 0){
@@ -67,6 +76,14 @@ export function extractEvent(cmds:Commands[], file:string){
                         for(let i=0;i<cmd.strArg.length;i++){
                             console.log(`${i} : ${decodeEncoding(cmd.strArg[i].str)}`)
                         }
+                    }
+                    if(conf.extAll){
+                        let i = 0;
+                        for(const str of cmd.strArg){
+                            addString(str, file, 'external', `${type}-${i}`)
+                            i += 1
+                        }
+                        break
                     }
                 }
             }

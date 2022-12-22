@@ -2,7 +2,7 @@ import fs from 'fs';
 import * as  ExtTool from './extract.js';
 import path from 'path';
 import * as edTool from './edtool.js';
-const tools = require('./libs/projectTools').default;
+import tools from '../libs/projectTools'
 import yaml from 'js-yaml';
 
 function sleep(ms) {
