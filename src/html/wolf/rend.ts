@@ -27,6 +27,21 @@
         }
     })
 
+    ipcRenderer.on('alertExten', async (ev, arg) => {
+        const {isDenied} = await Swal.fire({
+            icon: 'success',
+            showDenyButton: true,
+            denyButtonText: "아니요",
+            title: arg[0],
+        })
+        if(!isDenied){
+            ipcRenderer.send("getextention", arg[1])
+        }
+        else{
+            ipcRenderer.send("getextention", 'none')
+        }
+    })
+
     let config:{[key:string]:boolean} = {}
     let LastTime = -1
 
@@ -104,6 +119,13 @@
             document.getElementById('marTrans').setAttribute('selected', '')
             document.getElementById('marCont').style.display = 'flex'
             document.getElementById('handCont').style.display = 'none'
+            if(globalSettings.HideExtractAll){
+                document.getElementById('ext-all').style.display = 'none'
+            }
+            else{
+                document.getElementById('ext-all').style.display = 'block'
+
+            }
 
         }
         document.getElementById('handTrans').onclick = () => {
@@ -171,6 +193,10 @@
             })
         }
     });
+
+    ipcRenderer.on('loadingTag', (evn, tt) => {
+        loadingTag = tt
+    })
 
     ipcRenderer.on('loading', (evn, tt) => {
         document.getElementById('border_r').style.width = `${tt}vw`
@@ -347,5 +373,17 @@
     ipcRenderer.on('worked', () => {
         running = false
     })
+
+    document.getElementById('settings').onclick = () => {
+        if(running){
+            Swal.fire({
+                icon: 'error',
+                text: '이미 다른 작업이 시행중입니다!',
+            })
+            return
+        }
+        ipcRenderer.send('settings')
+        running = true
+    }
     
 })()

@@ -98,6 +98,14 @@ body {
   cursor: pointer;
 }
 
+.box2 {
+  background-color: var(--Highlight3);
+  border-radius: 3px;
+  padding: 5px;
+  cursor: pointer;
+  font-size: smaller;
+}
+
 .smalmar {
   position: absolute;
   top: 515px;
@@ -170,5 +178,18 @@ body {
 
 .updateInfo {
   font-size: 12px;
+}
+
+.flags {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  gap: 5px;
 }
 /*# sourceMappingURL=back.css.map */

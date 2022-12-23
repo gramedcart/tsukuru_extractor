@@ -23,6 +23,8 @@ import Themes from './src/js/rpgmv/styles'
 import sendUpdateInfo from './main_update'
 import { wolfInit } from './src/js/wolf/main.js';
 import { initFontIPC } from './src/js/rpgmv/fonts';
+import { papagoTrans } from './src/js/libs/papagotrans';
+import { initExtentions } from './src/js/libs/extentions';
 
 
 function ErrorAlert(msg){
@@ -53,7 +55,14 @@ async function loadSettings(){
   storage.set('settings', JSON.stringify(globalThis.settings))
 }
 
-let mainWindow
+let mainWindow:Electron.BrowserWindow
+
+ipcMain.on('changeLang', (ev, arg) => {
+  globalThis.settings.language = arg
+  storage.set('settings', JSON.stringify(globalThis.settings))
+  globalThis.mwindow.reload()
+})
+
 
 function createWindow() {
   loadSettings()
@@ -115,6 +124,9 @@ function createWindow() {
   });
   mainid = mainWindow.id;
   globalThis.mwindow = mainWindow
+  mainWindow.on('close', () => {
+    app.quit()
+  })
   tools.init()
   // Open the DevTools.
 }
@@ -141,6 +153,7 @@ function sendError(txt){
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow()
+  initExtentions()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -273,6 +286,9 @@ ipcMain.on('select_folder', async (ev, typeo) => {
       else if(fs.existsSync(path.join(qs, 'data'))){
         getMainWindow().webContents.send('set_path', {type:typeo, dir:path.join(qs, 'data')});
       }
+      else if(fs.existsSync(path.join(qs, 'Data.wolf'))){
+        getMainWindow().webContents.send('set_path', {type:typeo, dir:path.join(qs)});
+      }
       else{
         getMainWindow().webContents.send('alert', {icon: 'error',  message:'폴더가 올바르지 않습니다'});
       }
@@ -330,7 +346,7 @@ async function extractor(arg){
         let hail2 = fs.readFileSync(jsdir + '/plugins.js', 'utf-8')
         let hail = hail2.split('$plugins =')
         hail2 = hail[hail.length - 1] + '  '
-        hail2 = hail2.substring(hail.indexOf('['), hail.lastIndexOf(']') + 1)
+        hail2 = hail2.substring(hail2.indexOf('['), hail2.lastIndexOf(']') + 1)
         fs.writeFileSync(dir + '/ext_plugins.json', JSON.stringify(JSON.parse(hail2)), 'utf-8')
       }
     }

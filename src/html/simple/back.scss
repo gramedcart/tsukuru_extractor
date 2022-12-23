@@ -81,6 +81,14 @@ body{
     cursor: pointer;
 }
 
+.box2{
+    background-color: var(--Highlight3);
+    border-radius: 3px;
+    padding: 5px;
+    cursor: pointer;
+    font-size: smaller;
+}
+
 .smalmar{
     position: absolute;
     top: 515px;
@@ -157,4 +165,13 @@ body{
 
 .updateInfo{
     font-size: 12px;
+}
+
+.flags{
+    display: flex;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    justify-content: flex-start;
+    gap: 5px
 }

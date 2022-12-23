@@ -4,12 +4,14 @@ import { extractEvent } from './ext_events.js'
 import { wolfExtractCommon, wolfExtractMap } from '../parser/Map.js';
 import { getAllFileInDir } from '../../../utils.js';
 import { sleep } from '../../rpgmv/globalutils.js';
+import { wolfDecrypt } from './decrypter.js';
 
 function setProgressBar(now:number, max:number, multipl=10){
     globalThis.mwindow.webContents.send('loading', (now/max) * multipl);
 }
 
 export async function extractWolfFolder(DataDir:string, conf:{[key:string]:boolean}){
+
     const maps = (getAllFileInDir(DataDir, '.mps'))
     const commonEvent = (path.join(DataDir, 'BasicData','CommonEvent.dat'))
     globalThis.WolfCache = {}
@@ -27,6 +29,7 @@ export async function extractWolfFolder(DataDir:string, conf:{[key:string]:boole
             }
         } catch (error) {
             console.log(`failed on ${map}`)
+            console.log(error)
         }
 
         await sleep(1)
@@ -40,10 +43,9 @@ export async function extractWolfFolder(DataDir:string, conf:{[key:string]:boole
             const c = wolfExtractCommon(fs.readFileSync(commonEvent))
             extractEvent(c, commonEvent, conf, {commonevent:true})   
         } catch (error) {
-            console.log(error)
             console.log(`failed on ${commonEvent}`)
         }
-    }
+    }   
     setProgressBar(1,1)
     console.log('extract done')
 }

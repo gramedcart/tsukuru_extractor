@@ -49,6 +49,7 @@
     "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
     "open": "^8.4.0",
+    "os-locale": "^6.0.2",
     "request": "^2.88.2",
     "sha3": "^2.1.4",
     "tcp-port-used": "^1.0.2"

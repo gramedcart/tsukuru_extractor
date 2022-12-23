@@ -433,6 +433,21 @@
         }
     }
     
+    ipcRenderer.on('alertExten', async (ev, arg) => {
+        const {isDenied} = await Swal.fire({
+            icon: 'success',
+            showDenyButton: true,
+            denyButtonText: "아니요",
+            title: arg[0],
+        })
+        if(!isDenied){
+            ipcRenderer.send("getextention", arg[1])
+        }
+        else{
+            ipcRenderer.send("getextention", 'none')
+        }
+    })
+
     document.getElementById('autoline').onclick = () => {config.autoline = !config.autoline;_reload();}
     document.getElementById('instantapply').onclick = () => {config.instantapply = !config.instantapply;_reload();}
     

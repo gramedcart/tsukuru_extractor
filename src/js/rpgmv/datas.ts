@@ -1,3 +1,4 @@
+
 const styles = require('./styles').default
 
 export const settings = {
@@ -24,7 +25,8 @@ export const settings = {
     extractPlus: [],
     themeList: Object.keys(styles),
     hideUnrecomenedTranslators: true,
-    language: 'en'
+    language: 'en',
+    HideExtractAll: true
 }
 
 export const onebyone = {

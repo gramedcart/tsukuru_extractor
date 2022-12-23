@@ -2,7 +2,7 @@ import request from "request"
 
 export function kakaoTrans(text:string, queryLanguage:string) {
     const bodyObj = {
-        queryLanguage: 'en',
+        queryLanguage: queryLanguage,
         resultLanguage: 'kr',
         q: (text)
     }

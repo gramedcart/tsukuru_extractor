@@ -10,6 +10,11 @@ export declare global {
     var WolfExtData: extData[]
     var WolfEncoding:'utf8'|'shift-jis'
     var WolfCache: {[key:string]:Buffer}
+    var WolfMetadata: wolfMetadata
+}
+
+interface wolfMetadata{
+    ver:number
 }
 
 interface extData{
