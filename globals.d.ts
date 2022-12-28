@@ -14,7 +14,7 @@ export declare global {
 }
 
 interface wolfMetadata{
-    ver:number
+    ver:2|3|-1
 }
 
 interface extData{

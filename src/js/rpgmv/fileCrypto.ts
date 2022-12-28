@@ -1,10 +1,9 @@
 "use strict";
 
-import path from 'path';
+import path, { dirname } from 'path';
 import fs, { readdirSync } from 'fs';
 import * as rpgencrypt from "../libs/rpgencrypt";
 import yaml from 'js-yaml';
-import Glob from 'glob'
 import fsx from 'fs-extra'
 
 function reader(dir:string){
@@ -97,6 +96,8 @@ export async function EncryptDir (DataDir:string, type:string, instantapply:bool
     }
     const files = getFilesRecursively(ExtractImgDir)
     console.log(ExtractImgDir)
+    const wwwDir = (dirname(dirname(dirname(CompleteDir))))
+    let MVMode = (wwwDir.endsWith('www\\') || wwwDir.endsWith('www/') || wwwDir.endsWith('www'))
 
     for(let i=0;i<files.length;i++){
         globalThis.mwindow.webContents.send('loadingTag', `${type} 암호화 중 : `);
@@ -108,9 +109,8 @@ export async function EncryptDir (DataDir:string, type:string, instantapply:bool
         }
         try{
             const pat =path.join(CompleteDir , tlan)
-            console.log(loc)
             fsx.mkdirsSync(pat)
-            rpgencrypt.Encrypt(loc, pat, Key)
+            rpgencrypt.Encrypt(loc, pat, Key, MVMode)
         }catch{}
         await sleep(1)
     }

@@ -75,13 +75,18 @@ export function wolfExtractCommon(data:Buffer){
     const eventsLen = io.readU4le();
     let events:WolfCmd[] = [];
     for (let i = 0; i < eventsLen; i++) {
-        const ev = io.readCEvent()
-        if(ev){
-            for(const e of ev.events){
-                events.push(e)
+        try {
+            const ev = io.readCEvent()
+            if(ev){
+                for(const e of ev.events){
+                    events.push(e)
+                }
             }
-        }
-        else{
+            else{
+                break
+            }   
+        } catch (error) {
+            console.log(error)
             break
         }
     }

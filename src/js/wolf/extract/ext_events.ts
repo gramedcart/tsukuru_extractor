@@ -27,7 +27,7 @@ function addString(str:lenStr, sourceFile:string, targetFile:string, codeStr:str
     })
 }
 
-const untranslates = [140, 112, 300, 212, 250, 122, 150]
+const untranslates = [140, 112, 300, 212, 250, 122, 150, 210, 213]
 
 export function extractEvent(cmds:Commands[], file:string, conf:{[key:string]:boolean}, conf2:{[key:string]:boolean} = {}){
     for(const cmd of cmds){
@@ -35,6 +35,8 @@ export function extractEvent(cmds:Commands[], file:string, conf:{[key:string]:bo
         switch (type){
             case 101:
             case 102:
+            case 106:
+            case 105:
             case 103:{
                 let i = 0;
                 for(const str of cmd.strArg){
@@ -59,15 +61,6 @@ export function extractEvent(cmds:Commands[], file:string, conf:{[key:string]:bo
                     }
                     break
                 }
-            }
-            case 300:{
-                // // note Extraction
-                // let i = 0;
-                // for(const str of cmd.strArg){
-                //     addString(str, file, 'note', `${type}-${i}`)
-                //     i += 1
-                // }
-                // break
             }
             default:{
                 if(cmd.strArg.length > 0){

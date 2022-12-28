@@ -6,12 +6,14 @@ const WolfExtDataParser = {
     create: (dir:string)=>{
         writeFileSync(dir,zlib.deflateSync(Buffer.from(encode({
             ext: globalThis.WolfExtData,
-            cache: globalThis.WolfCache
+            cache: globalThis.WolfCache,
+            meta: globalThis.WolfMetadata
         }))))
     },
     read:(dir:string) =>{
         const ca =  decode(zlib.inflateSync(readFileSync(dir))) as any
         globalThis.WolfExtData = ca.ext
+        globalThis.WolfMetadata = ca.meta
         globalThis.WolfCache = ca.cache
     }
 }

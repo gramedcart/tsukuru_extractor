@@ -3,17 +3,32 @@ import { lenStr } from "../../../../globals"
 export class WolfParserIo{
     data:Buffer
     pointer:number = 0
+    readonly byteLen:number
     constructor(data:Buffer){
         this.data = Buffer.from(data)
+        this.byteLen = data.byteLength
     }
     readBytes(bytes:number){
         const arr = this.data.subarray(this.pointer, this.pointer + bytes)
         this.pointer += bytes
         return arr
     }
+    byteCompare(equals:Uint8Array){
+        const byt = this.data.subarray(this.pointer, this.pointer + equals.length)
+        return byt.equals(equals)
+    }
     byteArrayCompare(data:Buffer, equals:number[]){
         const comp = Buffer.from(new Uint8Array(equals))
         return comp.equals(data)
+    }
+    findByteArray(equals:number[]){
+        const byt =  new Uint8Array(equals)
+        while(true){
+            if(this.byteCompare(byt)){
+                return this.pointer
+            }
+            this.pointer += 1
+        }
     }
     readU4le(){
         const bytes = 4
@@ -31,6 +46,10 @@ export class WolfParserIo{
         const pos1 = (this.pointer);
         const len = this.readU4le();
         const pos2 = (this.pointer);
+        if(len > (this.byteLen - this.pointer)){
+            throw 'Overflow Pointer Error'
+        }
+
         const str = this.readBytes(len);
         const pos3 = (this.pointer);
         return {
@@ -221,7 +240,7 @@ export class WolfParserIo{
         }
         const d = this.readU4le();
         if (!(d === 0)) {
-          return false
+            return false
             // throw `ValidationNotEqualError ${d} 3 `
         }
         const enabledNumArgNum = this.readU1();
@@ -232,7 +251,12 @@ export class WolfParserIo{
         for (let i = 0; i < len; i++) {
             const inst = this.readCInstruction()
             if(inst){
+              if(inst === 'trident'){
+                return {events:ins}
+              }
+              else{
                 ins.push(inst);
+              }
             }
         }
         const noteLen = this.readU4le();
@@ -242,7 +266,7 @@ export class WolfParserIo{
         }
         const check = this.readU1();
         if (!( ((check === 142) || (check === 143) || (check === 144)) )) {
-            throw `ValidationNotEqualError ${check}`
+            console.log(`ValidationNotEqualError ${check}`)
         }
         if (check !== 142) {
           const hmm = this.readHmm()
@@ -251,6 +275,7 @@ export class WolfParserIo{
     }
 
     readCInstruction(){
+        let monitor = true
         const u8ArgLen = this.readU1();
         let u8Arg:number[] = [];
         for (let i = 0; i < u8ArgLen; i++) {
@@ -260,7 +285,11 @@ export class WolfParserIo{
         const strArgLen = this.readU1();
         let strArg:lenStr[] = [];
         for (let i = 0; i < strArgLen; i++) {
-          strArg.push(this.readLenStr());
+          const st = this.readLenStr()
+          strArg.push(st);
+          if(st.str[st.len-1] !== 0){
+            return 'trident'
+          }
         }
         const l4 = this.readU1();
         if (l4 >= 1) {

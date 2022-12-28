@@ -1,4 +1,4 @@
-import fs from "fs"
+import fs, { existsSync } from "fs"
 import path from "path"
 
 
@@ -34,7 +34,7 @@ function VerifyFakeHeader(filePath:string){
 }
 
 
-export async function Encrypt(filePath:string, saveDir:string, key:string){
+export async function Encrypt(filePath:string, saveDir:string, key:string, MVMode=true){
     if(!fs.existsSync(filePath)){
         throw "file dosen't exist"
     }
@@ -50,9 +50,15 @@ export async function Encrypt(filePath:string, saveDir:string, key:string){
     {
         file[index] = (file[index] ^ hexToByte(keys[index]));
     }
-    const encryptedExt = EncryptedExtensions[DecryptedExtensions.indexOf(extension)]
+    const encryptedExtMV = EncryptedExtensions[DecryptedExtensions.indexOf(extension)]
+    const encryptedExt = MVMode ? encryptedExtMV : EncryptedExtensions[DecryptedExtensions.lastIndexOf(extension)]
     const fileData = Buffer.concat([header, file], header.length + file.length)
     await fs.promises.writeFile(path.join(saveDir, `${path.parse(filePath).name}${encryptedExt}`), fileData)
+    if(!MVMode){
+        if(existsSync(path.join(saveDir, `${path.parse(filePath).name}${encryptedExtMV}`))){
+            await fs.promises.writeFile(path.join(saveDir, `${path.parse(filePath).name}${encryptedExtMV}`), fileData)
+        }
+    }
 }
 
 export async function Decrypt(filePath:string, saveDir:string, key:string){
